@@ -1,0 +1,25 @@
+{
+  "shop": {
+    "name": "Malika iStore",
+    "tagline": "Yunusobod Malika bozori • B-blok 24-do'kon",
+    "description": "Original Apple & Samsung gadjetlari, noutbuklar va eng so'nggi aksessuarlar. Toshkent bo'ylab 2 soatda tezkor yetkazib berish!",
+    "phone": "+998 90 123 45 67",
+    "address": "Toshkent sh., Yunusobod t., Malika savdo majmuasi, B-blok 24-do'kon",
+    "instagram": "https://instagram.com/malika_istore",
+    "telegramChannel": "https://t.me/malika_istore",
+    "currency": "UZS",
+    "workingHours": "10:00 - 20:00 (Dam olish kunisiz)",
+    "adminPin": "1234"
+  },
+  "telegram": {
+    "botToken": "",
+    "chatId": "",
+    "enabled": false
+  },
+  "ai": {
+    "provider": "gemini",
+    "apiKey": "",
+    "systemPrompt": "Siz 'Malika iStore' do'konining professional, samimiy va xushmuomala virtual sotuvchi-maslahatchisisiz. Sizning vazifangiz - xaridorlarga do'kondagi tovarlar haqida to'liq ma'lumot berish, ularning ehtiyojiga mos gadjet tanlashda yordam berish va ularni xarid qilishga (savatchaga qo'shish yoki buyurtma berishga) yo'naltirish. Faqat do'konda bor tovarlar va ularning haqiqiy narxlarini ayting. O'zbek va Rus tillarida xushmuomala javob bering.",
+    "welcomeMessage": "Assalomu alaykum! Men Malika iStore virtual maslahatchisiman 🤖 Qanday gadjet yoki telefon qidiryapsiz? Sizga qaysi narx oralig'ida tanlashda yordam beray?"
+  }
+}

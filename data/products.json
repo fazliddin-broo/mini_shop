@@ -1,0 +1,172 @@
+[
+  {
+    "id": "prod-1",
+    "name": "Apple iPhone 16 Pro Max",
+    "category": "Smartfonlar",
+    "brand": "Apple",
+    "price": 17800000,
+    "oldPrice": 18900000,
+    "priceUsd": 1390,
+    "image": "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80",
+    "description": "Eng so'nggi flagman: A18 Pro chip, 48MP Fusion kamera, Titandi korpus, Camera Control tugmasi va eng kuchli batareya.",
+    "specs": [
+      "Xotira: 256 GB",
+      "Rang: Desert Titanium / Natural Titanium",
+      "Ekran: 6.9\" Super Retina XDR OLED 120Hz",
+      "Kafolat: 1 yil to'liq rasmiy kafolat",
+      "Holati: Yangi (Original, Qutida, Plombada)"
+    ],
+    "stock": 12,
+    "featured": true,
+    "isNew": true,
+    "badge": "Xit Savdo"
+  },
+  {
+    "id": "prod-2",
+    "name": "Apple iPhone 15 Pro",
+    "category": "Smartfonlar",
+    "brand": "Apple",
+    "price": 13400000,
+    "oldPrice": 14200000,
+    "priceUsd": 1050,
+    "image": "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=800&q=80",
+    "description": "A17 Pro chip, yengil titan rom, USB-C 3.0 port va professional uch kamerali optik sistema.",
+    "specs": [
+      "Xotira: 128 GB",
+      "Rang: Natural Titanium / Blue Titanium",
+      "Ekran: 6.1\" ProMotion 120Hz",
+      "Kafolat: 1 yil kafolat",
+      "Holati: Yangi (Plomba)"
+    ],
+    "stock": 8,
+    "featured": true,
+    "isNew": false,
+    "badge": "Top Narx"
+  },
+  {
+    "id": "prod-3",
+    "name": "Samsung Galaxy S24 Ultra",
+    "category": "Smartfonlar",
+    "brand": "Samsung",
+    "price": 14900000,
+    "oldPrice": 16000000,
+    "priceUsd": 1160,
+    "image": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=800&q=80",
+    "description": "Galaxy AI sun'iy intellekti, 200MP kamera, o'rnatilgan S-Pen qalami va yassi Titan ekrani.",
+    "specs": [
+      "Xotira: 12/256 GB",
+      "Rang: Titanium Gray / Titanium Black",
+      "Ekran: 6.8\" Dynamic AMOLED 2X, 2600 nit",
+      "Kafolat: 1 yil servis kafolati",
+      "Holati: Yangi (Muhrlangan)"
+    ],
+    "stock": 2,
+    "featured": true,
+    "isNew": true,
+    "badge": "Galaxy AI"
+  },
+  {
+    "id": "prod-4",
+    "name": "Apple MacBook Air 13\" M3",
+    "category": "Noutbuklar",
+    "brand": "Apple",
+    "price": 14200000,
+    "oldPrice": 15000000,
+    "priceUsd": 1110,
+    "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80",
+    "description": "Super yupqa dizayn, M3 kuchli protsessor, 18 soatgacha batareya quvvati. Dasturchilar va talabalar uchun ideal.",
+    "specs": [
+      "Protsessor: Apple M3 8-core CPU / 8-core GPU",
+      "Xotira: 8 GB Unified Memory / 256 GB SSD",
+      "Rang: Midnight / Space Gray / Starlight",
+      "Og'irligi: atigi 1.24 kg",
+      "Kafolat: 1 yil Apple xalqaro kafolati"
+    ],
+    "stock": 6,
+    "featured": true,
+    "isNew": true,
+    "badge": "Eng Yaxshi Tanlov"
+  },
+  {
+    "id": "prod-5",
+    "name": "Apple AirPods Pro 2 (USB-C)",
+    "category": "Aksessuarlar",
+    "brand": "Apple",
+    "price": 2750000,
+    "oldPrice": 3100000,
+    "priceUsd": 215,
+    "image": "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=800&q=80",
+    "description": "2 barobar kuchliroq shovqinni so'ndirish (Active Noise Cancellation), Shaffoflik rejimi, Type-C zaryadlash qutisi.",
+    "specs": [
+      "Model: MagSafe Case (USB-C) 2024",
+      "Batareya: 30 soatgacha g'ilof bilan",
+      "Himoya: IP54 chang va suvdan himoya",
+      "Holati: 100% Original, tekshirib olish imkoni"
+    ],
+    "stock": 20,
+    "featured": false,
+    "isNew": false,
+    "badge": "-11% Chegirma"
+  },
+  {
+    "id": "prod-6",
+    "name": "Apple Watch Series 10 (46mm)",
+    "category": "Soatlar",
+    "brand": "Apple",
+    "price": 5400000,
+    "oldPrice": 5800000,
+    "priceUsd": 420,
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80",
+    "description": "Eng yupqa korpus, kattaroq va yorqinroq OLED displey, tezkor quvvatlash va salomatlik datchiklari.",
+    "specs": [
+      "O'lcham: 46mm Alyuminiy",
+      "Rang: Jet Black / Rose Gold / Silver",
+      "Suvga chidamlilik: 50 metrgacha",
+      "Kafolat: 1 yil kafolat"
+    ],
+    "stock": 9,
+    "featured": false,
+    "isNew": true,
+    "badge": "Yangi Model"
+  },
+  {
+    "id": "prod-7",
+    "name": "Apple 20W USB-C Tezkor Zaryadnik",
+    "category": "Aksessuarlar",
+    "brand": "Apple",
+    "price": 240000,
+    "oldPrice": 290000,
+    "priceUsd": 19,
+    "image": "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80",
+    "description": "Original Apple 20W quvvatlash bloki. iPhone batareyasini 30 daqiqada 50% gacha to'ldiradi.",
+    "specs": [
+      "Quvvat: 20W Power Delivery",
+      "Port: USB Type-C",
+      "Holati: Original qutida, seriya raqami tekshiriladi"
+    ],
+    "stock": 45,
+    "featured": false,
+    "isNew": false,
+    "badge": "Original"
+  },
+  {
+    "id": "prod-8",
+    "name": "MagSafe Transparent Case (iPhone 16 / 15 Pro)",
+    "category": "Aksessuarlar",
+    "brand": "Apple",
+    "price": 150000,
+    "oldPrice": 200000,
+    "priceUsd": 12,
+    "image": "https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=800&q=80",
+    "description": "Sarg'aymaydigan shaffof MagSafe chexol. Kuchli magnit halqa bilan jihozlangan.",
+    "specs": [
+      "Material: Zarba o'tkazmaydigan polikarbonat",
+      "Moslik: iPhone 16 Pro / Pro Max / 15 Pro",
+      "Magnit: MagSafe aksessuarlariga mos"
+    ],
+    "stock": 35,
+    "featured": false,
+    "isNew": false,
+    "badge": "Aksiya"
+  }
+]

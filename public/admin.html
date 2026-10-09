@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Boshqaruv Paneli — Malika iStore Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+  <!-- 1. PIN Lock Screen -->
+  <div class="pin-screen" id="pin-screen">
+    <div class="pin-card">
+      <div class="pin-icon-box">🔐</div>
+      <h2 class="pin-title">Boshqaruv Paneliga Kirish</h2>
+      <p class="pin-subtitle">Do‘kon ma’lumotlarini boshqarish uchun PIN-kodni kiriting</p>
+      
+      <form id="pin-form" class="pin-form">
+        <div class="pin-input-wrap">
+          <input type="password" id="pin-input" maxlength="8" placeholder="••••" autocomplete="off" autofocus>
+        </div>
+        <p class="pin-error hidden" id="pin-error">PIN-kod noto‘g‘ri! Qayta urinib ko‘ring.</p>
+        <button type="submit" class="btn btn-primary btn-block">Kirish</button>
+        <p class="pin-hint">Standart PIN-kod: <strong>1234</strong></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Main Admin Dashboard -->
+  <div class="admin-layout hidden" id="admin-layout">
+    
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-badge">⚡</div>
+        <div class="brand-text">
+          <h3 id="sidebar-shop-name">Malika iStore</h3>
+          <span>Admin Panel</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-tab="tab-products">
+          <span class="nav-icon">📦</span>
+          <span>Mahsulotlar</span>
+          <span class="nav-badge" id="nav-products-count">0</span>
+        </button>
+        <button class="nav-item" data-tab="tab-orders">
+          <span class="nav-icon">🛍️</span>
+          <span>Buyurtmalar</span>
+          <span class="nav-badge alert" id="nav-orders-count">0</span>
+        </button>
+        <button class="nav-item" data-tab="tab-settings">
+          <span class="nav-icon">⚙️</span>
+          <span>Sozlamalar & Bot</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" target="_blank" class="sidebar-view-shop">
+          <span>🌐</span> Saytni ko'rish
+        </a>
+        <button class="sidebar-logout-btn" id="logout-btn">
+          <span>🚪</span> Chiqish
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      
+      <!-- Top Bar -->
+      <header class="admin-topbar">
+        <div class="topbar-title-wrap">
+          <h2 class="topbar-title" id="page-title">Mahsulotlar Katalogi</h2>
+          <span class="topbar-subtitle">Do‘kondagi tovarlarni boshqarish</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" id="btn-open-add-product">
+            <span>➕</span> Yangi Mahsulot Qo'shish
+          </button>
+        </div>
+      </header>
+
+      <!-- KPI Summary Cards -->
+      <section class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Jami Mahsulotlar</span>
+            <span class="kpi-icon">📦</span>
+          </div>
+          <div class="kpi-value" id="kpi-total-products">0</div>
+          <div class="kpi-sub">Sotuvda mavjud modellar</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Yangi Buyurtmalar</span>
+            <span class="kpi-icon">🛍️</span>
+          </div>
+          <div class="kpi-value highlight" id="kpi-total-orders">0</div>
+          <div class="kpi-sub" id="kpi-orders-sub">Oxirgi qabul qilingan</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span class="kpi-label">Telegram Boti</span>
+            <span class="kpi-icon">🤖</span>
+          </div>
+          <div class="kpi-value" id="kpi-bot-status">Ulanmagan</div>
+          <div class="kpi-sub" id="kpi-bot-sub">Xabarnomalar holati</div>
+        </div>
+      </section>
+
+      <!-- TAB 1: Mahsulotlar -->
+      <section class="tab-pane active" id="tab-products">
+        <div class="table-container">
+          <div class="table-toolbar">
+            <input type="text" id="admin-search-products" placeholder="Katalogdan qidirish..." class="admin-search-input">
+            <select id="admin-filter-category" class="admin-filter-select">
+              <option value="all">Barcha toifalar</option>
+              <option value="Smartfonlar">Smartfonlar</option>
+              <option value="Noutbuklar">Noutbuklar</option>
+              <option value="Aksessuarlar">Aksessuarlar</option>
+              <option value="Soatlar">Soatlar</option>
+            </select>
+          </div>
+
+          <div class="products-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Rasm</th>
+                  <th>Nomi va Toifa</th>
+                  <th>Narxi</th>
+                  <th>Qoldiq</th>
+                  <th>Belgi / Badge</th>
+                  <th style="text-align: right;">Harakatlar</th>
+                </tr>
+              </thead>
+              <tbody id="admin-products-tbody">
+                <!-- Products injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: Buyurtmalar -->
+      <section class="tab-pane hidden" id="tab-orders">
+        <div class="table-container">
+          <div class="table-toolbar">
+            <h3 style="font-size: 1.1rem; color: #fff;">Kelib Tushgan Buyurtmalar Ro'yxati</h3>
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-orders">🔄 Yangilash</button>
+          </div>
+
+          <div class="orders-list-grid" id="admin-orders-container">
+            <!-- Orders injected via JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: Sozlamalar & Telegram & AI -->
+      <section class="tab-pane hidden" id="tab-settings">
+        <div class="settings-grid">
+          
+          <!-- Shop Info Card -->
+          <div class="settings-card">
+            <div class="card-title-row">
+              <span class="card-icon">🏪</span>
+              <h3>Do'kon Ma'lumotlari</h3>
+            </div>
+            <form id="form-shop-settings" class="settings-form">
+              <div class="form-row">
+                <label>Do'kon Nomi</label>
+                <input type="text" id="set-shop-name" required>
+              </div>
+              <div class="form-row">
+                <label>Tagline (Qisqa tavsif)</label>
+                <input type="text" id="set-shop-tagline">
+              </div>
+              <div class="form-row">
+                <label>Telefon raqam</label>
+                <input type="text" id="set-shop-phone" required>
+              </div>
+              <div class="form-row">
+                <label>Manzil (Malika filiali)</label>
+                <input type="text" id="set-shop-address" required>
+              </div>
+              <div class="form-row">
+                <label>Ish vaqti</label>
+                <input type="text" id="set-shop-hours">
+              </div>
+              <div class="form-row">
+                <label>Instagram havola</label>
+                <input type="text" id="set-shop-instagram" placeholder="https://instagram.com/...">
+              </div>
+              <div class="form-row">
+                <label>Telegram kanal/profil havola</label>
+                <input type="text" id="set-shop-telegram" placeholder="https://t.me/...">
+              </div>
+              <div class="form-row">
+                <label>Admin PIN-kodi (Kirish uchun)</label>
+                <input type="text" id="set-shop-pin" maxlength="8" required>
+              </div>
+              <button type="submit" class="btn btn-primary">Saqlash</button>
+            </form>
+          </div>
+
+          <!-- Telegram Bot Integration Card -->
+          <div class="settings-card highlight-card">
+            <div class="card-title-row">
+              <span class="card-icon">🤖</span>
+              <h3>Telegram Bot Bildirishnomalari</h3>
+            </div>
+            <p class="card-desc">Xaridor saytda buyurtma tugmasini bosishi bilanoq, to'liq ma'lumotlar sotuvchining telegramiga keladi.</p>
+
+            <form id="form-telegram-settings" class="settings-form">
+              <div class="form-row">
+                <label>Telegram Bot Token</label>
+                <input type="text" id="set-tg-token" placeholder="Masalan: 7123456789:AAHk... (@BotFather dan olingan)">
+                <small class="field-help">Telegramda @BotFather ga kirib /newbot orqali 1 daqiqada olinadi</small>
+              </div>
+              <div class="form-row">
+                <label>Sotuvchi Chat ID yoki Guruh ID</label>
+                <input type="text" id="set-tg-chatid" placeholder="Masalan: 123456789 yoki -100123456789">
+                <small class="field-help">Telegramda @userinfobot orqali o'z ID raqamingizni bilib olasiz</small>
+              </div>
+              
+              <div class="form-actions-split">
+                <button type="submit" class="btn btn-primary">Botni Saqlash</button>
+                <button type="button" class="btn btn-accent" id="btn-test-telegram">🚀 Sinov Xabarini Yuborish</button>
+              </div>
+              <div id="test-tg-result" class="test-result-box hidden"></div>
+            </form>
+          </div>
+
+          <!-- AI Assistant Settings -->
+          <div class="settings-card">
+            <div class="card-title-row">
+              <span class="card-icon">🧠</span>
+              <h3>AI Savdo Maslahatchisi Sozlamalari</h3>
+            </div>
+            <p class="card-desc">Saytdagi virtual AI xaridorlarga tovarlar, narxlar va yetkazib berish bo'yicha maslahat beradi.</p>
+
+            <form id="form-ai-settings" class="settings-form">
+              <div class="form-row">
+                <label>Gemini API Key (Ixtiyoriy)</label>
+                <input type="password" id="set-ai-apikey" placeholder="AIzaSy...">
+                <small class="field-help">Agar kiritilmasa, o'rnatilgan aqlli mahalliy algoritm avtomatik ishlaydi</small>
+              </div>
+              <div class="form-row">
+                <label>AI Qutlov Xabari (Salomlashish)</label>
+                <input type="text" id="set-ai-welcome">
+              </div>
+              <div class="form-row">
+                <label>AI Tizim Qoidalari (System Prompt)</label>
+                <textarea id="set-ai-prompt" rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">AI Sozlamalarini Saqlash</button>
+            </form>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Product Modal (Add / Edit) -->
+  <div class="modal-backdrop hidden" id="product-crud-modal">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="close-crud-modal">&times;</button>
+      <h3 class="crud-modal-title" id="crud-modal-title">Yangi Mahsulot Qo'shish</h3>
+
+      <form id="product-crud-form" class="crud-form">
+        <input type="hidden" id="crud-prod-id">
+
+        <div class="form-row">
+          <label>Mahsulot Nomi *</label>
+          <input type="text" id="crud-prod-name" placeholder="Masalan: Apple iPhone 16 Pro Max 256GB" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Kategoriya</label>
+            <select id="crud-prod-category" required>
+              <option value="Smartfonlar">Smartfonlar</option>
+              <option value="Noutbuklar">Noutbuklar</option>
+              <option value="Aksessuarlar">Aksessuarlar</option>
+              <option value="Soatlar">Soatlar</option>
+              <option value="Boshqa">Boshqa</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Brend</label>
+            <input type="text" id="crud-prod-brand" placeholder="Apple, Samsung...">
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-row">
+            <label>Narxi (so'mda) *</label>
+            <input type="number" id="crud-prod-price" placeholder="17800000" required>
+          </div>
+          <div class="form-row">
+            <label>Eski narxi (so'mda)</label>
+            <input type="number" id="crud-prod-old-price" placeholder="18900000">
+          </div>
+          <div class="form-row">
+            <label>USD taxminan ($)</label>
+            <input type="number" id="crud-prod-usd" placeholder="1390">
+          </div>
+        </div>
+
+        <!-- Image Upload or URL -->
+        <div class="form-row">
+          <label>Mahsulot Rasmi</label>
+          <div class="image-source-tabs">
+            <input type="file" id="crud-prod-file" accept="image/*" class="file-input">
+            <span style="color: #64748b; font-size: 0.8rem; text-align: center;">yoki rasm URL havolasi:</span>
+            <input type="url" id="crud-prod-url" placeholder="https://images.unsplash.com/...">
+          </div>
+          <div class="image-preview-wrap" id="image-preview-wrap">
+            <img id="image-preview" src="" alt="Ko'rish" class="hidden">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Tavsif (Qisqacha)</label>
+          <textarea id="crud-prod-desc" rows="2" placeholder="Xususiyatlari haqida qisqacha ma'lumot..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <label>Xususiyatlari (Specs - har bir qatorda 1 tadan)</label>
+          <textarea id="crud-prod-specs" rows="3" placeholder="Xotira: 256 GB&#10;Rang: Natural Titanium&#10;Kafolat: 1 yil"></textarea>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label>Zaxiradagi soni (Qoldiq)</label>
+            <input type="number" id="crud-prod-stock" value="10">
+          </div>
+          <div class="form-row">
+            <label>Belgi (Badge)</label>
+            <input type="text" id="crud-prod-badge" placeholder="Masalan: Xit Savdo, Yangi, -10%">
+          </div>
+        </div>
+
+        <div class="form-row checkbox-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="crud-prod-featured" checked>
+            <span>Bosh sahifada tavsiya qilingan sifatida ko'rsatilsin</span>
+          </label>
+        </div>
+
+        <div class="modal-form-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-crud">Bekor qilish</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-crud">Saqlash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
