@@ -572,6 +572,11 @@ dom.formShopSettings.addEventListener('submit', async (e) => {
       })
     });
     if (res.ok) {
+      const data = await res.json();
+      if (data.token) {
+        adminState.token = data.token;
+        localStorage.setItem('mini_shop_admin_token', data.token);
+      }
       alert('Do‘kon ma’lumotlari muvaffaqiyatli saqlandi!');
       loadSettings();
     }
@@ -709,6 +714,15 @@ function setupAdminEvents() {
 
   // Refresh orders button
   dom.btnRefreshOrders.addEventListener('click', loadOrders);
+
+  // Logout button
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('mini_shop_admin_token');
+      location.reload();
+    });
+  }
 
   // Expose global methods
   window.openEditProduct = openEditProduct;

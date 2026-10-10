@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -178,21 +178,14 @@ function formatSum(num) {
 // \u2500\u2500 Admin panel himoyasi \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 // admin.html faqat to'g'ri referer yoki admin token orqali ochiladi.
 // Agar birov to'g'ridan URL kiritsa va token bo'lmasa — 404 beradi.
-app.get('/admin.html', (req, res) => {
-  const token = req.headers['x-admin-token'] || req.query.t || '';
-  const settings = readJson(SETTINGS_FILE, {});
-  const correctPin = settings.shop?.adminPin || process.env.ADMIN_PIN || '1234';
-  const expectedToken = 'auth_' + Buffer.from(correctPin).toString('base64');
-  const referer = req.headers['referer'] || '';
-  const isLocalReferer = referer.includes(req.headers['host'] || '');
+// ── Maxfiy Admin Panel (/blackstore-6666) ──────────────────
+app.get('/blackstore-6666', (req, res) => {
+  res.sendFile(path.join(__dirname, 'private', 'admin.html'));
+});
 
-  // Allow: valid token in header, OR coming from same site (browser navigation)
-  if (token === expectedToken || isLocalReferer || !token) {
-    // Serve the file normally - PIN screen inside will handle auth
-    return res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-  }
-  // Blocked
-  return res.status(404).send('Not found');
+// Begonalar /admin yoki /admin.html deb kirsa — 404 (Sahifa topilmadi)
+app.get(['/admin', '/admin.html', '/administrator', '/wp-admin'], (req, res) => {
+  res.status(404).send('<!DOCTYPE html><html lang="uz"><head><meta charset="UTF-8"><title>404 Topilmadi</title><style>body{background:#0a0d14;color:#94a3b8;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;flex-direction:column}h1{color:#f8fafc;font-size:3rem;margin:0}p{margin-top:10px}</style></head><body><h1>404</h1><p>Kechirasiz, bunday sahifa mavjud emas.</p><a href="/" style="color:#06b6d4;margin-top:20px;text-decoration:none">Bosh sahifaga qaytish</a></body></html>');
 });
 
 
@@ -252,7 +245,9 @@ app.put('/api/admin/settings', verifyAdmin, (req, res) => {
     ai: { ...current.ai, ...req.body.ai }
   };
   writeJson(SETTINGS_FILE, updated);
-  res.json({ success: true, settings: updated });
+  // Generate new token based on possibly updated admin PIN
+  const newToken = 'auth_' + Buffer.from(updated.shop.adminPin || '').toString('base64');
+  res.json({ success: true, settings: updated, token: newToken });
 });
 
 // 4. Products API
@@ -527,20 +522,28 @@ app.post('/api/chat', async (req, res) => {
   const storeInfo = `Do'kon: ${settings.shop?.name || 'Malika iStore'}, Manzil: ${settings.shop?.address || 'Malika bozori'}, Ish vaqti: ${settings.shop?.workingHours || '10:00 - 20:00'}, Tel: ${settings.shop?.phone || '+998 90 123 45 67'}. Toshkent bo'ylab 2 soat ichida Yandex orqali yetkazib beriladi. Barcha qurilmalarga 1 yil rasmiy kafolat bor.`;
 
   // Check if real Gemini API key is configured
-  if (aiConfig.apiKey && aiConfig.apiKey.trim().length > 10) {
+  const activeApiKey = (aiConfig.apiKey && aiConfig.apiKey.trim().length > 10) 
+    ? aiConfig.apiKey.trim() 
+    : (process.env.GEMINI_API_KEY || '').trim();
+
+  if (activeApiKey) {
     try {
       const prompt = `${aiConfig.systemPrompt || 'Siz aqlli savdo yordamchisisiz.'}\n\n` +
         `DO'KON HAQIDA MA'LUMOT:\n${storeInfo}\n\n` +
-        `HOZIRDA SOTUVDA BOR TOVARLAR:\n${catalogContext}\n\n` +
+        `HOZIRDA SOTUVDA BOR TOVARLAR VA NARXLAR:\n${catalogContext}\n\n` +
         `QOIDALAR:\n` +
-        `- Faqat yuqoridagi tovarlar asosida samimiy, aniq va xushmuomala javob bering.\n` +
+        `- Siz 'Malika iStore' (yoki sozlamalardagi do'kon) professional savdo konsultantisiz.\n` +
+        `- Faqat do'konda mavjud bo'lgan tovarlar haqida aniq, samimiy va ishonchli javob bering.\n` +
         `- Agar xaridor narxini so'rasa, aniq so'mdagi narxini ayting.\n` +
-        `- Xaridorni savatchaga qo'shishga va saytdan buyurtma berishga undab, do'konimiz manzilini eslating.\n` +
-        `- O'zbek yoki rus tilida (mijoz qaysi tilda yozsa) javob bering.\n\n` +
-        `Xaridor xabari: "${message}"`;
+        `- Xaridorni savatchaga qo'shishga, saytdan buyurtma berishga yoki do'konga tashrif buyurishga yo'naltiring.\n` +
+        `- Toshkent bo'ylab 2 soat ichida yetkazib berish (dostavka) va 1 yil rasmiy kafolat borligini eslatib turing.\n` +
+        `- Javobingizni ixcham, qulay, do'stona va chiroyli emojilar bilan yozing.\n` +
+        `- Mijoz qaysi tilda (o'zbek yoki rus) murojaat qilsa, o'sha tilda javob bering.\n\n` +
+        `Xaridor savoli: "${message}"`;
 
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${aiConfig.apiKey}`;
-      const response = await fetch(geminiUrl, {
+      // Try gemini-2.5-flash first, then fallback to gemini-flash-latest if needed
+      let geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${activeApiKey}`;
+      let response = await fetch(geminiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -548,9 +551,23 @@ app.post('/api/chat', async (req, res) => {
         })
       });
 
-      const data = await response.json();
+      let data = await response.json();
+      if (!response.ok && data.error?.code === 404) {
+        geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${activeApiKey}`;
+        response = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
+        });
+        data = await response.json();
+      }
+
       if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
         return res.json({ reply: data.candidates[0].content.parts[0].text });
+      } else {
+        console.warn('Gemini response format issue:', data);
       }
     } catch (err) {
       console.error('Gemini API call failed, falling back to smart local assistant:', err.message);
@@ -614,7 +631,7 @@ app.listen(PORT, () => {
   console.log(`=========================================`);
   console.log(`🚀 Mini Shop tizimi ishga tushdi!`);
   console.log(`🌐 Mijoz vitrinasi:  http://localhost:${PORT}`);
-  console.log(`⚙️ Admin panel:     http://localhost:${PORT}/admin.html`);
+  console.log(`⚙️ Maxfiy Admin:    http://localhost:${PORT}/blackstore-6666`);
   console.log(`📁 Data papkasi:    ${DATA_DIR}`);
   console.log(`=========================================`);
 });
