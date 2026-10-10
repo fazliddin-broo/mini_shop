@@ -4,28 +4,28 @@
    ========================================= */
 
 :root {
-  --bg-primary: #0a0d14;
-  --bg-secondary: #111726;
-  --bg-card: #151d30;
-  --bg-glass: rgba(17, 24, 39, 0.85);
-  --border-glass: rgba(255, 255, 255, 0.09);
-  --border-focus: #38bdf8;
+  --bg-primary: #06080e;
+  --bg-secondary: #0d121f;
+  --bg-card: rgba(17, 24, 40, 0.75);
+  --bg-glass: rgba(11, 16, 28, 0.82);
+  --border-glass: rgba(255, 255, 255, 0.12);
+  --border-focus: #00f2fe;
   
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   
-  --accent-cyan: #06b6d4;
-  --accent-blue: #3b82f6;
-  --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%);
+  --accent-cyan: #00f2fe;
+  --accent-blue: #38bdf8;
+  --accent-gradient: linear-gradient(135deg, #00f2fe 0%, #38bdf8 50%, #8b5cf6 100%);
   
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
   
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
   --radius-full: 9999px;
   
   --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -50,7 +50,7 @@ body {
 .pin-screen {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, #131b2e 0%, #0a0d14 100%);
+  background: radial-gradient(circle at 50% 30%, #111933 0%, #06080e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -59,14 +59,17 @@ body {
 }
 
 .pin-card {
-  background: var(--bg-secondary);
+  background: rgba(13, 18, 32, 0.82);
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
   border: 1px solid var(--border-glass);
+  border-top: 1px solid rgba(255, 255, 255, 0.38);
   border-radius: var(--radius-lg);
-  padding: 36px 28px;
+  padding: 40px 32px;
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
   text-align: center;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.25);
 }
 
 .pin-icon-box {
