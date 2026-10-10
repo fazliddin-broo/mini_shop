@@ -70,6 +70,13 @@
 
       <!-- Action Buttons -->
       <div class="header-actions">
+        <!-- Language Switcher Capsule -->
+        <div class="lang-switch-capsule" id="lang-switch-capsule">
+          <button class="lang-btn active" data-lang="uz">UZ</button>
+          <button class="lang-btn" data-lang="ru">RU</button>
+          <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+
         <a id="instagram-link" href="https://instagram.com" target="_blank" class="social-btn instagram"
           title="Instagram sahifamiz">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -94,7 +101,7 @@
             </svg>
             <span class="cart-count-badge" id="cart-count">0</span>
           </span>
-          <span class="cart-label">Savatcha</span>
+          <span class="cart-label" id="cart-label-text">Savatcha</span>
         </button>
       </div>
     </div>
@@ -107,39 +114,39 @@
         <div class="hero-content">
           <div class="hero-chip">
             <span class="pulsing-dot"></span>
-            Yangi flagmanlar va eng qulay narxlar
+            <span id="hero-chip-text">Yangi flagmanlar va eng qulay narxlar</span>
           </div>
-          <h2 class="hero-headline">Malika Bozoridagi Original Gadjetlar</h2>
-          <p class="hero-subtext">100% Original Apple & Samsung texnikalari. Har bir xaridga 1 yil rasmiy kafolat va
+          <h2 class="hero-headline" id="hero-headline">Malika Bozoridagi Original Gadjetlar</h2>
+          <p class="hero-subtext" id="hero-subtext">100% Original Apple & Samsung texnikalari. Har bir xaridga 1 yil rasmiy kafolat va
             Toshkent bo‘ylab 2 soat ichida eshigingizgacha yetkazib berish!</p>
 
           <div class="hero-features-grid">
             <div class="feature-item">
               <div class="feature-icon">🛡️</div>
               <div class="feature-text">
-                <strong>1 Yil Kafolat</strong>
-                <span>Rasmiy servis kafolati</span>
+                <strong id="feat-1-title">1 Yil Kafolat</strong>
+                <span id="feat-1-sub">Rasmiy servis kafolati</span>
               </div>
             </div>
             <div class="feature-item">
               <div class="feature-icon">🚀</div>
               <div class="feature-text">
-                <strong>2 Soatda Yetkazish</strong>
-                <span>Yandex Taxi orqali Toshkentda</span>
+                <strong id="feat-2-title">2 Soatda Yetkazish</strong>
+                <span id="feat-2-sub">Yandex Taxi orqali Toshkentda</span>
               </div>
             </div>
             <div class="feature-item">
               <div class="feature-icon">💯</div>
               <div class="feature-text">
-                <strong>Original Plomba</strong>
-                <span>Zavod muhrlangan qutilar</span>
+                <strong id="feat-3-title">Original Plomba</strong>
+                <span id="feat-3-sub">Zavod muhrlangan qutilar</span>
               </div>
             </div>
             <div class="feature-item">
               <div class="feature-icon">🤖</div>
               <div class="feature-text">
-                <strong>AI Maslahatchi</strong>
-                <span>24/7 savollarga javob beradi</span>
+                <strong id="feat-4-title">AI Maslahatchi</strong>
+                <span id="feat-4-sub">24/7 savollarga javob beradi</span>
               </div>
             </div>
           </div>
@@ -153,19 +160,19 @@
     <div class="container">
       <div class="categories-bar" id="categories-bar">
         <button class="category-pill active" data-category="Barchasi">
-          <span>🔥</span> Barchasi
+          <span>🔥</span> <span class="cat-pill-text">Barchasi</span>
         </button>
         <button class="category-pill" data-category="Smartfonlar">
-          <span>📱</span> Smartfonlar
+          <span>📱</span> <span class="cat-pill-text">Smartfonlar</span>
         </button>
         <button class="category-pill" data-category="Noutbuklar">
-          <span>💻</span> Noutbuklar
+          <span>💻</span> <span class="cat-pill-text">Noutbuklar</span>
         </button>
         <button class="category-pill" data-category="Aksessuarlar">
-          <span>🎧</span> Aksessuarlar
+          <span>🎧</span> <span class="cat-pill-text">Aksessuarlar</span>
         </button>
         <button class="category-pill" data-category="Soatlar">
-          <span>⌚</span> Soatlar
+          <span>⌚</span> <span class="cat-pill-text">Soatlar</span>
         </button>
       </div>
     </div>
@@ -224,11 +231,11 @@
           </div>
           <p class="modal-description" id="modal-product-desc"></p>
           <div class="modal-specs-wrap">
-            <h4 class="specs-heading">Xususiyatlari:</h4>
+            <h4 class="specs-heading" id="modal-specs-heading">Xususiyatlari:</h4>
             <ul class="specs-list" id="modal-product-specs"></ul>
           </div>
           <div class="modal-guarantee-box">
-            <span>🛡️ <strong>1 Yillik Kafolat</strong> • 100% Original IMEI ro'yxatdan o'tgan</span>
+            <span id="modal-guarantee-text">🛡️ <strong>1 Yillik Kafolat</strong> • 100% Original IMEI ro'yxatdan o'tgan</span>
           </div>
           <div class="modal-actions-row">
             <button class="btn btn-primary btn-large btn-add-modal" id="modal-add-cart-btn">
@@ -237,10 +244,10 @@
                 <line x1="3" y1="6" x2="21" y2="6"></line>
                 <path d="M16 10a4 4 0 0 1-8 0"></path>
               </svg>
-              Savatchaga qo‘shish
+              <span id="modal-add-cart-text">Savatchaga qo‘shish</span>
             </button>
             <button class="btn btn-accent btn-large" id="modal-buy-now-btn">
-              ⚡ 1-Klikda Xarid
+              <span id="modal-buy-now-text">⚡ 1-Klikda Xarid</span>
             </button>
           </div>
         </div>
@@ -258,7 +265,7 @@
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <path d="M16 10a4 4 0 0 1-8 0"></path>
           </svg>
-          <h3>Sizning Savatchangiz</h3>
+          <h3 id="cart-drawer-title">Sizning Savatchangiz</h3>
         </div>
         <button class="drawer-close-btn" id="close-cart-btn">&times;</button>
       </div>
@@ -272,51 +279,51 @@
         <!-- Empty Cart -->
         <div class="cart-empty-state hidden" id="cart-empty-state">
           <div class="cart-empty-icon">🛒</div>
-          <h4>Savatchangiz bo‘sh</h4>
-          <p>Katalogdan o‘zingizga ma’qul gadjetni tanlang</p>
+          <h4 id="cart-empty-title">Savatchangiz bo‘sh</h4>
+          <p id="cart-empty-sub">Katalogdan o‘zingizga ma’qul gadjetni tanlang</p>
           <button class="btn btn-secondary" id="browse-btn">Xarid qilishni boshlash</button>
         </div>
 
         <!-- Checkout Form Section (when items exist) -->
         <div class="checkout-form-section" id="checkout-form-section">
-          <div class="checkout-section-title">Yetkazib berish ma'lumotlari</div>
+          <div class="checkout-section-title" id="checkout-section-title">Yetkazib berish ma'lumotlari</div>
 
           <!-- Delivery method toggle -->
           <div class="delivery-toggle-grid">
             <label class="delivery-option active" id="delivery-opt-yandex">
               <input type="radio" name="deliveryMethod" value="yandex" checked>
-              <span class="delivery-opt-title">🚕 Yandex Kuryer</span>
-              <span class="delivery-opt-desc">Toshkent bo'ylab 1-2 soatda</span>
+              <span class="delivery-opt-title" id="deliv-yandex-title">🚕 Yandex Kuryer</span>
+              <span class="delivery-opt-desc" id="deliv-yandex-desc">Toshkent bo'ylab 1-2 soatda</span>
             </label>
             <label class="delivery-option" id="delivery-opt-pickup">
               <input type="radio" name="deliveryMethod" value="pickup">
-              <span class="delivery-opt-title">🏪 O'zi olib ketish</span>
-              <span class="delivery-opt-desc">Malika bozori B-24</span>
+              <span class="delivery-opt-title" id="deliv-pickup-title">🏪 O'zi olib ketish</span>
+              <span class="delivery-opt-desc" id="deliv-pickup-desc">Malika bozori B-24</span>
             </label>
           </div>
 
           <!-- Inputs -->
           <div class="form-group">
-            <label for="order-name">Ismingiz *</label>
+            <label for="order-name" id="label-order-name">Ismingiz *</label>
             <input type="text" id="order-name" placeholder="Masalan: Sardor" required>
           </div>
 
           <div class="form-group">
-            <label for="order-phone">Telefon raqamingiz *</label>
+            <label for="order-phone" id="label-order-phone">Telefon raqamingiz *</label>
             <div class="phone-input-wrap">
               <span class="phone-prefix">+998</span>
               <input type="tel" id="order-phone" placeholder="90 123 45 67" maxlength="12" required>
             </div>
-            <small class="field-hint">Buyurtmani tasdiqlash uchun qo'ng'iroq qilamiz</small>
+            <small class="field-hint" id="field-hint-phone">Buyurtmani tasdiqlash uchun qo'ng'iroq qilamiz</small>
           </div>
 
           <div class="form-group" id="address-group">
-            <label for="order-address">Manzil yoki Mo'ljal *</label>
+            <label for="order-address" id="label-order-address">Manzil yoki Mo'ljal *</label>
             <input type="text" id="order-address" placeholder="Toshkent sh., Yunusobod 4, 12-uy">
           </div>
 
           <div class="form-group">
-            <label for="order-notes">Izoh (ixtiyoriy)</label>
+            <label for="order-notes" id="label-order-notes">Izoh (ixtiyoriy)</label>
             <input type="text" id="order-notes" placeholder="Rangi, qulay yetkazish vaqti...">
           </div>
         </div>
@@ -325,14 +332,14 @@
       <!-- Drawer Footer -->
       <div class="drawer-footer" id="cart-drawer-footer">
         <div class="cart-summary-row">
-          <span>Jami to'lov:</span>
+          <span id="cart-total-label">Jami to'lov:</span>
           <span class="cart-total-amount" id="cart-total-amount">0 so'm</span>
         </div>
         <button class="btn btn-primary btn-large btn-block" id="submit-order-btn">
-          <span class="btn-text">Buyurtma berish 🚀</span>
+          <span class="btn-text" id="submit-order-btn-text">Buyurtma berish 🚀</span>
           <span class="btn-spinner hidden"></span>
         </button>
-        <div class="cart-security-badge">
+        <div class="cart-security-badge" id="cart-security-badge">
           🔒 To'lov mahsulotni qabul qilib olgach naqd yoki Click/Payme orqali
         </div>
       </div>
@@ -343,11 +350,11 @@
   <div class="modal-backdrop hidden" id="order-success-modal">
     <div class="modal-card success-card">
       <div class="success-icon-wrap">🎉</div>
-      <h2 class="success-title">Buyurtmangiz qabul qilindi!</h2>
-      <p class="success-order-id">Buyurtma raqami: <strong id="success-order-code">#ORD-0000</strong></p>
+      <h2 class="success-title" id="success-title">Buyurtmangiz qabul qilindi!</h2>
+      <p class="success-order-id"><span id="success-order-label">Buyurtma raqami:</span> <strong id="success-order-code">#ORD-0000</strong></p>
       <div class="success-info-box">
-        <p>✅ Sotuvchining Telegram botiga barcha ma'lumotlar yetkazildi.</p>
-        <p>📞 Menejerimiz 5-10 daqiqa ichida siz bilan bog'lanib, yetkazib berishni tasdiqlaydi.</p>
+        <p id="success-info-1">✅ Sotuvchining Telegram botiga barcha ma'lumotlar yetkazildi.</p>
+        <p id="success-info-2">📞 Menejerimiz 5-10 daqiqa ichida siz bilan bog'lanib, yetkazib berishni tasdiqlaydi.</p>
       </div>
       <div class="success-actions">
         <button class="btn btn-primary btn-block" id="close-success-btn">Yaxshi, tushunarli</button>
@@ -366,8 +373,8 @@
         <span class="ai-robot-emoji">🤖</span>
       </div>
       <div class="ai-fab-label">
-        <span class="ai-fab-title">AI Maslahatchi</span>
-        <span class="ai-fab-status">Onlayn</span>
+        <span class="ai-fab-title" id="ai-fab-title">AI Maslahatchi</span>
+        <span class="ai-fab-status" id="ai-fab-status">Onlayn</span>
       </div>
     </button>
 
@@ -377,8 +384,8 @@
         <div class="ai-header-left">
           <div class="ai-status-dot"></div>
           <div>
-            <h4 class="ai-chat-title">Malika AI Maslahatchi</h4>
-            <span class="ai-chat-subtitle">Tovarlar va narxlar bo'yicha 24/7 yordamchi</span>
+            <h4 class="ai-chat-title" id="ai-chat-title">Malika AI Maslahatchi</h4>
+            <span class="ai-chat-subtitle" id="ai-chat-subtitle">Tovarlar va narxlar bo'yicha 24/7 yordamchi</span>
           </div>
         </div>
         <button class="ai-chat-close-btn" id="ai-chat-close-btn">&times;</button>
@@ -390,8 +397,7 @@
         <div class="ai-msg ai-msg-bot">
           <div class="ai-bot-avatar">🤖</div>
           <div class="ai-msg-bubble">
-            <p id="ai-welcome-text">Assalomu alaykum! Men Malika iStore do'koni AI maslahatchisiman. Sizga qaysi
-              smartfon yoki gadjet haqida ma'lumot kerak?</p>
+            <p id="ai-welcome-text">Assalomu alaykum! Men Malika iStore do'koni AI maslahatchisiman. Sizga qaysi smartfon yoki gadjet haqida ma'lumot kerak?</p>
           </div>
         </div>
 
@@ -399,8 +405,7 @@
         <div class="ai-suggestions-wrap" id="ai-suggestions-wrap">
           <button class="ai-chip" data-query="iPhone 16 Pro Max narxi qancha?">iPhone 16 Pro Max narxi?</button>
           <button class="ai-chip" data-query="Samsung S24 Ultra bormi?">Samsung S24 Ultra bormi?</button>
-          <button class="ai-chip" data-query="Toshkentda yetkazib berish qancha vaqt oladi?">Yetkazib berish
-            qancha?</button>
+          <button class="ai-chip" data-query="Toshkentda yetkazib berish qancha vaqt oladi?">Yetkazib berish qancha?</button>
           <button class="ai-chip" data-query="Kafolat shartlari qanaqa?">Kafolat bormi?</button>
         </div>
       </div>
@@ -423,12 +428,11 @@
     <div class="container footer-content">
       <div class="footer-col">
         <h3 class="footer-heading" id="footer-shop-name">Malika iStore</h3>
-        <p class="footer-desc" id="footer-shop-desc">Yunusobod Malika bozori, eng sifatli original gadjetlar va tezkor
-          servis.</p>
-        <p class="footer-copy">© <span id="current-year">2026</span> Barcha huquqlar himoyalangan.</p>
+        <p class="footer-desc" id="footer-shop-desc">Yunusobod Malika bozori, eng sifatli original gadjetlar va tezkor servis.</p>
+        <p class="footer-copy">© <span id="current-year">2026</span> <span id="footer-copy-text">Barcha huquqlar himoyalangan.</span></p>
       </div>
       <div class="footer-col">
-        <h4 class="footer-subheading">Bog'lanish</h4>
+        <h4 class="footer-subheading" id="footer-contact-title">Bog'lanish</h4>
         <p id="footer-address">📍 Malika bozori, B-blok 24</p>
         <p id="footer-phone">📞 +998 90 123 45 67</p>
         <p id="footer-hours">🕒 10:00 - 20:00</p>
