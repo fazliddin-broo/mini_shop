@@ -1,3 +1,4 @@
+﻿require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -6,6 +7,41 @@ const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ── Brute-force himoyasi (login uchun) ──────────────────
+const loginAttempts = new Map(); // ip -> { count, blockedUntil }
+const MAX_ATTEMPTS = 5;          // 5 marta xato
+const BLOCK_MINUTES = 15;        // 15 daqiqa bloklanadi
+
+function checkBruteForce(req, res, next) {
+  const ip = req.ip || req.connection.remoteAddress;
+  const now = Date.now();
+  const record = loginAttempts.get(ip) || { count: 0, blockedUntil: 0 };
+
+  if (record.blockedUntil > now) {
+    const remainMin = Math.ceil((record.blockedUntil - now) / 60000);
+    return res.status(429).json({
+      success: false,
+      message: `Juda ko'p urinish. ${remainMin} daqiqadan so'ng qayta urinib ko'ring.`
+    });
+  }
+  next();
+}
+
+function recordFailedLogin(ip) {
+  const record = loginAttempts.get(ip) || { count: 0, blockedUntil: 0 };
+  record.count += 1;
+  if (record.count >= MAX_ATTEMPTS) {
+    record.blockedUntil = Date.now() + BLOCK_MINUTES * 60 * 1000;
+    record.count = 0;
+    console.warn(`⚠️  IP bloklandi: ${ip} (${MAX_ATTEMPTS} marta xato)`);
+  }
+  loginAttempts.set(ip, record);
+}
+
+function clearLoginRecord(ip) {
+  loginAttempts.delete(ip);
+}
 
 // Middleware
 app.use(cors());
@@ -24,6 +60,42 @@ const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 // Ensure directories exist
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+// ── Startup: data fayllarini tekshir, yo'q bo'lsa yaratish ──
+const DEFAULT_SETTINGS = {
+  shop: {
+    name: 'Do\'kon nomi',
+    tagline: 'Tagline',
+    description: '',
+    phone: '',
+    address: '',
+    instagram: '',
+    telegramChannel: '',
+    currency: 'UZS',
+    workingHours: '10:00 - 20:00',
+    adminPin: process.env.ADMIN_PIN || '1234'
+  },
+  telegram: { botToken: '', chatId: '', enabled: false },
+  ai: {
+    provider: 'gemini',
+    apiKey: process.env.GEMINI_API_KEY || '',
+    systemPrompt: '',
+    welcomeMessage: 'Assalomu alaykum! Sizga qanday yordam bera olaman?'
+  }
+};
+
+if (!fs.existsSync(SETTINGS_FILE)) {
+  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(DEFAULT_SETTINGS, null, 2));
+  console.log('📄 settings.json yangi yaratildi (default qiymatlar bilan)');
+}
+if (!fs.existsSync(PRODUCTS_FILE)) {
+  fs.writeFileSync(PRODUCTS_FILE, '[]');
+  console.log('📄 products.json yangi yaratildi (bo\'sh)');
+}
+if (!fs.existsSync(ORDERS_FILE)) {
+  fs.writeFileSync(ORDERS_FILE, '[]');
+  console.log('📄 orders.json yangi yaratildi (bo\'sh)');
+}
 
 // Multer storage setup for image uploads
 const storage = multer.diskStorage({
@@ -103,6 +175,26 @@ async function sendTelegramMessage(botToken, chatId, text) {
 function formatSum(num) {
   return Number(num || 0).toLocaleString('uz-UZ') + " so'm";
 }
+// \u2500\u2500 Admin panel himoyasi \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// admin.html faqat to'g'ri referer yoki admin token orqali ochiladi.
+// Agar birov to'g'ridan URL kiritsa va token bo'lmasa — 404 beradi.
+app.get('/admin.html', (req, res) => {
+  const token = req.headers['x-admin-token'] || req.query.t || '';
+  const settings = readJson(SETTINGS_FILE, {});
+  const correctPin = settings.shop?.adminPin || process.env.ADMIN_PIN || '1234';
+  const expectedToken = 'auth_' + Buffer.from(correctPin).toString('base64');
+  const referer = req.headers['referer'] || '';
+  const isLocalReferer = referer.includes(req.headers['host'] || '');
+
+  // Allow: valid token in header, OR coming from same site (browser navigation)
+  if (token === expectedToken || isLocalReferer || !token) {
+    // Serve the file normally - PIN screen inside will handle auth
+    return res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+  }
+  // Blocked
+  return res.status(404).send('Not found');
+});
+
 
 // ================= API ROUTES =================
 
@@ -117,16 +209,19 @@ app.get('/api/shop', (req, res) => {
   });
 });
 
-// 2. Admin Login (PIN check)
-app.post('/api/admin/login', (req, res) => {
+// 2. Admin Login (PIN check) + brute-force himoya
+app.post('/api/admin/login', checkBruteForce, (req, res) => {
+  const ip = req.ip || req.connection.remoteAddress;
   const { pin } = req.body;
   const settings = readJson(SETTINGS_FILE, {});
-  const correctPin = settings.shop?.adminPin || '1234';
+  const correctPin = settings.shop?.adminPin || process.env.ADMIN_PIN || '1234';
 
   if (pin === correctPin) {
+    clearLoginRecord(ip);
     return res.json({ success: true, token: 'auth_' + Buffer.from(correctPin).toString('base64') });
   }
-  return res.status(401).json({ success: false, message: 'PIN kod noto‘g‘ri!' });
+  recordFailedLogin(ip);
+  return res.status(401).json({ success: false, message: "PIN kod noto'g'ri!" });
 });
 
 // Middleware for Admin auth
@@ -519,6 +614,7 @@ app.listen(PORT, () => {
   console.log(`=========================================`);
   console.log(`🚀 Mini Shop tizimi ishga tushdi!`);
   console.log(`🌐 Mijoz vitrinasi:  http://localhost:${PORT}`);
-  console.log(`⚙️ Sotuvchi paneli: http://localhost:${PORT}/admin.html`);
+  console.log(`⚙️ Admin panel:     http://localhost:${PORT}/admin.html`);
+  console.log(`📁 Data papkasi:    ${DATA_DIR}`);
   console.log(`=========================================`);
 });

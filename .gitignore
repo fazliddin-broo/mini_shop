@@ -12,3 +12,9 @@ desktop.ini
 # Logs
 *.log
 npm-debug.log*
+
+# Runtime data (server manages these, git should NOT override them on deploy)
+# Uncomment below ONLY when deploying to production to avoid data loss:
+# data/products.json
+# data/orders.json
+# data/settings.json
