@@ -560,29 +560,6 @@
     "isNew": false
   },
   {
-    "id": "bs-602",
-    "name": "Canon LP-E17 Original Batareya & Dual USB Zaryadlovchi",
-    "name_ru": "Оригинальный аккумулятор Canon LP-E17 и зарядное устройство",
-    "category": "blogger-jihozlar",
-    "brand": "Canon",
-    "price": 540000,
-    "oldPrice": 650000,
-    "priceUsd": 42,
-    "image": "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=700&auto=format&fit=crop&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1617788138017-80ad40651399?w=700&auto=format&fit=crop&q=80"
-    ],
-    "description": "Canon foto va video kameralari uchun original quvvat manbai hamda LCD ekranli dual USB quvvatlovchi dok.",
-    "specs": [
-      "Sig'im: 1040 mAh Li-Ion",
-      "Moslik: Canon EOS R50, R10, RP, 250D"
-    ],
-    "stock": 15,
-    "featured": false,
-    "badge": "Original",
-    "isNew": false
-  },
-  {
     "id": "bs-603",
     "name": "Canon RF 50mm f/1.8 STM Portret Ob'yektivi",
     "name_ru": "Портретный объектив Canon RF 50mm f/1.8 STM",

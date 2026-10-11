@@ -1,1092 +1,679 @@
 <!DOCTYPE html>
-<html lang="uz" data-theme="light">
-
+<html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Black Store — Boshqaruv Markazi (macOS Dashboard)</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="/css/admin.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlackStore.uz — Apple mahsulotlari eng arzon narxlarda | Toshkent</title>
+  <meta name="description" content="BlackStore.uz — Toshkentda Apple mahsulotlari eng arzon narxlarda! 1 yilgacha kafolat, tezkor yetkazib berish. Malika B-blok 1-do'kon. Tel: +998 (95) 196-44-44" />
+  <meta name="keywords" content="blackstore.uz, black store, apple toshkent, iphone, airpods, apple watch, malika b-blok, arzon apple" />
+  <meta name="author" content="BlackStore.uz" />
+
+  <link rel="icon" type="image/png" href="images/logo.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="BlackStore.uz" />
+  <meta property="og:title" content="BlackStore.uz — Apple mahsulotlari eng arzon narxlarda" />
+  <meta property="og:description" content="Toshkentda Apple mahsulotlari eng arzon narxlarda! 1 yilgacha kafolat, tezkor yetkazib berish. Malika B-blok 1-do'kon." />
+  <meta property="og:image" content="images/logo.png" />
+  <meta property="og:theme-color" content="#09090b" />
+
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css" />
 </head>
+<body>
 
-<body data-theme="light">
-
-  <!-- =========================================================================
-       1. SLEEK LOGO INTRO ANIMATION OVERLAY (NO PASSWORD!)
-       ========================================================================= -->
-  <div class="splash-intro-overlay" id="splash-intro-overlay">
-    <div class="splash-card">
-      <div class="splash-logo-container">
-        <img src="/images/logo.png" alt="Black Store" class="splash-logo-img">
-        <div class="splash-glow-line"></div>
-      </div>
-      <div class="splash-status-row">
-        <span class="splash-pulse-dot"></span>
-        <span class="splash-status-text" id="splash-status-text">Boshqaruv Tizimi Yuklanmoqda...</span>
-      </div>
-      <div class="splash-progress-track">
-        <div class="splash-progress-fill"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Ambient Backdrop Glow (Subtle in Dark Mode) -->
-  <div class="ambient-glow-container" aria-hidden="true">
-    <div class="ambient-orb orb-1"></div>
-    <div class="ambient-orb orb-2"></div>
-  </div>
-
-  <!-- =========================================================================
-       2. MAIN ENTERPRISE DASHBOARD CONTAINER
-       ========================================================================= -->
-  <div class="admin-layout" id="admin-layout">
-
-    <!-- TOP WINDOW HEADER BAR (Matches Screenshot Header) -->
-    <header class="admin-window-header">
-      <div class="window-header-left">
-        <a href="/" class="header-logo-link">
-          <img src="/images/logo.png" alt="Black Store" class="header-brand-logo">
+  <!-- ==========================================================================
+       MAIN HEADER (Logo | Qidiruv | RU | Mavzu | Yurak | Savat)
+       ========================================================================== -->
+  <header class="main-header" id="mainHeader">
+    <div class="container">
+      <div class="header-inner">
+        <!-- Logo (Ixcham, proporcional va toza) -->
+        <a href="#" class="brand-logo" onclick="resetFilters(); return false;" id="brandLogo">
+          <img src="images/logo.png" alt="BlackStore.uz" class="brand-logo-img" width="34" height="34" />
+          <div class="brand-text">
+            <span class="brand-title">BlackStore<span class="brand-uz">.uz</span></span>
+          </div>
         </a>
-        <span class="window-sep">|</span>
-        <span class="window-section-title" data-i18n="adminCenterTitle">Admin Boshqaruv Markazi</span>
-      </div>
 
-      <div class="window-header-right">
-        <!-- Live Server / DB Status Pill -->
-        <div class="server-status-pill" id="server-status-pill">
-          <span class="pulse-dot"></span>
-          <span class="status-text" id="status-text">MongoDB Atlas Faol</span>
+        <!-- Search Bar (Screenshot 2: Dumaloq sariq chegarali qidiruv) -->
+        <div class="search-container">
+          <div class="search-input-wrap">
+            <span class="search-icon" id="searchBarIcon"></span>
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Mahsulot qidirish..." 
+              id="desktopSearchInput"
+            />
+            <button class="search-clear" id="desktopSearchClear" title="Tozalash"></button>
+          </div>
         </div>
 
-        <!-- Live Pulse Countdown Badge (8s) -->
-        <div class="live-pulse-badge" id="live-pulse-badge" title="Ma'lumotlar jonli avto-yangilanadi">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-          </svg>
-          <span class="pulse-text" id="live-pulse-text">Jonli (8s)</span>
-        </div>
+        <!-- Header Actions: RU · Quyosh · Yurak · Savat -->
+        <div class="header-actions">
+          <!-- Til almashtirgich (RU / UZ) -->
+          <button class="btn-lang" onclick="toggleLanguage()" id="langToggleBtn" title="Til">RU</button>
 
-        <!-- Manual Refresh Button -->
-        <button class="header-action-btn" id="btn-manual-refresh" title="Ma'lumotlarni yangilash">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <polyline points="1 20 1 14 7 14"></polyline>
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-          </svg>
-          <span data-i18n="btnRefresh">Yangilash</span>
-        </button>
+          <!-- Mavzu almashtirgich (Quyosh / Oy) -->
+          <button class="header-action-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Rejimni almashtirish">
+          </button>
 
-        <!-- Notifications Bell -->
-        <button class="header-action-btn icon-only" id="btn-notifications" title="Bildirishnomalar">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-          <span class="header-badge-count" id="header-notif-count">3</span>
-        </button>
+          <!-- Sevimlilar -->
+          <button class="header-action-btn" onclick="filterByWishlist()" id="headerWishlistBtn" title="Sevimlilar">
+            <span id="headerWishlistIcon"></span>
+            <span class="badge-count wishlist-count-badge" style="display: none;">0</span>
+          </button>
 
-        <!-- Kun / Tun Rejimi (Theme Toggle Button: Light & Dark Mode) -->
-        <button class="header-action-btn theme-toggle-btn" id="theme-toggle-btn" title="Kun / Tun rejimi (Oq va Qora)">
-          <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-          <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-        </button>
-
-        <!-- Language Capsule UZ / RU -->
-        <div class="admin-lang-capsule">
-          <button class="admin-lang-btn active" data-lang="uz">UZ</button>
-          <button class="admin-lang-btn" data-lang="ru">RU</button>
+          <!-- Savat -->
+          <button class="header-action-btn btn-cart" onclick="toggleCartDrawer(true)" id="headerCartBtn" title="Savat">
+            <span id="headerCartIcon"></span>
+            <span class="badge-count cart-count-badge" style="display: none;">0</span>
+          </button>
         </div>
       </div>
-    </header>
 
-    <!-- BODY WRAPPER (Sidebar + Main Workspace) -->
-    <div class="admin-body-container">
-      
-      <!-- =====================================================================
-           LEFT SIDEBAR (Matches Screenshot Sidebar)
-           ===================================================================== -->
-      <aside class="admin-sidebar">
-        <!-- Store Profile Card at Top -->
-        <div class="sidebar-profile-card">
-          <div class="profile-logo-box">
-            <img src="/images/logo.png" alt="Black Store" class="sidebar-brand-img">
+      <!-- Mobile Search Bar -->
+      <div class="mobile-search-row">
+        <div class="search-input-wrap">
+          <span class="search-icon" id="mobileSearchIcon"></span>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Mahsulot qidirish..." 
+            id="mobileSearchInput"
+          />
+          <button class="search-clear" id="mobileSearchClear" title="Tozalash"></button>
+        </div>
+      </div>
+
+      <!-- SUB NAVIGATION BAR (Screenshot 2: Kategoriyalar · Brendlar · Hammasini ko'rish) -->
+      <div class="sub-nav-bar">
+        <div class="sub-nav-inner">
+          <button class="sub-nav-btn" onclick="toggleCatalogDrawer(true)" id="subNavCatalogBtn">
+            <span class="sub-nav-icon" id="subNavCatalogIcon"></span>
+            <span>Kategoriyalar</span>
+          </button>
+          <button class="sub-nav-btn" onclick="toggleBrandsDrawer(true)" id="subNavBrandsBtn">
+            <span class="sub-nav-icon" id="subNavBrandsIcon"></span>
+            <span>Brendlar</span>
+          </button>
+          <a href="#" class="sub-nav-link" onclick="resetFilters(); return false;" id="subNavAllLink">
+            <span>Hammasini ko'rish</span>
+            <span id="subNavArrowIcon"></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN CONTENT
+       ========================================================================== -->
+  <main>
+    <!-- HERO SLIDER SECTION (Silky Smooth Horizontal Slide Carousel - Screenshot 2) -->
+    <section class="hero-section" id="heroSection">
+      <div class="container">
+        <div class="hero-slider-wrap" id="heroSliderWrap">
+          <div class="hero-slider-track" id="heroSliderTrack"></div>
+
+          <!-- Controls -->
+          <button class="slider-btn prev" onclick="prevSlide()" id="sliderPrevBtn" aria-label="Oldingi slayd"></button>
+          <button class="slider-btn next" onclick="nextSlide()" id="sliderNextBtn" aria-label="Keyingi slayd"></button>
+          <div class="slider-dashes" id="sliderDashes"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST STRIP / AFZALLIKLAR (Premium, rang-barang va yuqori kontrastli) -->
+    <section class="trust-strip">
+      <div class="container">
+        <div class="trust-grid">
+          <div class="trust-item trust-item-amber">
+            <div class="trust-icon-box" id="trustIcon1"></div>
+            <div class="trust-info">
+              <h4>Eng arzon narxlar</h4>
+              <p>Apple mahsulotlari eng arzon narxlarda</p>
+            </div>
           </div>
-          <div class="profile-info-text">
-            <h3 class="profile-store-title" id="sidebar-shop-name">Black Store</h3>
-            <span class="profile-role-sub">macOS Desktop Pro</span>
+          <div class="trust-item trust-item-green">
+            <div class="trust-icon-box" id="trustIcon2"></div>
+            <div class="trust-info">
+              <h4>1 Yilgacha kafolat</h4>
+              <p>Rasmiy servis xizmati</p>
+            </div>
+          </div>
+          <div class="trust-item trust-item-blue">
+            <div class="trust-icon-box" id="trustIcon3"></div>
+            <div class="trust-info">
+              <h4>Tezkor yetkazish</h4>
+              <p>Toshkent va viloyatlar bo'ylab</p>
+            </div>
+          </div>
+          <div class="trust-item trust-item-rose">
+            <div class="trust-icon-box" id="trustIcon4"></div>
+            <div class="trust-info">
+              <h4>Malika B-blok 1</h4>
+              <p>Toshkent sh., Malika savdo markazi</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES BAR -->
+    <section class="categories-section" id="categoriesSection">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-title-wrap">
+            <div class="section-title-indicator"></div>
+            <h2 class="section-title">Kategoriyalar</h2>
+          </div>
+        </div>
+        <div class="categories-scroll" id="categoriesScroll"></div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS CATALOG -->
+    <section class="catalog-section" id="catalogSection">
+      <div class="container">
+        <!-- Active Category Header (Screenshot 1: Quloqchinlar va naushniklar · 77 ta mahsulot [Quloqchinlar va naushniklar ✕]) -->
+        <div class="category-active-header" id="categoryActiveHeader"></div>
+
+        <!-- Catalog Toolbar -->
+        <div class="catalog-toolbar">
+          <div class="catalog-stats">
+            Jami: <strong id="productsCount">0</strong> ta mahsulot mavjud
+          </div>
+          <div class="catalog-sort-wrap">
+            <label for="sortSelect" class="sort-label">Saralash:</label>
+            <select class="sort-select" id="sortSelect">
+              <option value="popular">Ommabopligi bo'yicha</option>
+              <option value="price-asc">Narxi: Arzondan qimmatga</option>
+              <option value="price-desc">Narxi: Qimmatdan arzonga</option>
+              <option value="rating">Yuqori reytingli</option>
+            </select>
           </div>
         </div>
 
-        <!-- Section 1: BOSHQARUV -->
-        <div class="nav-section-label" data-i18n="grpManagement">BOSHQARUV</div>
-        <nav class="sidebar-nav">
-          <!-- 1. Dashboard (Overview) -->
-          <button class="nav-item active" data-tab="tab-dashboard">
-            <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-                <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-                <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-                <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-              </svg>
-            </span>
-            <span data-i18n="navDashboard">Dashboard</span>
-          </button>
+        <!-- Products Grid -->
+        <div class="products-grid" id="productsGrid"></div>
+      </div>
+    </section>
+  </main>
 
-          <!-- 2. Savdo & Analitika -->
-          <button class="nav-item" data-tab="tab-analytics">
-            <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 3v18h18"></path>
-                <path d="m19 9-5 5-4-4-3 3"></path>
-              </svg>
-            </span>
-            <span data-i18n="navAnalytics">Savdo & Analitika</span>
-          </button>
-
-          <!-- 3. Mahsulotlar Bazasi -->
-          <button class="nav-item" data-tab="tab-products">
-            <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m7.5 4.27 9 5.15"></path>
-                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
-              </svg>
-            </span>
-            <span data-i18n="navProducts">Mahsulotlar Bazasi</span>
-            <span class="nav-badge" id="nav-products-count">26</span>
-          </button>
-
-          <!-- 4. Buyurtmalar Bazasi -->
-          <button class="nav-item" data-tab="tab-orders">
-            <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="8" cy="21" r="1"></circle>
-                <circle cx="19" cy="21" r="1"></circle>
-                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-              </svg>
-            </span>
-            <span data-i18n="navOrders">Buyurtmalar</span>
-            <span class="nav-badge alert" id="nav-orders-count">14</span>
-          </button>
-
-          <!-- 5. Xabarnoma (Broadcast) -->
-          <button class="nav-item" data-tab="tab-broadcast">
-            <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 2L11 13"></path>
-                <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
-              </svg>
-            </span>
-            <span data-i18n="navBroadcast">Xabarnoma (Bot)</span>
-            <span class="nav-tag-purple">Yuborish</span>
-          </button>
-        </nav>
-
-        <!-- Section 2: MONITORING & TIZIM -->
-        <div class="nav-section-label" data-i18n="grpMonitoring">MONITORING & TIZIM</div>
-        <nav class="sidebar-nav">
-          <!-- 6. Jarayonlar & Audit -->
-          <button class="nav-item" data-tab="tab-audit">
-            <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-              </svg>
-            </span>
-            <span data-i18n="navAudit">Jarayonlar & Audit</span>
-          </button>
-
-          <!-- 7. Baza & Server -->
-          <button class="nav-item" data-tab="tab-database">
-            <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
-                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
-                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
-              </svg>
-            </span>
-            <span data-i18n="navDb">Baza & Server</span>
-          </button>
-
-          <!-- 8. Sozlamalar & Bot (Shop, Telegram, AI API) -->
-          <button class="nav-item" data-tab="tab-settings">
-            <span class="nav-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-              </svg>
-            </span>
-            <span data-i18n="navSettings">Sozlamalar & Bot & AI</span>
-          </button>
-        </nav>
-
-        <!-- Bottom Live Clock & Diagnostics Widget (from screenshot) -->
-        <div class="sidebar-system-info">
-          <div class="system-info-row">
-            <span class="info-label" data-i18n="lblClock">Vaqt (Toshkent):</span>
-            <span class="info-val highlight-green" id="live-clock-time">18:00:00</span>
+  <!-- ==========================================================================
+       FOOTER
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-logo footer-brand-logo" style="margin-bottom: 14px;">
+            <img src="images/logo.png" alt="BlackStore.uz" class="brand-logo-img" width="34" height="34" />
+            <div class="brand-text">
+              <span class="brand-title">BlackStore<span class="brand-uz">.uz</span></span>
+            </div>
           </div>
-          <div class="system-info-row">
-            <span class="info-label" data-i18n="lblDbType">Baza turi:</span>
-            <span class="info-val" id="db-type-val">MongoDB Atlas</span>
-          </div>
-          <div class="system-info-row">
-            <span class="info-label" data-i18n="lblAdminRole">Admin:</span>
-            <span class="info-val highlight-teal">Boshqaruvchi</span>
+          <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; margin-bottom: 16px;">
+            BlackStore.uz — Apple mahsulotlari eng arzon narxlarda! 1 yilgacha rasmiy kafolat, tezkor yetkazib berish va sifatli xizmat ko'rsatish.
+          </p>
+          <div class="footer-social-row">
+            <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerTgBtn" title="Telegram: t.me/+y-KOTC5kOaFiZWUy"></a>
+            <a href="https://instagram.com/blackstore.uz?mdxt=eHRsNWNkZTRkenE%3D" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerInstaBtn" title="Instagram: @blackstore.uz"></a>
           </div>
         </div>
 
-        <div class="sidebar-footer">
-          <div class="sidebar-store-location">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            <span>Malika B-blok 1-do'kon</span>
-          </div>
+        <div class="footer-col">
+          <h5>Kategoriyalar</h5>
+          <ul class="footer-links">
+            <li><a href="#" onclick="selectCategory('smart-watch-fitnes'); return false;">Aqlli soatlar</a></li>
+            <li><a href="#" onclick="selectCategory('naushniki-quloqchinlar'); return false;">Quloqchinlar</a></li>
+            <li><a href="#" onclick="selectCategory('zaryadka-kabel'); return false;">Zaryadlovchi va kabellar</a></li>
+            <li><a href="#" onclick="selectCategory('powerbanklar'); return false;">Powerbanklar</a></li>
+            <li><a href="#" onclick="selectCategory('kompyuter-aksessuar'); return false;">Gaming aksessuarlar</a></li>
+          </ul>
         </div>
-      </aside>
 
-      <!-- =====================================================================
-           MAIN CONTENT WORKSPACE
-           ===================================================================== -->
-      <main class="admin-main">
+        <div class="footer-col">
+          <h5>Mijozlar uchun</h5>
+          <ul class="footer-links">
+            <li><a href="#heroSection">Aksiyalar va chegirmalar</a></li>
+            <li><a href="#" onclick="openInfoModal('delivery'); return false;">Yetkazib berish shartlari</a></li>
+            <li><a href="#" onclick="openInfoModal('warranty'); return false;">Kafolat va qaytarish</a></li>
+            <li><a href="#" onclick="openInfoModal('payment'); return false;">To'lov usullari</a></li>
+          </ul>
+        </div>
 
-        <!-- ===================================================================
-             TAB 0: DASHBOARD (EXACT SCREENSHOT LAYOUT ADAPTED FOR BLACK STORE)
-             =================================================================== -->
-        <section class="tab-pane active" id="tab-dashboard">
-          
-          <!-- Top Header Row of Dashboard -->
-          <div class="dash-header-row">
-            <div class="dash-title-wrap">
-              <h2 class="dash-title" data-i18n="dashTitle">Dashboard</h2>
-              <span class="dash-sub" data-i18n="dashSub">Umumiy tizim holati, statistika va faolliklar</span>
-            </div>
+        <div class="footer-col">
+          <h5>Aloqa va Manzil</h5>
+          <ul class="footer-links">
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span id="footerPhoneIcon" style="color: var(--yellow-400);"></span>
+              <a href="tel:+998951964444" style="color: inherit; font-weight: 700;">+998 (95) 196-44-44</a>
+            </li>
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span id="footerTgIcon" style="color: var(--yellow-400);"></span>
+              <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" style="color: inherit;">Telegram: @blackstore.uz</a>
+            </li>
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--yellow-400); font-size: 0.85rem;">⚡️</span>
+              <a href="https://t.me/blackstore_admin" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: 600;">Admin: @blackstore_admin</a>
+            </li>
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span id="footerMapIcon" style="color: var(--yellow-400);"></span>
+              <span>Malika B-blok 1-do'kon</span>
+            </li>
+            <li style="color: var(--text-muted); font-size: 0.8125rem; margin-top: 6px;" id="footerHoursText">
+              Ish vaqti: 09:00 - 22:00 (dam olish kunlarisiz)
+            </li>
+          </ul>
+        </div>
+      </div>
 
-            <div class="dash-tools-wrap">
-              <!-- Search Box with ⌘K Badge -->
-              <div class="dash-search-box">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" id="dash-search-input" placeholder="Qidiruv (Mahsulot, @mijoz, tel...)" autocomplete="off">
-                <span class="kbd-badge">⌘K</span>
-              </div>
+      <div class="footer-bottom">
+        <span id="footerRightsText">&copy; 2026 BlackStore.uz. Barcha huquqlar himoyalangan.</span>
+        <span id="footerTaglineText">Malika B-blok 1-do'kon · +998 (95) 196-44-44</span>
+      </div>
+    </div>
+  </footer>
 
-              <!-- Export Button -->
-              <button class="btn btn-outline" id="btn-export-data">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <span data-i18n="btnExport">Eksport</span>
-              </button>
+  <!-- ==========================================================================
+       MOBILE BOTTOM NAVIGATION BAR
+       ========================================================================== -->
+  <nav class="mobile-bottom-bar" aria-label="Mobil boshqaruv paneli">
+    <button class="nav-tab-item active" onclick="resetFilters(); window.scrollTo({top: 0, behavior: 'smooth'});">
+      <span id="navHomeIcon"></span>
+      <span>Asosiy</span>
+    </button>
+    <button class="nav-tab-item" onclick="toggleCatalogDrawer(true);">
+      <span id="navCatalogIcon"></span>
+      <span>Katalog</span>
+    </button>
+    <button class="nav-tab-item" onclick="focusMobileSearch();">
+      <span id="navSearchIcon"></span>
+      <span>Qidiruv</span>
+    </button>
+    <button class="nav-tab-item" onclick="filterByWishlist();">
+      <span id="navWishlistIcon"></span>
+      <span class="nav-tab-badge wishlist-count-badge" style="display: none;">0</span>
+      <span>Sevimlilar</span>
+    </button>
+    <button class="nav-tab-item" onclick="toggleCartDrawer(true);">
+      <span id="navCartIcon"></span>
+      <span class="nav-tab-badge cart-count-badge" style="display: none;">0</span>
+      <span>Savat</span>
+    </button>
+  </nav>
 
-              <!-- Add Product Button -->
-              <button class="btn btn-primary" id="btn-dash-add-product">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                <span data-i18n="btnAddProduct">Yangi Mahsulot</span>
-              </button>
-            </div>
-          </div>
+  <!-- ==========================================================================
+       DRAWERS (CART & CATALOG)
+       ========================================================================== -->
+  <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeAllDrawers()"></div>
 
-          <!-- 4 Stat Cards Row (Horizontal Bento Grid from Screenshot) -->
-          <div class="stats-cards-row">
-            <!-- Card 1: XARIDORLAR & MIJOZLAR -->
-            <div class="dash-stat-card">
-              <div class="stat-card-top">
-                <span class="stat-card-label" data-i18n="statCustomers">XARIDORLAR & MIJOZLAR</span>
-                <div class="stat-card-icon icon-blue">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-card-number" id="stat-cust-number">148</div>
-              <div class="stat-card-pills">
-                <span class="pill-badge pill-green" id="stat-cust-active">148 faol</span>
-                <span class="pill-badge pill-yellow" id="stat-cust-pending">0 kutilmoqda</span>
-                <span class="pill-badge pill-red" id="stat-cust-blocked">0 blok</span>
-              </div>
-            </div>
+  <!-- Cart Drawer -->
+  <div class="drawer drawer-right" id="cartDrawer" role="dialog" aria-modal="true">
+    <div class="drawer-header">
+      <div class="drawer-title">
+        <span id="cartDrawerTitleIcon"></span>
+        <span>Savatingiz</span>
+      </div>
+      <button class="drawer-close" onclick="toggleCartDrawer(false)" id="cartDrawerCloseBtn" aria-label="Yopish"></button>
+    </div>
 
-            <!-- Card 2: BUYURTMALAR (JAMI) -->
-            <div class="dash-stat-card">
-              <div class="stat-card-top">
-                <span class="stat-card-label" data-i18n="statOrders">BUYURTMALAR (JAMI)</span>
-                <div class="stat-card-icon icon-green">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="9" cy="21" r="1"></circle>
-                    <circle cx="20" cy="21" r="1"></circle>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-card-number" id="stat-orders-number">242</div>
-              <div class="stat-card-subtext">
-                <span class="subtext-green" id="stat-orders-today">+3 bugun</span>
-                <span class="subtext-dot">•</span>
-                <span class="subtext-muted" id="stat-orders-delayed">0 kechikkan</span>
-              </div>
-            </div>
+    <div class="drawer-body" id="cartDrawerItems"></div>
 
-            <!-- Card 3: O'RTACHA SAVDO CHEKI -->
-            <div class="dash-stat-card">
-              <div class="stat-card-top">
-                <span class="stat-card-label" data-i18n="statAov">O'RTACHA SAVDO CHEKI</span>
-                <div class="stat-card-icon icon-orange">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                    <polyline points="17 6 23 6 23 12"></polyline>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-card-number" id="stat-aov-number">2.8 mln</div>
-              <div class="stat-card-subtext">
-                <span class="subtext-muted" data-i18n="statAovSub">O'rtacha buyurtma qiymati</span>
-              </div>
-            </div>
-
-            <!-- Card 4: MAHSULOTLAR BAZASI -->
-            <div class="dash-stat-card">
-              <div class="stat-card-top">
-                <span class="stat-card-label" data-i18n="statCatalog">MAHSULOTLAR BAZASI</span>
-                <div class="stat-card-icon icon-purple">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                  </svg>
-                </div>
-              </div>
-              <div class="stat-card-number" id="stat-products-number">26 ta</div>
-              <div class="stat-card-pills">
-                <span class="pill-badge pill-green" id="stat-products-active">26 ta faol</span>
-                <span class="pill-badge pill-muted" id="stat-products-stock">390 dona qoldiq</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 2-Column Main Bento Grid (Wide Table ~65%, Right Feed ~35%) -->
-          <div class="dash-main-bento-grid">
-            
-            <!-- Left Wide Card: So'nggi qabul qilingan buyurtmalar -->
-            <div class="bento-card bento-wide-card">
-              <div class="bento-card-header">
-                <div class="bento-header-title">
-                  <span class="bento-title-icon text-green">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-2z"></path>
-                      <line x1="3" y1="6" x2="21" y2="6"></line>
-                      <path d="M16 10a4 4 0 0 1-8 0"></path>
-                    </svg>
-                  </span>
-                  <h3 data-i18n="recentOrdersTitle">So'nggi qabul qilingan buyurtmalar</h3>
-                </div>
-
-                <div class="bento-header-controls">
-                  <div class="bento-pag-arrows">
-                    <button class="pag-arrow-btn" id="dash-orders-prev" title="Oldingi">
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                      <span data-i18n="btnPrev">Chappa</span>
-                    </button>
-                    <button class="pag-arrow-btn" id="dash-orders-next" title="Keyingi">
-                      <span data-i18n="btnNext">O'ngga</span>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                    </button>
-                  </div>
-                  <button class="btn-link-action" id="btn-view-all-orders">
-                    <span data-i18n="btnViewAll">Barchasini ko'rish</span> →
-                  </button>
-                </div>
-              </div>
-
-              <!-- Table Container -->
-              <div class="bento-table-wrap">
-                <table class="dash-table">
-                  <thead>
-                    <tr>
-                      <th data-i18n="thCustomer">MIJOZ</th>
-                      <th data-i18n="thOrderId">BUYURTMA ID</th>
-                      <th data-i18n="thTime">VAQT</th>
-                      <th data-i18n="thItemsQty">MAHSULOT / DONA</th>
-                      <th data-i18n="thTotalSum">SUMMA</th>
-                      <th data-i18n="thAction">HARAKAT</th>
-                    </tr>
-                  </thead>
-                  <tbody id="dash-recent-orders-tbody">
-                    <!-- Populated dynamically via JS -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- Right Feed Card: Jonli jarayonlar & Xronologiya -->
-            <div class="bento-card bento-feed-card">
-              <div class="bento-card-header">
-                <div class="bento-header-title">
-                  <span class="bento-title-icon text-blue">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                    </svg>
-                  </span>
-                  <h3 data-i18n="liveAuditTitle">Jonli jarayonlar & Xronologiya</h3>
-                </div>
-
-                <div class="feed-filter-pills">
-                  <button class="feed-pill active" data-feed-filter="all" data-i18n="feedAll">Barchasi</button>
-                  <button class="feed-pill" data-feed-filter="today" data-i18n="feedToday">Bugun</button>
-                  <button class="feed-pill" data-feed-filter="yesterday" data-i18n="feedYesterday">Kecha</button>
-                  <button class="feed-pill-link" id="btn-feed-to-journal" data-i18n="feedJournal">Jurnal →</button>
-                </div>
-              </div>
-
-              <!-- Chronological Grouped Timeline Stream -->
-              <div class="chronology-stream" id="chronology-stream">
-                <!-- Populated dynamically via JS -->
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <!-- ===================================================================
-             TAB 1: SAVDO & ANALITIKA (Weekly & Monthly Sales Charts)
-             =================================================================== -->
-        <section class="tab-pane hidden" id="tab-analytics">
-          <div class="analytics-layout-grid">
-            
-            <!-- Sales Timeline Chart Card -->
-            <div class="analytics-card chart-card">
-              <div class="analytics-card-header">
-                <div>
-                  <h3 class="analytics-card-title" data-i18n="chartTitle">Savdo Dinamikasi & Tushum</h3>
-                  <span class="analytics-card-desc" data-i18n="chartDesc">Tanlangan davr bo'yicha tushum va buyurtmalar hajmi</span>
-                </div>
-
-                <!-- Period Pill Switcher -->
-                <div class="period-capsule">
-                  <button class="period-btn active" data-period="weekly" data-i18n="periodWeekly">Haftalik (7 kun)</button>
-                  <button class="period-btn" data-period="monthly" data-i18n="periodMonthly">Oylik (30 kun)</button>
-                </div>
-              </div>
-
-              <!-- SVG Sales Chart Container -->
-              <div class="sales-chart-wrapper" id="sales-chart-wrapper">
-                <div class="sales-chart-tooltip" id="sales-chart-tooltip">
-                  <strong id="st-tooltip-label">Dushanba</strong>
-                  <span id="st-tooltip-val">12,500,000 so'm</span>
-                  <small id="st-tooltip-orders">8 ta buyurtma</small>
-                </div>
-
-                <svg class="sales-svg" id="sales-svg" viewBox="0 0 800 240" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#059669" stop-opacity="0.38"></stop>
-                      <stop offset="100%" stop-color="#059669" stop-opacity="0.0"></stop>
-                    </linearGradient>
-                  </defs>
-                  <line x1="0" y1="40" x2="800" y2="40" class="svg-grid-line"></line>
-                  <line x1="0" y1="100" x2="800" y2="100" class="svg-grid-line"></line>
-                  <line x1="0" y1="160" x2="800" y2="160" class="svg-grid-line"></line>
-                  <line x1="0" y1="220" x2="800" y2="220" class="svg-grid-line"></line>
-
-                  <path class="sales-path-area" id="sales-path-area" d=""></path>
-                  <path class="sales-path-line" id="sales-path-line" d=""></path>
-                  <g id="sales-chart-points"></g>
-                </svg>
-
-                <!-- Chart X-Axis Labels -->
-                <div class="chart-labels-row" id="chart-labels-row">
-                  <!-- Injected via JS -->
-                </div>
-              </div>
-            </div>
-
-            <!-- Order Statuses & Conversion Breakdown Card -->
-            <div class="analytics-card status-card">
-              <div class="analytics-card-header">
-                <h3 class="analytics-card-title" data-i18n="orderStatusTitle">Buyurtmalar Holati</h3>
-                <span class="period-badge" id="period-badge-label">Haftalik</span>
-              </div>
-
-              <div class="status-bars-list" id="status-bars-list">
-                <!-- Status items populated via JS -->
-              </div>
-
-              <div class="category-share-section">
-                <h4 class="cat-share-title" data-i18n="catShareTitle">Toifalar bo'yicha ulush:</h4>
-                <div class="cat-pill-tags" id="cat-pill-tags">
-                  <!-- Populated via JS -->
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Top Selling Products Table -->
-          <div class="analytics-card top-products-card">
-            <div class="analytics-card-header">
-              <div>
-                <h3 class="analytics-card-title" data-i18n="topProductsTitle">Eng Ko'p Sotilgan Mahsulotlar (Top Sotuvlar)</h3>
-                <span class="analytics-card-desc" data-i18n="topProductsDesc">Xaridorgir flagman tovarlar va ularning savdo aylanmasi</span>
-              </div>
-            </div>
-
-            <div class="bento-table-wrap">
-              <table class="dash-table">
-                <thead>
-                  <tr>
-                    <th data-i18n="thProduct">Mahsulot</th>
-                    <th data-i18n="thCategory">Toifa</th>
-                    <th data-i18n="thPrice">Narxi</th>
-                    <th data-i18n="thSoldCount">Sotilgan Soni</th>
-                    <th data-i18n="thTotalVolume">Jami Tushum</th>
-                  </tr>
-                </thead>
-                <tbody id="top-products-tbody">
-                  <!-- Populated via JS -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================================
-             TAB 2: MAHSULOTLAR BAZASI (5-Angle Photo Uploads, Black Store Catalog)
-             =================================================================== -->
-        <section class="tab-pane hidden" id="tab-products">
-          <div class="section-card">
-            <div class="section-card-header">
-              <div>
-                <h3 class="section-title" data-i18n="navProducts">Mahsulotlar Bazasi</h3>
-                <p class="section-subtitle">Katalogdagi barcha tovarlar, narxlar, qoldiqlar va 5 xil burchakdagi fotosuratlar</p>
-              </div>
-              <button class="btn btn-primary" id="btn-add-product">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                <span data-i18n="btnAddProduct">Yangi Mahsulot</span>
-              </button>
-            </div>
-
-            <!-- Filter Controls -->
-            <div class="products-filter-bar">
-              <div class="filter-input-wrap">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" id="admin-search-products" placeholder="Tovar nomi yoki brend bo'yicha qidiruv...">
-              </div>
-
-              <div class="filter-select-wrap">
-                <select id="admin-filter-category">
-                  <option value="Barchasi">Barcha toifalar (14 ta)</option>
-                  <option value="naushniki-quloqchinlar">Quloqchinlar va naushniklar</option>
-                  <option value="zaryadka-kabel">Zaryadlovchi va kabellar</option>
-                  <option value="telefon-aksessuar">Telefon aksessuarlari</option>
-                  <option value="smart-watch-fitnes">Aqlli soatlar va fitnes</option>
-                  <option value="powerbanklar">Powerbanklar</option>
-                  <option value="kolonki-audio">Karnaylar va audio</option>
-                  <option value="blogger-jihozlar">Blogerlar jihozlari</option>
-                  <option value="kompyuter-aksessuar">Playstation va Kompyuter aksessuarlari</option>
-                  <option value="telefon-planshet">Telefon va planshetlar</option>
-                  <option value="smart-texnika">Smart qurilmalar va uy texnikasi</option>
-                  <option value="gozellik-avto">Go'zallik, avto va boshqalar</option>
-                  <option value="holderlar-va-smart-parfyumlar">Holderlar va Smart Parfyumlar</option>
-                  <option value="sumkalar">Sumkalar va chexollar</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Product Table -->
-            <div class="bento-table-wrap">
-              <table class="dash-table">
-                <thead>
-                  <tr>
-                    <th data-i18n="thImages">Rasmlar (5 tagacha)</th>
-                    <th data-i18n="thNameCategory">Nomi va Toifa</th>
-                    <th data-i18n="thPrice">Narxi</th>
-                    <th data-i18n="thStock">Qoldiq</th>
-                    <th data-i18n="thBadge">Belgi</th>
-                    <th data-i18n="thActions">Harakatlar</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-products-tbody">
-                  <!-- Populated via JS -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================================
-             TAB 3: BUYURTMALAR (Order Management)
-             =================================================================== -->
-        <section class="tab-pane hidden" id="tab-orders">
-          <div class="section-card">
-            <div class="section-card-header">
-              <div>
-                <h3 class="section-title" data-i18n="ordersListTitle">Kelib Tushgan Buyurtmalar Ro'yxati</h3>
-                <p class="section-subtitle">Mijozlar buyurtmalari, telefon raqamlari, tanlangan tovarlar va yetkazib berish holati</p>
-              </div>
-              <div class="orders-filter-capsule">
-                <button class="feed-pill active" data-order-status="all">Barchasi</button>
-                <button class="feed-pill" data-order-status="new">Yangi</button>
-                <button class="feed-pill" data-order-status="processing">Jarayonda</button>
-                <button class="feed-pill" data-order-status="completed">Topshirildi</button>
-              </div>
-            </div>
-
-            <div class="bento-table-wrap">
-              <table class="dash-table">
-                <thead>
-                  <tr>
-                    <th data-i18n="thOrderId">BUYURTMA ID</th>
-                    <th data-i18n="thCustomer">MIJOZ & TELEFON</th>
-                    <th data-i18n="thTime">SANA & VAQT</th>
-                    <th>BUYURTMA TARKIBI</th>
-                    <th data-i18n="thTotalSum">SUMMA</th>
-                    <th>HOLAT (STATUS)</th>
-                    <th data-i18n="thAction">HARAKAT</th>
-                  </tr>
-                </thead>
-                <tbody id="admin-all-orders-tbody">
-                  <!-- Populated via JS -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================================
-             TAB 4: XABARNOMA (Telegram Broadcast Bot)
-             =================================================================== -->
-        <section class="tab-pane hidden" id="tab-broadcast">
-          <div class="section-card max-w-700">
-            <div class="section-card-header">
-              <div>
-                <h3 class="section-title" data-i18n="navBroadcast">Telegram Xabarnoma (Broadcast)</h3>
-                <p class="section-subtitle">Do‘kon mijozlariga chegirmalar, aksiyalar yoki yangi tovarlar haqida ommaviy xabar yuborish</p>
-              </div>
-            </div>
-
-            <form id="form-broadcast-msg" class="admin-form">
-              <div class="form-group">
-                <label>Xabar Mavzusi (Sarlavha)</label>
-                <input type="text" id="bc-title" placeholder="Masalan: 🔥 Yangi iPhone 16 Pro chegirmada!" required>
-              </div>
-
-              <div class="form-group">
-                <label>Xabar Matni</label>
-                <textarea id="bc-message" rows="5" placeholder="Mijozlarga yuboriladigan to'liq matn..." required></textarea>
-              </div>
-
-              <div class="form-group">
-                <label>Rasm havolasi (Ixtiyoriy)</label>
-                <input type="url" id="bc-image-url" placeholder="https://example.com/rasm.jpg">
-              </div>
-
-              <button type="submit" class="btn btn-primary" id="btn-send-broadcast">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="22" y1="2" x2="11" y2="13"></line>
-                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-                <span>Xabarnomani Yuborish</span>
-              </button>
-              <div id="broadcast-alert" class="alert-box hidden"></div>
-            </form>
-          </div>
-        </section>
-
-        <!-- ===================================================================
-             TAB 5: JARAYONLAR & AUDIT (Chronology Stream & Logs)
-             =================================================================== -->
-        <section class="tab-pane hidden" id="tab-audit">
-          <div class="section-card">
-            <div class="section-card-header">
-              <div>
-                <h3 class="section-title" data-i18n="navAudit">Jarayonlar & Xronologiya Jurnali</h3>
-                <p class="section-subtitle">Tizimda sodir bo'lgan har bir o'zgarish va buyurtmalar tarixi</p>
-              </div>
-            </div>
-
-            <div class="audit-full-timeline" id="audit-full-timeline">
-              <!-- Populated dynamically via JS -->
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================================
-             TAB 6: BAZA & SERVER (Database Health & Sync)
-             =================================================================== -->
-        <section class="tab-pane hidden" id="tab-database">
-          <div class="database-grid-layout">
-            <div class="section-card">
-              <h3 class="section-title">Ma'lumotlar Bazasi Holati</h3>
-              <p class="section-subtitle">MongoDB Atlas bulutli ma'lumotlar ombori diagnostikasi</p>
-              
-              <div class="db-stat-badges-grid">
-                <div class="db-badge-item">
-                  <span class="db-badge-label">Ulanish Holati:</span>
-                  <span class="pill-badge pill-green" id="db-conn-status">Faol / Ulangan</span>
-                </div>
-                <div class="db-badge-item">
-                  <span class="db-badge-label">Jami Mahsulotlar:</span>
-                  <span class="db-badge-val" id="db-prod-count">26 ta</span>
-                </div>
-                <div class="db-badge-item">
-                  <span class="db-badge-label">Jami Buyurtmalar:</span>
-                  <span class="db-badge-val" id="db-orders-count">14 ta</span>
-                </div>
-                <div class="db-badge-item">
-                  <span class="db-badge-label">Server Javob Tezligi:</span>
-                  <span class="db-badge-val highlight-green" id="db-latency">~18ms</span>
-                </div>
-              </div>
-
-              <div class="db-actions-row">
-                <button class="btn btn-outline" id="btn-ping-db">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                  </svg>
-                  <span>Aloqani Tekshirish (Ping)</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ===================================================================
-             TAB 7: SOZLAMALAR & BOT & AI (Shop, Telegram, AI API Settings)
-             =================================================================== -->
-        <section class="tab-pane hidden" id="tab-settings">
-          <div class="settings-grid-layout">
-            
-            <!-- 1. Do'kon Asosiy Sozlamalari -->
-            <div class="section-card">
-              <div class="section-card-header">
-                <div>
-                  <h3 class="section-title" data-i18n="setShopTitle">Do'kon Ma'lumotlari</h3>
-                  <p class="section-subtitle">Do'kon nomi, telefon raqamlari, manzil va ish vaqti</p>
-                </div>
-              </div>
-
-              <form id="form-shop-settings" class="admin-form">
-                <div class="form-group">
-                  <label data-i18n="setShopName">Do'kon Nomi</label>
-                  <input type="text" id="shop-name" value="Black Store" required>
-                </div>
-
-                <div class="form-group">
-                  <label data-i18n="setShopTagline">Tagline (Qisqa tavsif)</label>
-                  <input type="text" id="shop-tagline" value="Malika savdo markazi • B-blok 1-do'kon">
-                </div>
-
-                <div class="form-row-2">
-                  <div class="form-group">
-                    <label data-i18n="setShopPhone">Telefon raqam</label>
-                    <input type="text" id="shop-phone" value="+998 (95) 196-44-44" required>
-                  </div>
-                  <div class="form-group">
-                    <label data-i18n="setShopHours">Ish vaqti</label>
-                    <input type="text" id="shop-hours" value="09:00 - 22:00 (dam olish kunlarisiz)">
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label data-i18n="setShopAddress">Manzil (Malika filiali)</label>
-                  <input type="text" id="shop-address" value="Toshkent sh., Malika savdo markazi, B-blok 1-do'kon" required>
-                </div>
-
-                <div class="form-row-2">
-                  <div class="form-group">
-                    <label>Instagram Havolasi</label>
-                    <input type="url" id="shop-instagram" value="https://instagram.com/blackstore.uz">
-                  </div>
-                  <div class="form-group">
-                    <label>Telegram Kanal</label>
-                    <input type="url" id="shop-telegram" value="https://t.me/blackstore_uz">
-                  </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="btn-save-shop" data-i18n="btnSave">Saqlash</button>
-                <div id="shop-save-alert" class="alert-box hidden"></div>
-              </form>
-            </div>
-
-            <!-- 2. Telegram Bot Bildirishnomalari -->
-            <div class="section-card">
-              <div class="section-card-header">
-                <div>
-                  <h3 class="section-title" data-i18n="setTgTitle">Telegram Bot Bildirishnomalari</h3>
-                  <p class="section-subtitle" data-i18n="setTgDesc">Xaridor buyurtma berishi bilanoq, ma'lumotlar sotuvchining telegramiga keladi.</p>
-                </div>
-              </div>
-
-              <form id="form-telegram-settings" class="admin-form">
-                <div class="form-group">
-                  <label>Telegram Bot Token</label>
-                  <input type="password" id="tg-token" placeholder="Masalan: 123456789:ABCdefGhIJKlmNoPqRStUvWxYz">
-                  <small class="form-hint" data-i18n="setTgHelpToken">Telegramda @BotFather orqali olinadi</small>
-                </div>
-
-                <div class="form-group">
-                  <label data-i18n="setTgChatId">Sotuvchi Chat ID yoki Guruh ID</label>
-                  <input type="text" id="tg-chat-id" placeholder="Masalan: 987654321 yoki -1001234567890">
-                  <small class="form-hint" data-i18n="setTgHelpChatId">Telegramda @userinfobot orqali o'z ID raqamingizni olasiz</small>
-                </div>
-
-                <div class="form-group-checkbox">
-                  <label class="switch-label">
-                    <input type="checkbox" id="tg-enabled">
-                    <span class="switch-slider"></span>
-                    <span class="switch-text">Telegram bot orqali bildirishnomalarni yoqish</span>
-                  </label>
-                </div>
-
-                <div class="form-actions-row">
-                  <button type="submit" class="btn btn-primary" data-i18n="btnSaveBot">Botni Saqlash</button>
-                  <button type="button" class="btn btn-outline" id="btn-test-telegram" data-i18n="btnTestBot">Sinov Xabarini Yuborish</button>
-                </div>
-                <div id="tg-save-alert" class="alert-box hidden"></div>
-              </form>
-            </div>
-
-            <!-- 3. AI Savdo Maslahatchisi & API Sozlamalari (Yangi!) -->
-            <div class="section-card">
-              <div class="section-card-header">
-                <div>
-                  <h3 class="section-title" data-i18n="setAiTitle">AI Savdo Maslahatchisi & API</h3>
-                  <p class="section-subtitle" data-i18n="setAiDesc">Virtual AI sotuvchi xaridorlarga tovarlar, narxlar va yetkazib berish bo'yicha professional maslahat beradi.</p>
-                </div>
-              </div>
-
-              <form id="form-ai-settings" class="admin-form">
-                <div class="form-row-2">
-                  <div class="form-group">
-                    <label>AI Provayderi</label>
-                    <select id="ai-provider">
-                      <option value="gemini">Google Gemini AI (Tavsiya etiladi)</option>
-                      <option value="openai">OpenAI ChatGPT</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label data-i18n="setAiKey">API Key</label>
-                    <input type="password" id="ai-key" placeholder="AI API kalitini kiriting">
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label data-i18n="setAiWelcome">AI Qutlov Xabari (Salomlashish)</label>
-                  <input type="text" id="ai-welcome" value="Assalomu alaykum! Black Store do'koniga xush kelibsiz! Qanday gadjet yoki Apple mahsuloti qidiryapsiz?">
-                </div>
-
-                <div class="form-group">
-                  <label data-i18n="setAiPrompt">AI Tizim Qoidalari (System Prompt)</label>
-                  <textarea id="ai-prompt" rows="4">Siz 'Black Store' (Apple, Samsung va premium gadjetlar do'koni)ning aqlli AI maslahatchisisiz. Xaridorlarga tovarlar, 1 yillik kafolat, tezkor yetkazib berish bo'yicha do'stona va aniq javob bering. Manzil: Malika B-blok 1-do'kon. Tel: +998 (95) 196-44-44.</textarea>
-                </div>
-
-                <div class="form-actions-row">
-                  <button type="submit" class="btn btn-primary" data-i18n="btnSaveAi">AI Sozlamalarini Saqlash</button>
-                  <button type="button" class="btn btn-outline" id="btn-test-ai-modal">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    <span>AIni Sinab Ko'rish</span>
-                  </button>
-                </div>
-                <div id="ai-save-alert" class="alert-box hidden"></div>
-              </form>
-            </div>
-
-          </div>
-        </section>
-
-      </main>
+    <div class="drawer-footer">
+      <div class="promo-row">
+        <input type="text" class="promo-input" id="promoInput" placeholder="Promo-kod (BLACK10)" />
+        <button class="btn-promo" onclick="applyPromoCode()">Qo'llash</button>
+      </div>
+      <div class="cart-total-row">
+        <span class="cart-total-label">Jami hisob:</span>
+        <span class="cart-total-amount" id="cartTotalAmount">0 so'm</span>
+      </div>
+      <button class="btn-checkout" onclick="openCheckoutModal()">
+        <span id="checkoutBtnIcon"></span>
+        <span>Rasmiylashtirish</span>
+      </button>
     </div>
   </div>
 
-  <!-- =========================================================================
-       3. MODAL: MAHSULOT QO'SHISH VA TAHRIRLASH (5-Angle Photos)
-       ========================================================================= -->
-  <div class="modal-backdrop hidden" id="product-crud-modal">
-    <div class="modal-card modal-lg">
-      <div class="modal-header">
-        <h3 class="modal-title" id="crud-modal-title">Mahsulot Qo'shish</h3>
-        <button class="modal-close-btn" id="close-crud-modal">&times;</button>
-      </div>
+  <!-- Catalog Drawer (Left - Screenshot 1: ✕ Kategoriyalar) -->
+  <div class="drawer drawer-left" id="catalogDrawer" role="dialog" aria-modal="true">
+    <div class="catalog-drawer-nav-header">
+      <button class="catalog-drawer-close-btn" onclick="toggleCatalogDrawer(false)" id="catalogDrawerCloseBtn" aria-label="Yopish">
+        <span id="catDrawerCloseIcon"></span>
+      </button>
+      <h3 class="catalog-drawer-heading">Kategoriyalar</h3>
+    </div>
 
-      <form id="product-crud-form" class="modal-body">
-        <input type="hidden" id="crud-prod-id">
+    <div class="drawer-body" id="catalogDrawerList" style="padding: 12px 14px; gap: 4px;"></div>
+  </div>
 
-        <!-- 5-Angle Photos Section -->
-        <div class="photos-upload-section">
-          <label class="form-section-title" data-i18n="modalPhotosTitle">Mahsulot Rasmlari (5 tagacha poza / burchak)</label>
-          <p class="photos-sub-hint" data-i18n="modalPhotosSub">5 xil rakursdagi tiniq fotosuratlar (xaridorlar Uzum Market kabi surib tomosha qilishlari uchun)</p>
+  <!-- Brands Drawer (Left - Image 5 Uslubida: ✕ Brendlar) -->
+  <div class="drawer drawer-left" id="brandsDrawer" role="dialog" aria-modal="true">
+    <div class="catalog-drawer-nav-header">
+      <button class="catalog-drawer-close-btn" onclick="toggleBrandsDrawer(false)" id="brandsDrawerCloseBtn" aria-label="Yopish">
+        <span id="brandsDrawerCloseIcon"></span>
+      </button>
+      <h3 class="catalog-drawer-heading" id="brandsDrawerHeading">Brendlar</h3>
+    </div>
 
-          <div class="photo-slots-grid" id="photo-slots-grid">
-            <!-- 5 slots injected via JS -->
-          </div>
+    <div class="drawer-body" style="padding: 16px 14px;">
+      <div class="brands-drawer-grid" id="brandsDrawerGrid"></div>
+    </div>
+  </div>
 
-          <div class="photo-upload-tools">
-            <label class="btn btn-outline btn-upload-label">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
-              <span data-i18n="btnBatchUpload">Foto yuklash (max 5 ta)</span>
-              <input type="file" id="crud-prod-multi-files" accept="image/*" multiple class="hidden">
-            </label>
+  <!-- ==========================================================================
+       MODALS (PRODUCT DETAIL & CHECKOUT)
+       ========================================================================== -->
+  <!-- Product Detail Modal -->
+  <div class="modal-backdrop" id="productDetailModal" onclick="if(event.target === this) closeProductModal();">
+    <div class="modal-card">
+      <button class="modal-close-btn" onclick="closeProductModal()" id="productDetailCloseBtn" aria-label="Yopish"></button>
+      <div class="modal-body" id="productDetailBody"></div>
+    </div>
+  </div>
 
-            <div class="url-input-wrap">
-              <input type="url" id="crud-prod-url" placeholder="Yoki tashqi rasm URL manzili...">
-              <button type="button" class="btn btn-sm btn-outline" id="btn-add-url-photo" data-i18n="btnAddUrl">Qo'shish</button>
+  <!-- Checkout Modal -->
+  <div class="modal-backdrop" id="checkoutModal" onclick="if(event.target === this) closeCheckoutModal();">
+    <div class="modal-card" style="max-width: 520px;">
+      <button class="modal-close-btn" onclick="closeCheckoutModal()" id="checkoutCloseBtn" aria-label="Yopish"></button>
+      <div class="modal-body" id="checkoutModalBody"></div>
+    </div>
+  </div>
+
+  <!-- Contact Modal (Bog'lanish & Do'kon Ma'lumotlari) -->
+  <div class="modal-backdrop" id="contactModal" onclick="if(event.target === this) closeContactModal();">
+    <div class="modal-card" style="max-width: 480px;">
+      <button class="modal-close-btn" onclick="closeContactModal()" id="contactCloseBtn" aria-label="Yopish"></button>
+      <div class="modal-body" style="padding: 24px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="images/logo.png" alt="BlackStore.uz" style="width: 58px; height: 58px; border-radius: 50%; margin: 0 auto 10px; display: block; box-shadow: 0 4px 14px rgba(0,0,0,0.4);" />
+          <h3 style="font-family: var(--font-heading); font-size: 1.3rem; margin-bottom: 4px;">BlackStore.uz</h3>
+          <p style="color: var(--yellow-400); font-weight: 600; font-size: 0.9rem;">Apple mahsulotlari eng arzon narxlarda!</p>
+        </div>
+
+        <div class="contact-info-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+          <a href="tel:+998951964444" class="contact-quick-card">
+            <div class="contact-card-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--yellow-400);">📞</div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Telefon raqam</div>
+              <div style="font-size: 1rem; font-weight: 700;">+998 (95) 196-44-44</div>
+            </div>
+            <span class="contact-badge" style="color: var(--yellow-400);">Qo'ng'iroq</span>
+          </a>
+
+          <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" class="contact-quick-card">
+            <div class="contact-card-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">✈️</div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Telegram kanal & Narxlar</div>
+              <div style="font-size: 1rem; font-weight: 700;">t.me/+y-KOTC5kOaFiZWUy</div>
+            </div>
+            <span class="contact-badge" style="color: #38bdf8;">O'tish</span>
+          </a>
+
+          <a href="https://instagram.com/blackstore.uz" target="_blank" rel="noopener noreferrer" class="contact-quick-card">
+            <div class="contact-card-icon" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">📸</div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Instagram profil (30,6K)</div>
+              <div style="font-size: 1rem; font-weight: 700;">@blackstore.uz</div>
+            </div>
+            <span class="contact-badge" style="color: #ec4899;">Kuzatish</span>
+          </a>
+
+          <div class="contact-quick-card" style="cursor: default;">
+            <div class="contact-card-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--yellow-400);">📍</div>
+            <div style="flex: 1;">
+              <div style="font-size: 0.8rem; color: var(--text-muted);">Do'konimiz manzili</div>
+              <div style="font-size: 0.95rem; font-weight: 700;">Toshkent sh., Malika savdo markazi, B-blok 1-do'kon</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Ish vaqti: 09:00 - 22:00 (dam olish kunlarisiz)</div>
             </div>
           </div>
         </div>
 
-        <div class="form-row-2">
-          <div class="form-group">
-            <label data-i18n="lblProdName">Mahsulot Nomi *</label>
-            <input type="text" id="crud-prod-name" placeholder="Masalan: iPhone 16 Pro Max 256GB" required>
+        <div style="display: flex; gap: 10px;">
+          <a href="tel:+998951964444" class="btn btn-primary" style="flex: 1; justify-content: center; text-decoration: none;">Qo'ng'iroq qilish</a>
+          <button class="btn btn-secondary" onclick="closeContactModal()" style="flex: 1; justify-content: center;">Yopish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reviews / Social Proof Modal (Mijozlar) -->
+  <div class="modal-backdrop" id="reviewsModal" onclick="if(event.target === this) closeReviewsModal();">
+    <div class="modal-card" style="max-width: 520px;">
+      <button class="modal-close-btn" onclick="closeReviewsModal()" id="reviewsCloseBtn" aria-label="Yopish"></button>
+      <div class="modal-body" style="padding: 24px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="images/logo.png" alt="BlackStore.uz" style="width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 10px; display: block; box-shadow: 0 4px 14px rgba(0,0,0,0.4);" />
+          <h3 style="font-family: var(--font-heading); font-size: 1.3rem; margin-bottom: 4px;">Mijozlar va Ishonch</h3>
+          <p style="color: var(--text-muted); font-size: 0.875rem;">BlackStore.uz rasmiy ko'rsatkichlari va kafolatlari</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; text-align: center;">
+          <div style="background: var(--bg-card); padding: 14px 8px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="font-size: 1.3rem; font-weight: 800; color: var(--yellow-400);">30.6K</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Obunachilar</div>
           </div>
-          <div class="form-group">
-            <label data-i18n="lblCategory">Toifa</label>
-            <select id="crud-prod-category">
-              <option value="naushniki-quloqchinlar">Quloqchinlar va naushniklar</option>
-              <option value="zaryadka-kabel">Zaryadlovchi va kabellar</option>
-              <option value="telefon-aksessuar">Telefon aksessuarlari</option>
-              <option value="smart-watch-fitnes">Aqlli soatlar va fitnes</option>
-              <option value="powerbanklar">Powerbanklar</option>
-              <option value="kolonki-audio">Karnaylar va audio</option>
-              <option value="blogger-jihozlar">Blogerlar jihozlari</option>
-              <option value="kompyuter-aksessuar">Playstation va Kompyuter aksessuarlari</option>
-              <option value="telefon-planshet">Telefon va planshetlar</option>
-              <option value="smart-texnika">Smart qurilmalar va uy texnikasi</option>
-              <option value="gozellik-avto">Go'zallik, avto va boshqalar</option>
-              <option value="holderlar-va-smart-parfyumlar">Holderlar va Smart Parfyumlar</option>
-              <option value="sumkalar">Sumkalar va chexollar</option>
-            </select>
+          <div style="background: var(--bg-card); padding: 14px 8px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="font-size: 1.3rem; font-weight: 800; color: #ffffff;">169+</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Post va videolar</div>
+          </div>
+          <div style="background: var(--bg-card); padding: 14px 8px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <div style="font-size: 1.3rem; font-weight: 800; color: #22c55e;">1 Yil</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">Rasmiy kafolat</div>
           </div>
         </div>
 
-        <div class="form-row-3">
-          <div class="form-group">
-            <label data-i18n="lblBrand">Brend</label>
-            <select id="crud-prod-brand">
-              <option value="Apple">Apple</option>
-              <option value="Samsung">Samsung</option>
-              <option value="WHOOP">WHOOP</option>
-              <option value="Meta">Meta</option>
-              <option value="Google">Google</option>
-              <option value="Canon">Canon</option>
-              <option value="Boshqa">Boshqa</option>
-            </select>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+          <div style="padding: 12px 14px; background: var(--bg-card); border-radius: var(--radius-md); border-left: 3px solid var(--yellow-400);">
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-main);">⚡️ Eng arzon narxlar kafolati</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Apple mahsulotlari (iPhone, AirPods, Apple Watch) Toshkentdagi eng arzon va qulay narxlarda.</div>
           </div>
-          <div class="form-group">
-            <label data-i18n="lblPrice">Narxi (so'mda) *</label>
-            <input type="number" id="crud-prod-price" placeholder="18500000" required>
-          </div>
-          <div class="form-group">
-            <label data-i18n="lblOldPrice">Eski Narxi (so'mda)</label>
-            <input type="number" id="crud-prod-old-price" placeholder="19900000">
+          <div style="padding: 12px 14px; background: var(--bg-card); border-radius: var(--radius-md); border-left: 3px solid var(--yellow-400);">
+            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-main);">📍 Malika B-blok 1-do'kon</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Do'konimizga tashrif buyurib, istalgan mahsulotni jonli ko'rishingiz va mutaxassis maslahatini olishingiz mumkin.</div>
           </div>
         </div>
 
-        <div class="form-group">
-          <label data-i18n="lblDesc">Qisqa Tavsif</label>
-          <textarea id="crud-prod-desc" rows="3" placeholder="Mahsulot haqida asosiy ma'lumotlar..."></textarea>
+        <div style="display: flex; gap: 10px;">
+          <a href="https://instagram.com/blackstore.uz?mdxt=eHRsNWNkZTRkenE%3D" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="flex: 1; justify-content: center; text-decoration: none;">Instagramda ko'rish</a>
+          <button class="btn btn-secondary" onclick="closeReviewsModal()" style="flex: 1; justify-content: center;">Yopish</button>
         </div>
+      </div>
+    </div>
+  </div>
 
-        <div class="form-row-2">
-          <div class="form-group">
-            <label data-i18n="lblSpecs">Xususiyatlar (har bir qatorda 1 tadan)</label>
-            <textarea id="crud-prod-specs" rows="3" placeholder="Xotira: 256GB&#10;Kafolat: 1 yil rasmiy&#10;Rang: Natural Titanium"></textarea>
+  <!-- Info Modal (Yetkazib berish / Kafolat / To'lov usullari) -->
+  <div class="modal-backdrop" id="infoModal" onclick="if(event.target === this) closeInfoModal();">
+    <div class="modal-card" style="max-width: 480px;">
+      <button class="modal-close-btn" onclick="closeInfoModal()" id="infoCloseBtn" aria-label="Yopish"></button>
+      <div class="modal-body" id="infoModalBody" style="padding: 24px;"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       FLOATING AI ASSISTANT WIDGET
+       ========================================================================== -->
+  <aside class="ai-widget-wrapper" id="aiWidgetWrapper" aria-label="AI Maslahatchi">
+    <!-- Chat Trigger Bubble -->
+    <button class="ai-fab-btn" id="aiFabBtn" onclick="toggleAiChat()" title="AI Maslahatchi bilan suhbat" aria-label="AI Maslahatchi">
+      <div class="ai-avatar-pulse">
+        <span class="ai-robot-emoji">🤖</span>
+      </div>
+      <div class="ai-fab-label">
+        <span class="ai-fab-title">AI Maslahatchi</span>
+        <span class="ai-fab-status">Onlayn</span>
+      </div>
+    </button>
+
+    <!-- AI Chat Popup Box -->
+    <div class="ai-chat-window hidden" id="aiChatWindow">
+      <div class="ai-chat-header">
+        <div class="ai-header-left">
+          <div class="ai-status-dot"></div>
+          <div>
+            <h4 class="ai-chat-title">Black Store AI Yordamchi</h4>
+            <span class="ai-chat-subtitle">Tovarlar va narxlar bo'yicha 24/7 aqlli yordamchi</span>
           </div>
-          <div class="form-group">
-            <label data-i18n="lblStock">Ombordagi Qoldiq (Dona)</label>
-            <input type="number" id="crud-prod-stock" value="15" min="0">
+        </div>
+        <button class="ai-chat-close-btn" id="aiChatCloseBtn" onclick="toggleAiChat(false)" aria-label="Yopish">&times;</button>
+      </div>
 
-            <label class="mt-12" data-i18n="lblBadge">Belgi (Badge)</label>
-            <input type="text" id="crud-prod-badge" placeholder="Masalan: Original, -15%, Yangi">
+      <!-- Messages Stream -->
+      <div class="ai-messages-container" id="aiMessagesContainer">
+        <!-- Initial Welcome Message -->
+        <div class="ai-msg ai-msg-bot">
+          <div class="ai-bot-avatar">🤖</div>
+          <div class="ai-msg-bubble">
+            <p id="aiWelcomeText">Assalomu alaykum! Men Black Store do'konining sun'iy intellekt maslahatchisiman. Sizga qaysi gadjet yoki aksessuar haqida ma'lumot kerak?</p>
           </div>
         </div>
 
-        <div class="form-group-checkbox">
-          <label class="switch-label">
-            <input type="checkbox" id="crud-prod-featured">
-            <span class="switch-slider"></span>
-            <span class="switch-text" data-i18n="lblFeatured">Tavsiya etilgan tovar (Top sotuvlar)</span>
-          </label>
+        <!-- Suggestion Chips -->
+        <div class="ai-suggestions-wrap" id="aiSuggestionsWrap">
+          <button type="button" class="ai-chip" onclick="sendAiPrompt('iPhone 16 chexollari bormi?')">iPhone 16 chexollari?</button>
+          <button type="button" class="ai-chip" onclick="sendAiPrompt('Samsung S24 Ultra bormi?')">Samsung S24 bormi?</button>
+          <button type="button" class="ai-chip" onclick="sendAiPrompt('Yetkazib berish shartlari qanaqa?')">Yetkazib berish qancha?</button>
+          <button type="button" class="ai-chip" onclick="sendAiPrompt('Kafolat muddati qancha?')">Kafolat bormi?</button>
         </div>
+      </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" id="btn-cancel-crud" data-i18n="btnCancel">Bekor qilish</button>
-          <button type="submit" class="btn btn-primary" id="btn-save-prod" data-i18n="btnSaveProduct">Saqlash</button>
-        </div>
+      <!-- Input Area -->
+      <form class="ai-chat-input-row" id="aiChatForm" onsubmit="handleAiFormSubmit(event)">
+        <input type="text" id="aiUserInput" placeholder="Savolingizni yozing..." autocomplete="off">
+        <button type="submit" class="ai-send-btn" id="aiSendBtn" aria-label="Yuborish">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
       </form>
     </div>
-  </div>
+  </aside>
 
-  <!-- =========================================================================
-       4. MODAL: AI TEST CHAT WIDGET
-       ========================================================================= -->
-  <div class="modal-backdrop hidden" id="ai-test-modal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title">Black Store AI Maslahatchi Sinovi</h3>
-        <button class="modal-close-btn" id="close-ai-modal">&times;</button>
-      </div>
-      <div class="modal-body ai-chat-body">
-        <div class="ai-chat-messages" id="ai-chat-messages">
-          <div class="ai-msg bot">
-            <div class="ai-msg-bubble">Assalomu alaykum! Black Store AI maslahatchisiman. Tizim sozlamalari muvaffaqiyatli ishlayapti. Biror savol bering!</div>
-          </div>
-        </div>
-        <div class="ai-chat-input-bar">
-          <input type="text" id="ai-chat-input" placeholder="AIga savol bering (Masalan: AirPods narxi qancha?)...">
-          <button class="btn btn-primary" id="ai-chat-send-btn">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="22" y1="2" x2="11" y2="13"></line>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- ==========================================================================
+       TOAST CONTAINER
+       ========================================================================== -->
+  <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Toast Notification Box -->
-  <div class="toast-container" id="toast-container"></div>
+  <!-- ==========================================================================
+       SCRIPTS (PURE SVG ICONS + DATA + LOGIC)
+       ========================================================================== -->
+  <script src="js/icons.js"></script>
+  <script src="js/products-data.js"></script>
+  <script src="js/app.js"></script>
 
-  <script src="/js/admin.js"></script>
+  <!-- Inject Static Vector Icons into Placeholders -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Top bar
+      const topPhone = document.getElementById('topPhoneIcon');
+      if (topPhone) topPhone.innerHTML = getIcon('phone');
+      const topTg = document.getElementById('topTelegramIcon');
+      if (topTg) topTg.innerHTML = getIcon('telegram');
+
+      // Search & Actions
+      const catIcon = document.getElementById('catalogBtnIcon');
+      if (catIcon) catIcon.innerHTML = getIcon('grid');
+      const searchIcon = document.getElementById('searchBarIcon');
+      if (searchIcon) searchIcon.innerHTML = getIcon('search');
+      const searchClear = document.getElementById('desktopSearchClear');
+      if (searchClear) searchClear.innerHTML = getIcon('close');
+      const mSearchIcon = document.getElementById('mobileSearchIcon');
+      if (mSearchIcon) mSearchIcon.innerHTML = getIcon('search');
+      const mSearchClear = document.getElementById('mobileSearchClear');
+      if (mSearchClear) mSearchClear.innerHTML = getIcon('close');
+
+      const wishIcon = document.getElementById('headerWishlistIcon');
+      if (wishIcon) wishIcon.innerHTML = getIcon('heart');
+      const cartIcon = document.getElementById('headerCartIcon');
+      if (cartIcon) cartIcon.innerHTML = getIcon('shoppingBag');
+
+      // Slider controls
+      const prevBtn = document.getElementById('sliderPrevBtn');
+      if (prevBtn) prevBtn.innerHTML = getIcon('chevronLeft');
+      const nextBtn = document.getElementById('sliderNextBtn');
+      if (nextBtn) nextBtn.innerHTML = getIcon('chevronRight');
+
+      // Trust icons
+      const trust1 = document.getElementById('trustIcon1');
+      if (trust1) trust1.innerHTML = getIcon('lightning');
+      const trust2 = document.getElementById('trustIcon2');
+      if (trust2) trust2.innerHTML = getIcon('shieldCheck');
+      const trust3 = document.getElementById('trustIcon3');
+      if (trust3) trust3.innerHTML = getIcon('truck');
+      const trust4 = document.getElementById('trustIcon4');
+      if (trust4) trust4.innerHTML = getIcon('mapPin');
+
+      // Footer
+      const fTg = document.getElementById('footerTgBtn');
+      if (fTg) fTg.innerHTML = getIcon('telegram');
+      const fInsta = document.getElementById('footerInstaBtn');
+      if (fInsta) fInsta.innerHTML = getIcon('instagram');
+      const fPhone = document.getElementById('footerPhoneIcon');
+      if (fPhone) fPhone.innerHTML = getIcon('phone');
+      const fTgIcon = document.getElementById('footerTgIcon');
+      if (fTgIcon) fTgIcon.innerHTML = getIcon('telegram');
+      const fMapIcon = document.getElementById('footerMapIcon');
+      if (fMapIcon) fMapIcon.innerHTML = getIcon('mapPin');
+
+      // Mobile Bottom Bar
+      const navHome = document.getElementById('navHomeIcon');
+      if (navHome) navHome.innerHTML = getIcon('home');
+      const navCat = document.getElementById('navCatalogIcon');
+      if (navCat) navCat.innerHTML = getIcon('grid');
+      const navSearch = document.getElementById('navSearchIcon');
+      if (navSearch) navSearch.innerHTML = getIcon('search');
+      const navWish = document.getElementById('navWishlistIcon');
+      if (navWish) navWish.innerHTML = getIcon('heart');
+      const navCart = document.getElementById('navCartIcon');
+      if (navCart) navCart.innerHTML = getIcon('shoppingBag');
+
+      // Drawers & Modals Close buttons
+      const cartClose = document.getElementById('cartDrawerCloseBtn');
+      if (cartClose) cartClose.innerHTML = getIcon('close');
+      const cartTitleIcon = document.getElementById('cartDrawerTitleIcon');
+      if (cartTitleIcon) cartTitleIcon.innerHTML = getIcon('shoppingBag');
+      const checkoutBtnIcon = document.getElementById('checkoutBtnIcon');
+      if (checkoutBtnIcon) checkoutBtnIcon.innerHTML = getIcon('check');
+
+      // Sub-nav bar ikonkalar
+      const subNavCat = document.getElementById('subNavCatalogIcon');
+      if (subNavCat) subNavCat.innerHTML = getIcon('grid');
+      const subNavBrands = document.getElementById('subNavBrandsIcon');
+      if (subNavBrands) subNavBrands.innerHTML = getIcon('tag');
+      const subNavArrow = document.getElementById('subNavArrowIcon');
+      if (subNavArrow) subNavArrow.innerHTML = getIcon('chevronRight');
+
+      const catDrawerCloseIcon = document.getElementById('catDrawerCloseIcon');
+      if (catDrawerCloseIcon) catDrawerCloseIcon.innerHTML = getIcon('close');
+      const brandsDrawerCloseIcon = document.getElementById('brandsDrawerCloseIcon');
+      if (brandsDrawerCloseIcon) brandsDrawerCloseIcon.innerHTML = getIcon('close');
+
+      const infoClose = document.getElementById('infoCloseBtn');
+      if (infoClose) infoClose.innerHTML = getIcon('close');
+
+      const pDetailClose = document.getElementById('productDetailCloseBtn');
+      if (pDetailClose) pDetailClose.innerHTML = getIcon('close');
+      const checkoutClose = document.getElementById('checkoutCloseBtn');
+      if (checkoutClose) checkoutClose.innerHTML = getIcon('close');
+      const contactClose = document.getElementById('contactCloseBtn');
+      if (contactClose) contactClose.innerHTML = getIcon('close');
+      const reviewsClose = document.getElementById('reviewsCloseBtn');
+      if (reviewsClose) reviewsClose.innerHTML = getIcon('close');
+    });
+
+    function focusMobileSearch() {
+      const input = document.getElementById('mobileSearchInput');
+      if (input) {
+        input.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  </script>
 </body>
-
 </html>

@@ -1,53 +1,25 @@
 [
   {
-    "id": "ORD-78342",
-    "createdAt": "2026-10-09T17:27:58.342Z",
-    "formattedDate": "22:27, 09/10/2026",
+    "id": "ORD-23606",
+    "createdAt": "2026-10-11T17:10:23.607Z",
+    "formattedDate": "22:10, 11/10/2026",
     "customer": {
-      "name": "Test Mijoz",
-      "phone": "+998901112233",
-      "address": "Yunusobod 4",
-      "deliveryMethod": "yandex",
-      "notes": ""
+      "name": "Fazliddin Tursunov",
+      "phone": "+998 200231108",
+      "address": "Chirchiq",
+      "deliveryMethod": "Naqd",
+      "notes": "To'lov turi: Naqd"
     },
     "items": [
       {
-        "id": "prod-1",
-        "name": "Apple iPhone 16 Pro Max",
-        "price": 17800000,
+        "id": "105",
+        "name": "Apple AirPods Pro 2 (USB-C) MagSafe Keys bilan",
+        "price": 2690000,
         "quantity": 1
       }
     ],
-    "total": 17800000,
+    "total": 2421000,
     "status": "new",
     "telegramSent": false
-  },
-  {
-    "id": "ORD-1001",
-    "createdAt": "2026-10-09T18:30:00.000Z",
-    "customer": {
-      "name": "Jasur Alimov",
-      "phone": "+998 90 987 65 43",
-      "address": "Toshkent sh., Mirzo Ulug'bek t., Buyuk Ipak Yo'li 14",
-      "deliveryMethod": "yandex",
-      "notes": "Kelishdan oldin qo'ng'iroq qiling, iltimos"
-    },
-    "items": [
-      {
-        "id": "prod-1",
-        "name": "Apple iPhone 16 Pro Max",
-        "price": 17800000,
-        "quantity": 1
-      },
-      {
-        "id": "prod-7",
-        "name": "Apple 20W USB-C Tezkor Zaryadnik",
-        "price": 240000,
-        "quantity": 1
-      }
-    ],
-    "total": 18040000,
-    "status": "new",
-    "telegramSent": true
   }
 ]

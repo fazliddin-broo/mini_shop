@@ -12,9 +12,9 @@
     "adminPin": "1234"
   },
   "telegram": {
-    "botToken": "",
-    "chatId": "",
-    "enabled": false
+    "botToken": "8399821587:AAEezCvv51nqqS10ZeAQ-7ACTgWneJMTyV8",
+    "chatId": "7878337508",
+    "enabled": true
   },
   "ai": {
     "provider": "gemini",

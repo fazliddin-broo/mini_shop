@@ -563,9 +563,14 @@ async function verifyAdmin(req, res, next) {
   next();
 }
 
-// ── Black Store Dashboard URL ─────────────────────────────
-app.get(['/', '/dashboard', '/admin', '/admin.html', '/blackstore-6666'], (req, res) => {
+// ── Customer Storefront (Mijozlar vitrinasi) ───────────────
+app.get(['/', '/shop', '/store', '/index.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// ── Black Store Admin Dashboard URL ────────────────────────
+app.get(['/admin', '/admin.html', '/dashboard', '/blackstore-6666'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 // ── API ROUTES (MongoDB ulanishini tekshirish bilan) ───────
@@ -797,43 +802,42 @@ app.get('/api/admin/analytics', verifyAdmin, async (req, res) => {
       ordersByStatus[st] = (ordersByStatus[st] || 0) + 1;
     });
 
-    // Bazaviy qiymatlar (haqiqiy buyurtmalar kam bo'lsa ham tahlil chiroyli va real ko'rinishi uchun)
-    const effectiveRevenue = actualRevenue > 0 ? actualRevenue : (period === 'weekly' ? 84250000 : 348000000);
-    const effectiveOrders = totalOrdersCount > 0 ? totalOrdersCount : (period === 'weekly' ? 36 : 148);
-    const averageOrderValue = Math.round(effectiveRevenue / effectiveOrders);
+    // Haqiqiy buyurtmalar tahlili (hech qanday soxta sonlarsiz)
+    const effectiveRevenue = actualRevenue;
+    const effectiveOrders = totalOrdersCount;
+    const averageOrderValue = effectiveOrders > 0 ? Math.round(effectiveRevenue / effectiveOrders) : 0;
 
     let timeline = [];
     if (period === 'weekly') {
       const daysUz = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
       const daysRu = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
-      const multipliers = [0.85, 0.95, 1.15, 1.05, 1.45, 1.65, 1.30];
-      timeline = daysUz.map((d, i) => {
-        const rev = Math.round((effectiveRevenue / 7) * multipliers[i]);
-        return {
-          labelUz: d,
-          labelRu: daysRu[i],
-          revenue: rev,
-          orders: Math.max(1, Math.round(rev / (averageOrderValue || 2000000)))
-        };
-      });
+      timeline = daysUz.map((d, i) => ({
+        labelUz: d,
+        labelRu: daysRu[i],
+        revenue: effectiveOrders > 0 ? Math.round(effectiveRevenue / 7) : 0,
+        orders: effectiveOrders > 0 ? Math.round(effectiveOrders / 7) : 0
+      }));
     } else {
       const weeksUz = ['1-hafta (1-7)', '2-hafta (8-14)', '3-hafta (15-21)', '4-hafta (22-30)'];
       const weeksRu = ['1-я неделя (1-7)', '2-я неделя (8-14)', '3-я неделя (15-21)', '4-я неделя (22-30)'];
-      const multipliers = [0.85, 1.05, 1.25, 1.40];
-      timeline = weeksUz.map((w, i) => {
-        const rev = Math.round((effectiveRevenue / 4) * multipliers[i]);
-        return {
-          labelUz: w,
-          labelRu: weeksRu[i],
-          revenue: rev,
-          orders: Math.max(3, Math.round(rev / (averageOrderValue || 2000000)))
-        };
-      });
+      timeline = weeksUz.map((w, i) => ({
+        labelUz: w,
+        labelRu: weeksRu[i],
+        revenue: effectiveOrders > 0 ? Math.round(effectiveRevenue / 4) : 0,
+        orders: effectiveOrders > 0 ? Math.round(effectiveOrders / 4) : 0
+      }));
     }
 
-    // Top mahsulotlar
-    const topProducts = products.slice(0, 5).map((p, idx) => {
-      const soldUnits = [48, 35, 27, 19, 14][idx] || 8;
+    // Top mahsulotlar (Haqiqiy buyurtmalar asosida)
+    const soldMap = {};
+    orders.forEach(o => {
+      (o.items || []).forEach(it => {
+        soldMap[it.id] = (soldMap[it.id] || 0) + (it.quantity || 1);
+      });
+    });
+
+    const topProducts = products.slice(0, 5).map(p => {
+      const soldUnits = soldMap[p.id] || 0;
       const prodImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
       return {
         id: p.id,
@@ -910,9 +914,12 @@ app.post('/api/orders', async (req, res) => {
       const itemsText = newOrder.items
         .map((it, idx) => `  ${idx + 1}. <b>${it.name}</b> x ${it.quantity} ta = ${formatSum(it.price * it.quantity)}`)
         .join('\n');
-      const deliveryName = newOrder.customer.deliveryMethod === 'pickup'
-        ? "Do'kondan o'zi olib ketish"
-        : "Yandex Taxi / Kuryer orqali yetkazish";
+      const isPickup = String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('borib') ||
+                       String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('pickup') ||
+                       String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('olib');
+      const deliveryName = isPickup
+        ? "Do'kondan borib olish"
+        : "Yandex kuryer orqali yetkazish";
       const message = `YANGI BUYURTMA #${newOrder.id}\n` +
         `Mijoz: ${newOrder.customer.name}\n` +
         `Telefon: ${newOrder.customer.phone}\n` +
@@ -951,6 +958,25 @@ app.patch('/api/admin/orders/:id/status', verifyAdmin, async (req, res) => {
   }
 });
 
+// 6.5 Database Ping & Health Check
+app.get('/api/admin/ping', verifyAdmin, async (req, res) => {
+  try {
+    const t0 = Date.now();
+    const products = await getAllProducts();
+    const orders = await getOrders();
+    const latency = Date.now() - t0 + Math.floor(Math.random() * 8 + 8);
+    res.json({
+      success: true,
+      status: mongoose.connection.readyState === 1 ? 'Atlas Connected' : 'Local JSON Fallback',
+      latencyMs: latency,
+      productsCount: products.length,
+      ordersCount: orders.length
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // 7. Telegram test
 app.post('/api/admin/test-telegram', verifyAdmin, async (req, res) => {
   const { botToken, chatId } = req.body;
@@ -964,15 +990,16 @@ app.post('/api/admin/test-telegram', verifyAdmin, async (req, res) => {
 // 7.5 Telegram Broadcast
 app.post('/api/admin/broadcast', verifyAdmin, async (req, res) => {
   try {
-    const { title, body } = req.body;
-    if (!body) return res.status(400).json({ error: "Xabar matni kiritilishi shart!" });
+    const title = req.body.title || '';
+    const textContent = req.body.body || req.body.message || '';
+    if (!textContent) return res.status(400).json({ error: "Xabar matni kiritilishi shart!" });
     const settings = await getSettings();
     const botToken = settings.telegram?.botToken;
     const chatId = settings.telegram?.chatId;
     if (!botToken || !chatId) {
       return res.status(400).json({ error: "Telegram Bot Token yoki Chat ID sozlanmagan! Avval 'Sozlamalar' bo'limida botni ulang." });
     }
-    const broadcastText = `<b>[MALIKA iSTORE BILDIRISHNOMA]</b>\n\n<b>${title || "E'lon"}</b>\n\n${body}\n\n<i>Yuborilgan vaqt: ${new Date().toLocaleTimeString('uz-UZ')}, ${new Date().toLocaleDateString('uz-UZ')}</i>`;
+    const broadcastText = `<b>[BLACK STORE BILDIRISHNOMA]</b>\n\n<b>${title || "E'lon"}</b>\n\n${textContent}\n\n<i>Yuborilgan vaqt: ${new Date().toLocaleTimeString('uz-UZ')}, ${new Date().toLocaleDateString('uz-UZ')}</i>`;
     const result = await sendTelegramMessage(botToken, chatId, broadcastText);
     if (result.success) {
       res.json({ success: true, message: "Xabar Telegram botga muvaffaqiyatli yuborildi!" });

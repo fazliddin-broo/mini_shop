@@ -1,19 +1,13 @@
-// ============================================
-// MINI SHOP — ENTERPRISE ADMIN DASHBOARD
-// Dual Theme (Light & Dark Mode) • macOS Aesthetics
-// E-commerce Analytics • 5-Angle Photo Uploads
-// 100% SVG Icons (Zero Emojis)
-// ============================================
+// =============================================================================
+// BLACK STORE — ENTERPRISE DASHBOARD SYSTEM
+// 100% SVG Vector Icons • macOS / Figma Bento Grid Design System
+// Dual Theme (Kun / Tun: Light & Dark Mode) • Multi-Language (UZ / RU)
+// 5-Angle Photo Uploads (Uzum Market Style) • End-to-End API Integration
+// =============================================================================
 
 const adminI18n = {
   uz: {
-    pinTitle: "Boshqaruv Paneliga Kirish",
-    pinSub: "Do‘kon ma’lumotlarini boshqarish uchun PIN-kodni kiriting",
-    pinError: "PIN-kod noto‘g‘ri! Qayta urinib ko‘ring.",
-    pinSubmit: "Kirish",
     adminCenterTitle: "Admin Boshqaruv Markazi",
-    grpManagement: "BOSHQARUV",
-    grpMonitoring: "MONITORING & TIZIM",
     navDashboard: "Dashboard",
     navAnalytics: "Savdo & Analitika",
     navProducts: "Mahsulotlar Bazasi",
@@ -22,11 +16,6 @@ const adminI18n = {
     navAudit: "Jarayonlar & Audit",
     navDb: "Baza & Server",
     navSettings: "Sozlamalar & Bot",
-    sidebarViewShop: "Saytni ko'rish",
-    sidebarLogout: "Chiqish",
-    lblClock: "Vaqt (Toshkent):",
-    lblDbType: "Baza turi:",
-    lblAdminRole: "Admin:",
     btnRefresh: "Yangilash",
     dashTitle: "Dashboard",
     dashSub: "Umumiy tizim holati, statistika va faolliklar",
@@ -57,10 +46,6 @@ const adminI18n = {
     periodWeekly: "Haftalik (7 kun)",
     periodMonthly: "Oylik (30 kun)",
     orderStatusTitle: "Buyurtmalar Holati",
-    statusNew: "Yangi buyurtmalar",
-    statusProcessing: "Yetkazilmoqda / Jarayonda",
-    statusCompleted: "Muvaffaqiyatli topshirildi",
-    statusCancelled: "Bekor qilingan",
     catShareTitle: "Toifalar bo'yicha ulush:",
     topProductsTitle: "Eng Ko'p Sotilgan Mahsulotlar (Top Sotuvlar)",
     topProductsDesc: "Xaridorgir flagman tovarlar va ularning savdo aylanmasi",
@@ -81,49 +66,39 @@ const adminI18n = {
     setShopPhone: "Telefon raqam",
     setShopAddress: "Manzil (Malika filiali)",
     setShopHours: "Ish vaqti",
-    setShopPin: "Admin PIN-kodi (Kirish uchun)",
     btnSave: "Saqlash",
     setTgTitle: "Telegram Bot Bildirishnomalari",
-    setTgDesc: "Xaridor saytda buyurtma tugmasini bosishi bilanoq, to'liq ma'lumotlar sotuvchining telegramiga keladi.",
+    setTgDesc: "Xaridor buyurtma berishi bilanoq, to'liq ma'lumotlar sotuvchining telegramiga keladi.",
     setTgChatId: "Sotuvchi Chat ID yoki Guruh ID",
-    setTgHelpToken: "Telegramda @BotFather ga kirib /newbot orqali 1 daqiqada olinadi",
-    setTgHelpChatId: "Telegramda @userinfobot orqali o'z ID raqamingizni bilib olasiz",
+    setTgHelpToken: "Telegramda @BotFather orqali olinadi",
+    setTgHelpChatId: "Telegramda @userinfobot orqali o'z ID raqamingizni olasiz",
     btnSaveBot: "Botni Saqlash",
     btnTestBot: "Sinov Xabarini Yuborish",
-    setAiTitle: "AI Savdo Maslahatchisi Sozlamalari",
-    setAiDesc: "Saytdagi virtual AI xaridorlarga tovarlar, narxlar va yetkazib berish bo'yicha maslahat beradi.",
-    setAiKey: "Gemini API Key (Ixtiyoriy)",
-    setAiKeyHelp: "Agar kiritilmasa, o'rnatilgan aqlli mahalliy algoritm avtomatik ishlaydi",
+    setAiTitle: "AI Savdo Maslahatchisi & API",
+    setAiDesc: "Virtual AI sotuvchi xaridorlarga tovarlar, narxlar va yetkazib berish bo'yicha maslahat beradi.",
+    setAiKey: "API Key",
     setAiWelcome: "AI Qutlov Xabari (Salomlashish)",
     setAiPrompt: "AI Tizim Qoidalari (System Prompt)",
     btnSaveAi: "AI Sozlamalarini Saqlash",
     modalPhotosTitle: "Mahsulot Rasmlari (5 tagacha poza / burchak)",
-    modalPhotosSub: "Har xil burchakdan olingan 5 ta sifatli rasm (Uzum Market kabi xaridorlar surib ko'ra oladi)",
-    btnBatchUpload: "Rasmlarni yuklash (max 5 ta)",
-    modalUrlHint: "yoki tashqi rasm URL havolasi:",
+    modalPhotosSub: "5 xil rakursdagi tiniq fotosuratlar (xaridorlar Uzum Market kabi surib tomosha qilishlari uchun)",
+    btnBatchUpload: "Foto yuklash (max 5 ta)",
     btnAddUrl: "Qo'shish",
     lblProdName: "Mahsulot Nomi *",
-    lblCategory: "Kategoriya",
+    lblCategory: "Toifa",
     lblBrand: "Brend",
     lblPrice: "Narxi (so'mda) *",
-    lblOldPrice: "Eski narxi (so'mda)",
-    lblUsd: "USD taxminan ($)",
-    lblDesc: "Tavsif (Qisqacha)",
-    lblSpecs: "Xususiyatlari (Specs - har bir qatorda 1 tadan)",
-    lblStock: "Zaxiradagi soni (Qoldiq)",
+    lblOldPrice: "Eski Narxi (so'mda)",
+    lblDesc: "Qisqa Tavsif",
+    lblSpecs: "Xususiyatlar (har bir qatorda 1 tadan)",
+    lblStock: "Ombordagi Qoldiq (Dona)",
     lblBadge: "Belgi (Badge)",
-    lblFeatured: "Bosh sahifada tavsiya qilingan sifatida ko'rsatilsin",
+    lblFeatured: "Tavsiya etilgan tovar (Top sotuvlar)",
     btnCancel: "Bekor qilish",
     btnSaveProduct: "Saqlash"
   },
   ru: {
-    pinTitle: "Вход в Панель Управления",
-    pinSub: "Введите PIN-код для управления магазином",
-    pinError: "Неверный PIN-код! Попробуйте снова.",
-    pinSubmit: "Войти",
     adminCenterTitle: "Центр Управления Магазином",
-    grpManagement: "УПРАВЛЕНИЕ",
-    grpMonitoring: "МОНИТОРИНГ & СИСТЕМА",
     navDashboard: "Дашборд",
     navAnalytics: "Продажи & Аналитика",
     navProducts: "База Товаров",
@@ -132,11 +107,6 @@ const adminI18n = {
     navAudit: "Процессы & Аудит",
     navDb: "База & Сервер",
     navSettings: "Настройки & Бот",
-    sidebarViewShop: "Перейти на сайт",
-    sidebarLogout: "Выйти",
-    lblClock: "Время (Ташкент):",
-    lblDbType: "Тип базы:",
-    lblAdminRole: "Админ:",
     btnRefresh: "Обновить",
     dashTitle: "Дашборд",
     dashSub: "Общее состояние системы, статистика продаж и активность",
@@ -167,10 +137,6 @@ const adminI18n = {
     periodWeekly: "Еженедельно (7 дней)",
     periodMonthly: "Ежемесячно (30 дней)",
     orderStatusTitle: "Статус Заказов",
-    statusNew: "Новые заказы",
-    statusProcessing: "В доставке / В обработке",
-    statusCompleted: "Успешно доставлено",
-    statusCancelled: "Отменено",
     catShareTitle: "Доля по категориям:",
     topProductsTitle: "Топ Продаваемых Товаров",
     topProductsDesc: "Флагманские позиции и их торговый оборот",
@@ -191,7 +157,6 @@ const adminI18n = {
     setShopPhone: "Номер телефона",
     setShopAddress: "Адрес (Филиал на Малике)",
     setShopHours: "График работы",
-    setShopPin: "PIN-код Админа (Для входа)",
     btnSave: "Сохранить",
     setTgTitle: "Оповещения Telegram Бота",
     setTgDesc: "Как только покупатель оформляет заказ, полные данные мгновенно приходят в Telegram продавца.",
@@ -200,24 +165,21 @@ const adminI18n = {
     setTgHelpChatId: "Узнайте свой ID через бота @userinfobot",
     btnSaveBot: "Сохранить Бота",
     btnTestBot: "Отправить Тестовое Сообщение",
-    setAiTitle: "Настройки AI Консультанта",
+    setAiTitle: "AI Консультант & API",
     setAiDesc: "Виртуальный AI на сайте консультирует покупателей по товарам, ценам и доставке.",
-    setAiKey: "Gemini API Key (Необязательно)",
-    setAiKeyHelp: "Если не указан, работает встроенный локальный алгоритм",
+    setAiKey: "API Key",
     setAiWelcome: "Приветственное сообщение AI",
     setAiPrompt: "Системный промпт AI",
     btnSaveAi: "Сохранить Настройки AI",
     modalPhotosTitle: "Фотографии Товара (до 5 ракурсов)",
     modalPhotosSub: "5 качественных фото с разных углов (листаются покупателями как на Uzum Market)",
     btnBatchUpload: "Загрузить фото (макс 5 шт)",
-    modalUrlHint: "или внешняя ссылка на изображение:",
     btnAddUrl: "Добавить",
     lblProdName: "Название Товара *",
     lblCategory: "Категория",
     lblBrand: "Бренд",
     lblPrice: "Цена (в сумах) *",
     lblOldPrice: "Старая цена (в сумах)",
-    lblUsd: "Примерно в USD ($)",
     lblDesc: "Описание (Кратко)",
     lblSpecs: "Характеристики (по 1 в строке)",
     lblStock: "Количество на складе",
@@ -228,10 +190,10 @@ const adminI18n = {
   }
 };
 
-// Global State
+// Global App State
 const adminState = {
   lang: localStorage.getItem('mini_shop_admin_lang') || 'uz',
-  theme: localStorage.getItem('admin_theme') || 'light', // Defaults to light mode like screenshot!
+  theme: localStorage.getItem('admin_theme') || 'light',
   token: localStorage.getItem('mini_shop_admin_token') || '',
   products: [],
   orders: [],
@@ -239,17 +201,19 @@ const adminState = {
   currentPeriod: 'weekly',
   photoSlots: [null, null, null, null, null],
   activeTab: 'tab-dashboard',
-  feedFilter: 'all',
-  liveCounter: 8
+  currentOrderFilter: 'all',
+  liveCounter: 8,
+  selectedViewingOrder: null
 };
 
-// Format currency
+// Utility: Format currency
 function formatSum(num) {
   const locale = adminState.lang === 'ru' ? 'ru-RU' : 'uz-UZ';
   const suffix = adminState.lang === 'ru' ? 'сум' : "so'm";
   return Number(num || 0).toLocaleString(locale) + ' ' + suffix;
 }
 
+// Utility: Escape HTML
 function escapeHtml(str) {
   return String(str || '')
     .replace(/&/g, '&amp;')
@@ -258,19 +222,41 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+// Floating Toast Notification System
+function showToast(message, type = 'success') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const item = document.createElement('div');
+  item.className = `toast-item ${type}`;
+  const iconSvg = type === 'success'
+    ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`
+    : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
+
+  item.innerHTML = `${iconSvg}<span>${escapeHtml(message)}</span>`;
+  container.appendChild(item);
+
+  setTimeout(() => {
+    item.style.opacity = '0';
+    item.style.transform = 'translateY(10px)';
+    item.style.transition = 'all 0.25s ease';
+    setTimeout(() => item.remove(), 250);
+  }, 3500);
+}
+
 // =============================================================================
-// 1. INITIALIZATION & AUTH
+// 1. INITIALIZATION & THEME / LANGUAGE
 // =============================================================================
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   initLanguage(adminState.lang);
   initLiveClock();
   initAutoRefresh();
-  initAuth();
+  initPhotoSlots();
+  initSplashAndLoad();
   setupEventListeners();
 });
 
-// Theme System (Light / Dark Kun-Tun Rejimi)
 function initTheme() {
   applyTheme(adminState.theme);
 }
@@ -292,7 +278,6 @@ function toggleTheme() {
   applyTheme(newTheme);
 }
 
-// Live Clock (Tashkent Time HH:mm:ss)
 function initLiveClock() {
   const clockEl = document.getElementById('live-clock-time');
   function tick() {
@@ -305,16 +290,13 @@ function initLiveClock() {
   tick();
 }
 
-// Auto-Refresh Pulse (8s countdown)
 function initAutoRefresh() {
   const pulseText = document.getElementById('live-pulse-text');
   setInterval(() => {
     adminState.liveCounter -= 1;
     if (adminState.liveCounter <= 0) {
       adminState.liveCounter = 8;
-      if (adminState.token) {
-        refreshDashboardData(true);
-      }
+      refreshDashboardData(true);
     }
     if (pulseText) {
       const prefix = adminState.lang === 'ru' ? 'В сети' : 'Jonli';
@@ -323,7 +305,6 @@ function initAutoRefresh() {
   }, 1000);
 }
 
-// Language System
 function initLanguage(lang) {
   if (!adminI18n[lang]) lang = 'uz';
   adminState.lang = lang;
@@ -351,190 +332,253 @@ function initLanguage(lang) {
   }
 }
 
-// Splash Logo Intro Animation (Parol butunlay olib tashlangan, to'g'ridan-to'g'ri kirish)
-function initAuth() {
-  initSplashAndLoad();
-}
-
 function initSplashAndLoad() {
   const splash = document.getElementById('splash-intro-overlay');
   const statusText = document.getElementById('splash-status-text');
 
   setTimeout(() => {
     if (statusText) statusText.textContent = adminState.lang === 'ru' ? 'Синхронизация данных Black Store...' : 'Black Store ma\'lumotlari sinxronlanmoqda...';
-  }, 500);
+  }, 400);
 
   setTimeout(() => {
     if (splash) splash.classList.add('fade-out');
     refreshDashboardData();
-  }, 1100);
+  }, 950);
 }
 
-// Refresh all dashboard data
 async function refreshDashboardData(silent = false) {
   if (!silent) {
     const refreshBtn = document.getElementById('btn-manual-refresh');
     if (refreshBtn) refreshBtn.style.opacity = '0.5';
   }
 
-  await Promise.allSettled([
-    loadSettings(),
+  const tasks = [
     loadProducts(),
     loadOrders(),
     loadAnalytics(adminState.currentPeriod)
-  ]);
+  ];
+  // Sozlamalarni avto-refreshda qayta yuklamaymiz, foydalanuvchi Token kiritayotganda input o'chib ketmasligi uchun!
+  if (!silent) {
+    tasks.push(loadSettings());
+  }
+
+  await Promise.allSettled(tasks);
 
   renderDashboardStats();
   renderRecentOrdersTable();
   renderChronologyStream();
 
-  const refreshBtn = document.getElementById('btn-manual-refresh');
-  if (refreshBtn) refreshBtn.style.opacity = '1';
+  if (!silent) {
+    showToast("Ma'lumotlar muvaffaqiyatli yangilandi!", "success");
+    const refreshBtn = document.getElementById('btn-manual-refresh');
+    if (refreshBtn) refreshBtn.style.opacity = '1';
+  }
 }
 
 // =============================================================================
-// 2. DASHBOARD MAIN TAB: STATS & BENTO GRID RENDERING
+// 2. 5-ANGLE PHOTOS SLOTS INJECTION & INTERACTION (Uzum Market Style)
+// =============================================================================
+const SLOT_LABELS = [
+  "1. Asosiy / Old",
+  "2. Yon ko'rinish",
+  "3. Orqa ko'rinish",
+  "4. Quti / Komplekt",
+  "5. Detal / Makro"
+];
+
+function initPhotoSlots() {
+  const container = document.getElementById('photo-slots-grid');
+  if (!container) return;
+
+  container.innerHTML = SLOT_LABELS.map((label, idx) => `
+    <div class="photo-slot" data-slot="${idx}" title="${label}">
+      ${idx === 0 ? '<span class="slot-primary-badge">1. Asosiy</span>' : ''}
+      <img src="" class="slot-img hidden" alt="${label}">
+      <div class="slot-placeholder">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+          <circle cx="12" cy="13" r="4"></circle>
+        </svg>
+        <span>${label}</span>
+      </div>
+      <button type="button" class="btn-remove-slot hidden" title="O'chirish">&times;</button>
+      <input type="file" accept="image/*" class="slot-file-input hidden">
+    </div>
+  `).join('');
+
+  // Individual Slot Click
+  container.querySelectorAll('.photo-slot').forEach(slotEl => {
+    slotEl.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-remove-slot')) return;
+      const idx = parseInt(slotEl.dataset.slot, 10);
+      const slotData = adminState.photoSlots[idx];
+      if (!slotData) {
+        const fileInput = slotEl.querySelector('.slot-file-input');
+        if (fileInput) fileInput.click();
+      }
+    });
+
+    const fileInput = slotEl.querySelector('.slot-file-input');
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const idx = parseInt(slotEl.dataset.slot, 10);
+          adminState.photoSlots[idx] = { type: 'file', file };
+          renderPhotoSlots();
+        }
+      });
+    }
+  });
+}
+
+function resetPhotoSlots(initialImages = []) {
+  adminState.photoSlots = [null, null, null, null, null];
+  for (let i = 0; i < 5; i++) {
+    if (initialImages[i]) {
+      adminState.photoSlots[i] = { type: 'url', src: initialImages[i] };
+    }
+  }
+  renderPhotoSlots();
+}
+
+function renderPhotoSlots() {
+  const container = document.getElementById('photo-slots-grid');
+  if (!container) return;
+
+  adminState.photoSlots.forEach((slot, idx) => {
+    const slotEl = container.querySelector(`.photo-slot[data-slot="${idx}"]`);
+    if (!slotEl) return;
+
+    const imgEl = slotEl.querySelector('.slot-img');
+    const placeholderEl = slotEl.querySelector('.slot-placeholder');
+    const removeBtn = slotEl.querySelector('.btn-remove-slot');
+
+    if (slot && (slot.src || slot.file)) {
+      const src = slot.src || URL.createObjectURL(slot.file);
+      imgEl.src = src;
+      imgEl.classList.remove('hidden');
+      placeholderEl.classList.add('hidden');
+      removeBtn.classList.remove('hidden');
+      slotEl.classList.add('filled');
+    } else {
+      imgEl.src = '';
+      imgEl.classList.add('hidden');
+      placeholderEl.classList.remove('hidden');
+      removeBtn.classList.add('hidden');
+      slotEl.classList.remove('filled');
+    }
+  });
+}
+
+function handleBatchPhotos(files) {
+  if (!files || files.length === 0) return;
+  const fileArr = Array.from(files).slice(0, 5);
+
+  fileArr.forEach(file => {
+    const emptyIdx = adminState.photoSlots.findIndex(s => s === null);
+    if (emptyIdx !== -1) {
+      adminState.photoSlots[emptyIdx] = { type: 'file', file };
+    }
+  });
+
+  renderPhotoSlots();
+}
+
+function removePhotoSlot(idx) {
+  adminState.photoSlots[idx] = null;
+  // Compact array to keep top slots filled
+  adminState.photoSlots = adminState.photoSlots.filter(Boolean);
+  while (adminState.photoSlots.length < 5) adminState.photoSlots.push(null);
+  renderPhotoSlots();
+}
+
+// =============================================================================
+// 3. DASHBOARD MAIN TAB: STATS & BENTO GRID
 // =============================================================================
 function renderDashboardStats() {
   const orders = adminState.orders || [];
   const products = adminState.products || [];
 
-  // Card 1: Xaridorlar & Mijozlar
+  // Card 1: Xaridorlar & Mijozlar (Haqiqiy mijozlar soni)
   const custSet = new Set();
   orders.forEach(o => {
     if (o.customer && o.customer.phone) custSet.add(o.customer.phone);
   });
-  const customerCount = Math.max(custSet.size, 124);
+  const customerCount = custSet.size;
   const custNumEl = document.getElementById('stat-cust-number');
   if (custNumEl) custNumEl.textContent = customerCount;
+  const custActiveEl = document.getElementById('stat-cust-active');
+  if (custActiveEl) custActiveEl.textContent = `${customerCount} faol`;
+  const custPendingEl = document.getElementById('stat-cust-pending');
+  if (custPendingEl) custPendingEl.textContent = '0 kutilmoqda';
+  const custBlockedEl = document.getElementById('stat-cust-blocked');
+  if (custBlockedEl) custBlockedEl.textContent = '0 blok';
 
   // Card 2: Buyurtmalar (Jami)
-  const totalOrders = Math.max(orders.length, 206);
+  const totalOrders = orders.length;
   const ordersNumEl = document.getElementById('stat-orders-number');
   if (ordersNumEl) ordersNumEl.textContent = totalOrders;
+  const ordersTodayEl = document.getElementById('stat-orders-today');
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayCount = orders.filter(o => o.createdAt && o.createdAt.startsWith(todayStr)).length;
+  if (ordersTodayEl) ordersTodayEl.textContent = `+${todayCount} bugun`;
+  const ordersDelayedEl = document.getElementById('stat-orders-delayed');
+  if (ordersDelayedEl) ordersDelayedEl.textContent = '0 kechikkan';
 
-  // Card 3: O'rtacha Savdo Cheki
+  // Card 3: O'rtacha Savdo Cheki (Haqiqiy tushum / buyurtmalar)
   let totalRevenue = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
-  if (totalRevenue === 0) totalRevenue = 35840000;
-  const aov = Math.round(totalRevenue / (orders.length || 2));
+  const aov = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
   const aovNumEl = document.getElementById('stat-aov-number');
   if (aovNumEl) {
-    aovNumEl.textContent = (aov >= 1000000) ? (aov / 1000000).toFixed(1) + ' mln' : formatSum(aov);
+    aovNumEl.textContent = aov === 0 ? "0 so'm" : (aov >= 1000000 ? (aov / 1000000).toFixed(1) + ' mln' : formatSum(aov));
   }
 
   // Card 4: Mahsulotlar Bazasi
   const prodNumEl = document.getElementById('stat-products-number');
-  if (prodNumEl) prodNumEl.textContent = `${products.length || 8} ta`;
+  if (prodNumEl) prodNumEl.textContent = `${products.length} ta`;
   const prodStockEl = document.getElementById('stat-products-stock');
-  const totalStock = products.reduce((acc, p) => acc + (p.stock || 0), 0) || 137;
+  const totalStock = products.reduce((acc, p) => acc + (p.stock || 0), 0);
   if (prodStockEl) prodStockEl.textContent = `${totalStock} dona qoldiq`;
   const prodActiveEl = document.getElementById('stat-products-active');
-  if (prodActiveEl) prodActiveEl.textContent = `${products.length || 8} ta faol`;
+  if (prodActiveEl) prodActiveEl.textContent = `${products.length} ta faol`;
 
-  // Sidebar count badges
-  const navProdBadge = document.getElementById('nav-products-count');
-  if (navProdBadge) navProdBadge.textContent = products.length;
-  const navOrderBadge = document.getElementById('nav-orders-count');
-  if (navOrderBadge) navOrderBadge.textContent = orders.length || 12;
+  // Database Tab Counters
+  const dbProdCount = document.getElementById('db-prod-count');
+  if (dbProdCount) dbProdCount.textContent = `${products.length} ta`;
+  const dbOrdersCount = document.getElementById('db-orders-count');
+  if (dbOrdersCount) dbOrdersCount.textContent = `${orders.length} ta`;
+
+  // Sidebar & Header Badges
+  const navProdCount = document.getElementById('nav-products-count');
+  if (navProdCount) navProdCount.textContent = products.length;
+  const navOrdersCount = document.getElementById('nav-orders-count');
+  if (navOrdersCount) {
+    navOrdersCount.textContent = orders.length;
+    navOrdersCount.style.display = orders.length > 0 ? 'inline-flex' : 'none';
+  }
+  const notifCount = document.getElementById('header-notif-count');
+  if (notifCount) {
+    notifCount.textContent = orders.length;
+    notifCount.style.display = orders.length > 0 ? 'inline-flex' : 'none';
+  }
 }
 
-// Render Left Wide Table: Recent Orders (Matches screenshot!)
 function renderRecentOrdersTable() {
   const tbody = document.getElementById('dash-recent-orders-tbody');
   if (!tbody) return;
 
-  const orders = adminState.orders;
+  const orders = adminState.orders || [];
   if (orders.length === 0) {
-    // Elegant sample orders matching screenshot style
-    const sampleRows = [
-      {
-        name: "Muslimbek Tursunboyev",
-        phone: "@muslim_bek09",
-        id: "#122",
-        time: "JUM, 2-OKT 16:49:51",
-        item: "iPhone 16 Pro Max",
-        qty: "2 ta",
-        total: 35600000
-      },
-      {
-        name: "Maxmayusufov Azizbek",
-        phone: "@maxmayusufov_audi",
-        id: "#121",
-        time: "PAY, 1-OKT 22:45:12",
-        item: "Samsung S24 Ultra",
-        qty: "1 ta",
-        total: 14900000
-      },
-      {
-        name: "Axmadjonov Akbarbek",
-        phone: "@akbar_istore",
-        id: "#120",
-        time: "PAY, 1-OKT 22:44:33",
-        item: "AirPods Pro 2",
-        qty: "1 ta",
-        total: 2750000
-      },
-      {
-        name: "Iroda Rahmanova",
-        phone: "@imnotiroda",
-        id: "#119",
-        time: "PAY, 1-OKT 22:42:39",
-        item: "MacBook Air 13\" M3",
-        qty: "1 ta",
-        total: 14200000
-      },
-      {
-        name: "Xadjayeva Robiya",
-        phone: "+998 90 987 65 43",
-        id: "#118",
-        time: "PAY, 1-OKT 22:42:32",
-        item: "Apple Watch Series 10",
-        qty: "1 ta",
-        total: 5400000
-      },
-      {
-        name: "Hamidjonov Muhammadali",
-        phone: "+998 93 111 22 33",
-        id: "#117",
-        time: "PAY, 1-OKT 22:40:25",
-        item: "iPhone 15 Pro 128GB",
-        qty: "1 ta",
-        total: 13400000
-      },
-      {
-        name: "Ollaberganov Jo'shqinbek",
-        phone: "@Starts1",
-        id: "#116",
-        time: "PAY, 1-OKT 22:40:05",
-        item: "20W USB-C Adapter",
-        qty: "2 ta",
-        total: 480000
-      }
-    ];
-
-    tbody.innerHTML = sampleRows.map(row => `
+    tbody.innerHTML = `
       <tr>
-        <td>
-          <div class="table-cust-name">${row.name}</div>
-          <div class="table-cust-sub">${row.phone}</div>
-        </td>
-        <td><span class="table-id-badge">${row.id}</span></td>
-        <td><span class="table-time-badge">${row.time}</span></td>
-        <td><span class="table-qty-badge">${row.item} (${row.qty})</span></td>
-        <td><span class="table-sum-bold">${formatSum(row.total)}</span></td>
-        <td>
-          <div class="table-action-btns">
-            <button class="tbl-btn" onclick="viewSampleOrder('${row.name}', '${row.item}', '${row.total}')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              <span>Ko'rish</span>
-            </button>
-            <button class="tbl-btn tbl-btn-danger" onclick="alert('Buyurtma bekor qilindi')">
-              <span>Bekor</span>
-            </button>
-          </div>
+        <td colspan="6" style="text-align: center; padding: 48px 16px; color: var(--text-muted);">
+          <div style="font-size: 2.2rem; margin-bottom: 10px;">📦</div>
+          <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 6px;">Hozircha yangi buyurtmalar mavjud emas</div>
+          <div style="font-size: 0.85rem; max-width: 420px; margin: 0 auto; line-height: 1.5;">Do'kon yangi ishga tushirildi. Mijozlar vitrinadan buyurtma berganda, to'liq chek va mijoz ma'lumotlari shu yerda real vaqtda aks etadi.</div>
         </td>
       </tr>
-    `).join('');
+    `;
     return;
   }
 
@@ -549,7 +593,7 @@ function renderRecentOrdersTable() {
           <div class="table-cust-name">${cust.name || 'Mijoz'}</div>
           <div class="table-cust-sub">${cust.phone || ''}</div>
         </td>
-        <td><span class="table-id-badge">#${order.id.slice(-4).toUpperCase()}</span></td>
+        <td><span class="table-id-badge">#${order.id.slice(-5).toUpperCase()}</span></td>
         <td><span class="table-time-badge">${order.formattedDate || new Date(order.createdAt).toLocaleDateString('uz-UZ')}</span></td>
         <td><span class="table-qty-badge">${itemSummary}</span></td>
         <td><span class="table-sum-bold">${formatSum(order.total)}</span></td>
@@ -569,27 +613,74 @@ function renderRecentOrdersTable() {
   }).join('');
 }
 
-// Render Right Feed: Jonli jarayonlar & Xronologiya (Matches screenshot!)
 function renderChronologyStream() {
   const container = document.getElementById('chronology-stream');
   if (!container) return;
 
-  const t = adminI18n[adminState.lang] || adminI18n.uz;
+  const orders = adminState.orders || [];
+  const products = adminState.products || [];
 
-  container.innerHTML = `
-    <!-- GROUP 1: BUGUNGI AMALLAR -->
-    <div class="stream-group">
-      <div class="stream-group-header">
-        <span>📅 ${adminState.lang === 'ru' ? 'СЕГОДНЯШНИЕ ДЕЙСТВИЯ' : 'BUGUNGI AMALLAR'}</span>
-        <span class="stream-group-badge">${adminState.lang === 'ru' ? 'ПОКА НЕТ НОВЫХ' : 'HOZIRCHA YANGI AMAL YO\'Q'}</span>
+  if (orders.length === 0) {
+    container.innerHTML = `
+      <div class="stream-group">
+        <div class="stream-group-header">
+          <span>${adminState.lang === 'ru' ? 'СЕГОДНЯШНИЕ ДЕЙСТВИЯ' : 'BUGUNGI AMALLAR'}</span>
+          <span class="stream-group-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">TIZIM TAYYOR</span>
+        </div>
+
+        <div class="stream-item" style="margin-top: 8px;">
+          <div class="stream-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+          </div>
+          <div class="stream-body">
+            <div class="stream-title">${adminState.lang === 'ru' ? 'Витрина готова к заказам' : 'Vitrina buyurtmalarni qabul qilishga tayyor'}</div>
+            <div class="stream-subtitle">${products.length} ta mahsulot sotuvda faol (jami 391 dona qoldiq)</div>
+            <div class="stream-meta-row">
+              <span class="stream-time-badge">Bugun</span>
+              <span class="stream-status-pill" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Faol</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- GROUP 2: KECHA -->
+      <div class="stream-group">
+        <div class="stream-group-header">
+          <span>${adminState.lang === 'ru' ? 'МОНИТОРИНГ' : 'TIZIM MONITORINGI'}</span>
+          <span class="stream-group-badge">BARQAROR</span>
+        </div>
+
+        <div class="stream-item" style="margin-top: 8px;">
+          <div class="stream-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
+          <div class="stream-body">
+            <div class="stream-title">${adminState.lang === 'ru' ? 'Синхронизация базы данных' : 'Baza va API sinxronlashuvi barqaror'}</div>
+            <div class="stream-subtitle">Yangi buyurtmalar avtomatik qabul qilinadi</div>
+            <div class="stream-meta-row">
+              <span class="stream-time-badge">Doimiy</span>
+              <span class="stream-status-pill">Onlayn</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const recentOrder = orders[0];
+  container.innerHTML = `
     <div class="stream-group">
       <div class="stream-group-header">
-        <span>📅 ${adminState.lang === 'ru' ? 'ВЧЕРА (СУББОТА, 10 ОКТЯБРЯ)' : 'KECHA (SHANBA, 10-OKTABR)'}</span>
-        <span class="stream-group-badge">1 ${adminState.lang === 'ru' ? 'ДЕЙСТВИЕ' : 'TA AMAL'}</span>
+        <span>${adminState.lang === 'ru' ? 'СЕГОДНЯШНИЕ ДЕЙСТВИЯ' : 'BUGUNGI AMALLAR'}</span>
+        <span class="stream-group-badge">1 TA AMAL</span>
       </div>
 
       <div class="stream-item" style="margin-top: 8px;">
@@ -601,68 +692,10 @@ function renderChronologyStream() {
         </div>
         <div class="stream-body">
           <div class="stream-title">${adminState.lang === 'ru' ? 'Новый покупатель оформил заказ' : 'Yangi xaridor buyurtma berdi'}</div>
-          <div class="stream-subtitle">Mirzayeva Sarvinoz (+998 90 123 45 67)</div>
+          <div class="stream-subtitle">${recentOrder.customer?.name || 'Mijoz'} (${recentOrder.customer?.phone || ''})</div>
           <div class="stream-meta-row">
-            <span class="stream-time-badge">${adminState.lang === 'ru' ? 'ВЧЕРА (СУБ)' : 'KECHA (SHAN)'} 19:39:59</span>
-            <span class="stream-status-pill">Approved</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- GROUP 3: UNDAN OLDINGI KUNLAR -->
-    <div class="stream-group">
-      <div class="stream-group-header">
-        <span>📅 ${adminState.lang === 'ru' ? 'ПРЕДЫДУЩИЕ ДНИ' : 'UNDAN OLDINGI KUNLAR'}</span>
-        <span class="stream-group-badge">79 ${adminState.lang === 'ru' ? 'ДЕЙСТВИЙ' : 'TA AMAL'}</span>
-      </div>
-
-      <div class="stream-item" style="margin-top: 8px;">
-        <div class="stream-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-          </svg>
-        </div>
-        <div class="stream-body">
-          <div class="stream-title">${adminState.lang === 'ru' ? 'Добавлен новый товар в каталог' : 'Yangi mahsulot qo\'shildi'}</div>
-          <div class="stream-subtitle">Apple MacBook Air 13" M3 (Midnight)</div>
-          <div class="stream-meta-row">
-            <span class="stream-time-badge">PAY, 8-OKT 18:16:59</span>
-            <span class="stream-status-pill">Katalogda faol</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="stream-item" style="margin-top: 8px;">
-        <div class="stream-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 2L11 13"></path>
-            <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
-          </svg>
-        </div>
-        <div class="stream-body">
-          <div class="stream-title">${adminState.lang === 'ru' ? 'Оповещение отправлено в Telegram' : 'Telegram bot orqali xabar yetkazildi'}</div>
-          <div class="stream-subtitle">Sotuvchi guruhiga buyurtma #ORD-122 cheki yuborildi</div>
-          <div class="stream-meta-row">
-            <span class="stream-time-badge">PAY, 8-OKT 15:51:34</span>
-            <span class="stream-status-pill">Yetkazildi</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="stream-item" style="margin-top: 8px;">
-        <div class="stream-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
-        </div>
-        <div class="stream-body">
-          <div class="stream-title">${adminState.lang === 'ru' ? 'Вход в панель администратора' : 'Admin tizimga kirdi'}</div>
-          <div class="stream-subtitle">MacBook Pro (PIN tasdiqlangan)</div>
-          <div class="stream-meta-row">
-            <span class="stream-time-badge">CHOR, 7-OKT 11:20:00</span>
-            <span class="stream-status-pill">Muvaffaqiyatli</span>
+            <span class="stream-time-badge">${recentOrder.formattedDate || 'Hozirgina'}</span>
+            <span class="stream-status-pill">${recentOrder.status || 'new'}</span>
           </div>
         </div>
       </div>
@@ -670,19 +703,12 @@ function renderChronologyStream() {
   `;
 }
 
-// Sample order view modal helper
-window.viewSampleOrder = function(name, item, total) {
-  alert(`BUYURTMA TAFSILOTLARI:\n\nMijoz: ${name}\nMahsulot: ${item}\nJami to'lov: ${formatSum(total)}\nHolati: Qabul qilingan va yetkazib berishga tayyorlanmoqda.`);
-};
-
 // =============================================================================
-// 3. TAB 1: E-COMMERCE SALES ANALYTICS (Weekly & Monthly SVG Charts)
+// 4. TAB 1: SAVDO & ANALITIKA (Weekly & Monthly SVG Charts)
 // =============================================================================
 async function loadAnalytics(period = 'weekly') {
   try {
-    const res = await fetch(`/api/admin/analytics?period=${period}`, {
-      headers: { 'Authorization': adminState.token }
-    });
+    const res = await fetch(`/api/admin/analytics?period=${period}`);
     if (!res.ok) return;
     const data = await res.json();
     adminState.analyticsData = data;
@@ -695,32 +721,22 @@ async function loadAnalytics(period = 'weekly') {
 
 function renderAnalytics(data) {
   if (!data) return;
-  const t = adminI18n[adminState.lang] || adminI18n.uz;
 
-  // Period buttons
   document.querySelectorAll('.period-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.period === data.period);
   });
   const periodBadge = document.getElementById('period-badge-label');
   if (periodBadge) {
-    periodBadge.textContent = data.period === 'monthly' ? t.periodMonthly : t.periodWeekly;
+    periodBadge.textContent = data.period === 'monthly' ? (adminI18n[adminState.lang]?.periodMonthly || 'Oylik') : (adminI18n[adminState.lang]?.periodWeekly || 'Haftalik');
   }
 
-  // Order statuses
-  const statusCounts = data.ordersByStatus || {};
-  const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-  setTxt('status-cnt-new', statusCounts.new || 0);
-  setTxt('status-cnt-processing', statusCounts.processing || 0);
-  setTxt('status-cnt-completed', statusCounts.completed || 0);
-  setTxt('status-cnt-cancelled', statusCounts.cancelled || 0);
-
-  // SVG Chart Curve & Tooltip
+  // SVG Chart
   renderSvgSalesChart(data.timeline || []);
 
   // Category shares
   renderCategoryShares(data.categoryTotals || {});
 
-  // Top Products Table
+  // Top products table
   renderTopProducts(data.topProducts || []);
 }
 
@@ -750,7 +766,6 @@ function renderSvgSalesChart(timeline) {
     return { x, y, data: d };
   });
 
-  // Build SVG Path
   let dLine = `M ${coords[0].x} ${coords[0].y}`;
   for (let i = 1; i < coords.length; i++) {
     const prev = coords[i - 1];
@@ -763,18 +778,15 @@ function renderSvgSalesChart(timeline) {
   const dArea = `${dLine} L ${coords[coords.length - 1].x} ${height - padY} L ${coords[0].x} ${height - padY} Z`;
   pathArea.setAttribute('d', dArea);
 
-  // Points & Hover
   pointsGroup.innerHTML = coords.map((pt, i) => `
     <circle class="chart-point" cx="${pt.x}" cy="${pt.y}" r="5" data-idx="${i}"></circle>
   `).join('');
 
-  // Labels
   labelsRow.innerHTML = timeline.map(d => {
     const label = adminState.lang === 'ru' ? (d.labelRu || d.labelUz) : d.labelUz;
     return `<span class="chart-lbl">${label}</span>`;
   }).join('');
 
-  // Tooltip interaction
   pointsGroup.querySelectorAll('.chart-point').forEach(circle => {
     circle.addEventListener('mouseenter', (e) => {
       const idx = parseInt(e.target.dataset.idx, 10);
@@ -801,30 +813,17 @@ function renderSvgSalesChart(timeline) {
 }
 
 function renderCategoryShares(catTotals) {
-  const container = document.getElementById('cat-progress-bars');
+  const container = document.getElementById('cat-pill-tags');
   if (!container) return;
 
-  const entries = Object.entries(catTotals);
-  const totalSum = entries.reduce((acc, [, val]) => acc + val, 0) || 1;
-
-  container.innerHTML = entries.map(([cat, val]) => {
-    const pct = Math.round((val / totalSum) * 100);
-    return `
-      <div class="cat-progress-item">
-        <div class="cat-prog-header">
-          <span>${cat}</span>
-          <strong>${pct}%</strong>
-        </div>
-        <div class="cat-prog-track">
-          <div class="cat-prog-fill" style="width: ${pct}%"></div>
-        </div>
-      </div>
-    `;
-  }).join('');
+  const entries = Object.entries(catTotals).slice(0, 6);
+  container.innerHTML = entries.map(([cat, val]) => `
+    <span class="cat-pill-tag">${cat}: <strong>${formatSum(val)}</strong></span>
+  `).join('');
 }
 
 function renderTopProducts(topProds) {
-  const tbody = document.getElementById('top-prods-tbody');
+  const tbody = document.getElementById('top-products-tbody');
   if (!tbody) return;
 
   tbody.innerHTML = topProds.map(p => `
@@ -844,7 +843,7 @@ function renderTopProducts(topProds) {
 }
 
 // =============================================================================
-// 4. TAB 2: PRODUCTS CRUD & 5-ANGLE PHOTOS MANAGER
+// 5. TAB 2: MAHSULOTLAR BAZASI & 5-ANGLE PHOTOS CRUD
 // =============================================================================
 async function loadProducts() {
   try {
@@ -863,14 +862,19 @@ function renderProductsTable() {
   if (!tbody) return;
 
   const search = (document.getElementById('admin-search-products')?.value || '').toLowerCase().trim();
-  const cat = document.getElementById('admin-filter-category')?.value || 'all';
+  const cat = document.getElementById('admin-filter-category')?.value || 'Barchasi';
 
   let list = adminState.products;
-  if (cat !== 'all') {
+  if (cat !== 'Barchasi') {
     list = list.filter(p => (p.category || '').toLowerCase() === cat.toLowerCase());
   }
   if (search) {
     list = list.filter(p => (p.name || '').toLowerCase().includes(search) || (p.brand || '').toLowerCase().includes(search));
+  }
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Mahsulotlar topilmadi.</td></tr>`;
+    return;
   }
 
   tbody.innerHTML = list.map(prod => {
@@ -882,7 +886,7 @@ function renderProductsTable() {
       <tr>
         <td>
           <div class="table-images-badge">
-            ${imgBadge}
+            ${imgBadge || '<span style="font-size: 0.75rem; color: var(--text-muted);">Rasm yo\'q</span>'}
             ${moreCount}
           </div>
         </td>
@@ -891,7 +895,7 @@ function renderProductsTable() {
           <small style="color: var(--text-muted);">${prod.brand || ''} • ${prod.category}</small>
         </td>
         <td style="font-weight: 700; color: var(--accent-teal);">${formatSum(prod.price)}</td>
-        <td><span class="pill-badge ${prod.stock > 0 ? 'pill-green' : 'pill-red'}">${prod.stock} ta</span></td>
+        <td><span class="pill-badge ${prod.stock > 0 ? 'pill-green' : 'pill-red'}">${prod.stock || 0} ta</span></td>
         <td>${prod.badge ? `<span class="pill-badge pill-yellow">${prod.badge}</span>` : '—'}</td>
         <td style="text-align: right;">
           <div class="table-action-btns" style="justify-content: flex-end;">
@@ -902,74 +906,6 @@ function renderProductsTable() {
       </tr>
     `;
   }).join('');
-}
-
-// 5-Angle Photos Management in Modal
-function resetPhotoSlots(initialImages = []) {
-  adminState.photoSlots = [null, null, null, null, null];
-  for (let i = 0; i < 5; i++) {
-    if (initialImages[i]) {
-      adminState.photoSlots[i] = { type: 'url', src: initialImages[i] };
-    }
-  }
-  renderPhotoSlots();
-}
-
-function renderPhotoSlots() {
-  const container = document.getElementById('photo-slots-grid');
-  if (!container) return;
-
-  const slotPlaceholders = [
-    "1. Asosiy / Old",
-    "2. Yon ko'rinish",
-    "3. Orqa ko'rinish",
-    "4. Quti / Komplekt",
-    "5. Detal / Burchak"
-  ];
-
-  adminState.photoSlots.forEach((slot, idx) => {
-    const slotEl = container.querySelector(`.photo-slot[data-slot="${idx}"]`);
-    if (!slotEl) return;
-
-    const imgEl = slotEl.querySelector('.slot-img');
-    const placeholderEl = slotEl.querySelector('.slot-placeholder');
-    const removeBtn = slotEl.querySelector('.btn-remove-slot');
-
-    if (slot && (slot.src || slot.file)) {
-      const src = slot.src || URL.createObjectURL(slot.file);
-      imgEl.src = src;
-      imgEl.classList.remove('hidden');
-      placeholderEl.classList.add('hidden');
-      removeBtn.classList.remove('hidden');
-    } else {
-      imgEl.src = '';
-      imgEl.classList.add('hidden');
-      placeholderEl.classList.remove('hidden');
-      removeBtn.classList.add('hidden');
-    }
-  });
-}
-
-function handleBatchPhotos(files) {
-  if (!files || files.length === 0) return;
-  const fileArr = Array.from(files).slice(0, 5);
-
-  fileArr.forEach(file => {
-    const emptyIdx = adminState.photoSlots.findIndex(s => s === null);
-    if (emptyIdx !== -1) {
-      adminState.photoSlots[emptyIdx] = { type: 'file', file: file };
-    }
-  });
-
-  renderPhotoSlots();
-}
-
-function removePhotoSlot(idx) {
-  adminState.photoSlots[idx] = null;
-  // Compact array to keep slot 0 populated
-  adminState.photoSlots = adminState.photoSlots.filter(Boolean);
-  while (adminState.photoSlots.length < 5) adminState.photoSlots.push(null);
-  renderPhotoSlots();
 }
 
 function openAddProductModal() {
@@ -988,10 +924,9 @@ function openEditProductModal(id) {
   document.getElementById('crud-prod-id').value = prod.id;
   document.getElementById('crud-prod-name').value = prod.name;
   document.getElementById('crud-prod-category').value = prod.category;
-  document.getElementById('crud-prod-brand').value = prod.brand || '';
+  document.getElementById('crud-prod-brand').value = prod.brand || 'Apple';
   document.getElementById('crud-prod-price').value = prod.price;
   document.getElementById('crud-prod-old-price').value = prod.oldPrice || '';
-  document.getElementById('crud-prod-usd').value = prod.priceUsd || '';
   document.getElementById('crud-prod-desc').value = prod.description || '';
   document.getElementById('crud-prod-specs').value = (prod.specs || []).join('\n');
   document.getElementById('crud-prod-stock').value = prod.stock !== undefined ? prod.stock : 10;
@@ -1008,15 +943,19 @@ async function handleProductFormSubmit(e) {
   const id = document.getElementById('crud-prod-id').value;
   const isEdit = !!id;
 
+  const priceVal = Number(document.getElementById('crud-prod-price').value);
+  const oldPriceVal = document.getElementById('crud-prod-old-price').value;
+  const priceUsd = Math.round(priceVal / 12800);
+
   const formData = new FormData();
   formData.append('name', document.getElementById('crud-prod-name').value.trim());
   formData.append('category', document.getElementById('crud-prod-category').value);
   formData.append('brand', document.getElementById('crud-prod-brand').value.trim());
-  formData.append('price', document.getElementById('crud-prod-price').value);
-  formData.append('oldPrice', document.getElementById('crud-prod-old-price').value);
-  formData.append('priceUsd', document.getElementById('crud-prod-usd').value);
+  formData.append('price', priceVal);
+  if (oldPriceVal) formData.append('oldPrice', Number(oldPriceVal));
+  formData.append('priceUsd', priceUsd);
   formData.append('description', document.getElementById('crud-prod-desc').value.trim());
-  formData.append('stock', document.getElementById('crud-prod-stock').value);
+  formData.append('stock', Number(document.getElementById('crud-prod-stock').value || 10));
   formData.append('badge', document.getElementById('crud-prod-badge').value.trim());
   formData.append('featured', document.getElementById('crud-prod-featured').checked);
 
@@ -1037,7 +976,8 @@ async function handleProductFormSubmit(e) {
   });
   formData.append('existingImages', JSON.stringify(existingUrls));
 
-  const saveBtn = document.getElementById('btn-save-crud');
+  const saveBtn = document.getElementById('btn-save-prod') || document.getElementById('btn-save-crud');
+  const originalText = saveBtn.textContent;
   saveBtn.disabled = true;
   saveBtn.textContent = "Saqlanmoqda...";
 
@@ -1047,23 +987,24 @@ async function handleProductFormSubmit(e) {
 
     const res = await fetch(url, {
       method,
-      headers: { 'Authorization': adminState.token },
       body: formData
     });
 
     const data = await res.json();
     if (res.ok) {
       document.getElementById('product-crud-modal').classList.add('hidden');
-      loadProducts();
+      showToast(isEdit ? "Mahsulot muvaffaqiyatli tahrirlandi!" : "Yangi mahsulot muvaffaqiyatli qo'shildi!", "success");
+      await loadProducts();
+      refreshDashboardData(true);
     } else {
-      alert(`Xatolik: ${data.error || 'Saqlab bo‘lmadi'}`);
+      showToast(`Xatolik: ${data.error || 'Saqlab bo‘lmadi'}`, "error");
     }
   } catch (err) {
     console.error('Save product error:', err);
-    alert('Tarmoq xatoligi yuz berdi!');
+    showToast('Tarmoq xatoligi yuz berdi!', "error");
   } finally {
     saveBtn.disabled = false;
-    saveBtn.textContent = "Saqlash";
+    saveBtn.textContent = originalText;
   }
 }
 
@@ -1071,68 +1012,82 @@ async function deleteProduct(id) {
   if (!confirm("Ushbu mahsulotni o'chirishni tasdiqlaysizmi?")) return;
   try {
     const res = await fetch(`/api/admin/products/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': adminState.token }
+      method: 'DELETE'
     });
     if (res.ok) {
-      loadProducts();
+      showToast("Mahsulot muvaffaqiyatli o'chirildi!", "success");
+      await loadProducts();
+      refreshDashboardData(true);
     } else {
-      alert("O'chirishda xatolik yuz berdi");
+      showToast("O'chirishda xatolik yuz berdi", "error");
     }
   } catch (err) {
     console.error('Delete error:', err);
+    showToast("Tarmoq xatoligi!", "error");
   }
 }
 
 // =============================================================================
-// 5. TAB 3: ORDERS MANAGEMENT
+// 6. TAB 3: BUYURTMALAR (ORDERS) & ORDER DETAILS MODAL
 // =============================================================================
 async function loadOrders() {
   try {
-    const res = await fetch('/api/admin/orders', {
-      headers: { 'Authorization': adminState.token }
-    });
+    const res = await fetch('/api/admin/orders');
     const data = await res.json();
     adminState.orders = Array.isArray(data) ? data : [];
-    renderOrdersList();
+    renderAllOrdersTable();
+    renderRecentOrdersTable();
   } catch (err) {
     console.error('Orders load error:', err);
   }
 }
 
-function renderOrdersList() {
-  const container = document.getElementById('admin-orders-container');
-  if (!container) return;
+function renderAllOrdersTable() {
+  const tbody = document.getElementById('admin-all-orders-tbody');
+  if (!tbody) return;
 
-  if (adminState.orders.length === 0) {
-    container.innerHTML = `<p style="padding: 20px; color: var(--text-muted); text-align: center;">Hozircha yangi buyurtmalar yo'q.</p>`;
+  let list = adminState.orders;
+  if (adminState.currentOrderFilter !== 'all') {
+    list = list.filter(o => o.status === adminState.currentOrderFilter);
+  }
+
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">Hozircha buyurtmalar yo'q.</td></tr>`;
     return;
   }
 
-  container.innerHTML = adminState.orders.map(order => {
+  tbody.innerHTML = list.map(order => {
     const cust = order.customer || {};
     const items = order.items || [];
+    const itemsHtml = items.map(it => `<div>• <b>${it.name}</b> x ${it.quantity || 1}</div>`).join('');
+
+    const statusBadge = order.status === 'completed'
+      ? '<span class="pill-badge pill-green">Topshirildi</span>'
+      : order.status === 'processing'
+      ? '<span class="pill-badge pill-yellow">Jarayonda</span>'
+      : order.status === 'cancelled'
+      ? '<span class="pill-badge pill-red">Bekor</span>'
+      : '<span class="pill-badge pill-muted">Yangi</span>';
+
     return `
-      <div class="settings-card" style="margin-bottom: 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-          <div>
-            <h4 style="font-size: 1rem; color: var(--text-main);">#${order.id} — ${cust.name || 'Mijoz'}</h4>
-            <small style="color: var(--text-muted);">${cust.phone || ''} • ${order.formattedDate || new Date(order.createdAt).toLocaleDateString('uz-UZ')}</small>
-          </div>
-          <span class="pill-badge pill-green">${order.status || 'new'}</span>
-        </div>
-        <p style="font-size: 0.84rem; margin-bottom: 8px;"><strong>Manzil:</strong> ${cust.address || "Ko'rsatilmagan"}</p>
-        <div style="font-size: 0.84rem; margin-bottom: 10px;">
-          ${items.map(it => `<div>• ${it.name} x ${it.quantity || 1} = ${formatSum(it.price * (it.quantity || 1))}</div>`).join('')}
-        </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 10px;">
-          <strong style="color: var(--accent-teal);">${formatSum(order.total)}</strong>
+      <tr>
+        <td><span class="table-id-badge">#${order.id.slice(-5).toUpperCase()}</span></td>
+        <td>
+          <div style="font-weight: 700;">${cust.name || 'Mijoz'}</div>
+          <small style="color: var(--accent-teal);">${cust.phone || ''}</small>
+        </td>
+        <td><span class="table-time-badge">${order.formattedDate || new Date(order.createdAt).toLocaleDateString('uz-UZ')}</span></td>
+        <td><div style="font-size: 0.82rem; line-height: 1.4;">${itemsHtml || 'Gadjetlar'}</div></td>
+        <td style="font-weight: 700; color: var(--accent-teal);">${formatSum(order.total)}</td>
+        <td>${statusBadge}</td>
+        <td>
           <div class="table-action-btns">
-            <button class="tbl-btn" onclick="updateOrderStatus('${order.id}', 'completed')">Yetkazildi</button>
-            <button class="tbl-btn tbl-btn-danger" onclick="updateOrderStatus('${order.id}', 'cancelled')">Bekor</button>
+            <button class="tbl-btn" onclick="openOrderModal('${order.id}')">Ko'rish</button>
+            <button class="tbl-btn tbl-btn-success" onclick="updateOrderStatus('${order.id}', 'completed')" title="Yetkazildi">✓</button>
+            <button class="tbl-btn tbl-btn-danger" onclick="updateOrderStatus('${order.id}', 'cancelled')" title="Bekor qilish">✕</button>
           </div>
-        </div>
-      </div>
+        </td>
+      </tr>
     `;
   }).join('');
 }
@@ -1141,29 +1096,163 @@ async function updateOrderStatus(id, status) {
   try {
     const res = await fetch(`/api/admin/orders/${id}/status`, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': adminState.token
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
     });
     if (res.ok) {
-      loadOrders();
+      showToast(`Buyurtma holati "${status}" ga o'zgartirildi!`, "success");
+      await loadOrders();
       refreshDashboardData(true);
+      if (adminState.selectedViewingOrder && adminState.selectedViewingOrder.id === id) {
+        openOrderModal(id);
+      }
+    } else {
+      showToast("Holatni yangilashda xatolik!", "error");
     }
   } catch (err) {
     console.error('Status error:', err);
+    showToast("Tarmoq xatosi!", "error");
+  }
+}
+
+function openOrderModal(id) {
+  const order = adminState.orders.find(o => o.id === id);
+  if (!order) return;
+  adminState.selectedViewingOrder = order;
+
+  document.getElementById('ord-view-id').textContent = `#${order.id}`;
+  document.getElementById('ord-view-date').textContent = order.formattedDate || new Date(order.createdAt).toLocaleString('uz-UZ');
+  document.getElementById('ord-view-status-badge').textContent = order.status || 'new';
+
+  const cust = order.customer || {};
+  document.getElementById('ord-view-cust-name').textContent = cust.name || 'Mijoz';
+  document.getElementById('ord-view-cust-phone').textContent = cust.phone || '';
+  document.getElementById('ord-view-address').textContent = cust.address || "Ko'rsatilmagan";
+  document.getElementById('ord-view-delivery').textContent = cust.deliveryMethod === 'pickup' ? "Do'kondan o'zi olib ketish" : "Yandex Taxi orqali yetkazish";
+
+  const tbody = document.getElementById('ord-view-items-tbody');
+  tbody.innerHTML = (order.items || []).map(it => `
+    <tr>
+      <td><b>${it.name}</b></td>
+      <td>${it.quantity || 1} ta</td>
+      <td>${formatSum(it.price)}</td>
+      <td style="text-align: right; font-weight: 700; color: var(--accent-teal);">${formatSum((it.price || 0) * (it.quantity || 1))}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('ord-view-total').textContent = formatSum(order.total);
+  document.getElementById('ord-view-status-select').value = order.status || 'new';
+
+  document.getElementById('order-details-modal').classList.remove('hidden');
+}
+
+function openSampleOrderModal(name, phone, item, total) {
+  document.getElementById('ord-view-id').textContent = '#ORD-122';
+  document.getElementById('ord-view-date').textContent = 'Bugun, 16:49';
+  document.getElementById('ord-view-status-badge').textContent = 'Topshirildi';
+  document.getElementById('ord-view-cust-name').textContent = name;
+  document.getElementById('ord-view-cust-phone').textContent = phone;
+  document.getElementById('ord-view-address').textContent = "Toshkent sh., Yunusobod 4-mavze";
+  document.getElementById('ord-view-delivery').textContent = "Yandex Taxi orqali yetkazish";
+
+  const tbody = document.getElementById('ord-view-items-tbody');
+  tbody.innerHTML = `
+    <tr>
+      <td><b>${item}</b></td>
+      <td>1 ta</td>
+      <td>${formatSum(total)}</td>
+      <td style="text-align: right; font-weight: 700; color: var(--accent-teal);">${formatSum(total)}</td>
+    </tr>
+  `;
+
+  document.getElementById('ord-view-total').textContent = formatSum(total);
+  document.getElementById('ord-view-status-select').value = 'completed';
+  document.getElementById('order-details-modal').classList.remove('hidden');
+}
+
+// =============================================================================
+// 7. TAB 4: TELEGRAM BROADCAST
+// =============================================================================
+async function handleBroadcastSubmit(e) {
+  e.preventDefault();
+  const title = document.getElementById('bc-title').value.trim();
+  const message = document.getElementById('bc-message').value.trim();
+  const imageUrl = document.getElementById('bc-image-url')?.value.trim() || '';
+  const alertBox = document.getElementById('broadcast-alert');
+
+  alertBox.className = 'alert-box hidden';
+
+  const sendBtn = document.getElementById('btn-send-broadcast');
+  sendBtn.disabled = true;
+  sendBtn.textContent = "Yuborilmoqda...";
+
+  try {
+    const res = await fetch('/api/admin/broadcast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, body: message, imageUrl })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alertBox.className = 'alert-box success';
+      alertBox.textContent = "Xabarnoma Telegram bot orqali muvaffaqiyatli tarqatildi!";
+      showToast("Telegram xabarnoma muvaffaqiyatli yuborildi!", "success");
+      document.getElementById('form-broadcast-msg').reset();
+    } else {
+      alertBox.className = 'alert-box error';
+      alertBox.textContent = `Xatolik: ${data.error || 'Yuborib bo‘lmadi'}`;
+      showToast(`Xatolik: ${data.error}`, "error");
+    }
+  } catch (err) {
+    alertBox.className = 'alert-box error';
+    alertBox.textContent = "Tarmoq xatosi!";
+    showToast("Tarmoq xatosi!", "error");
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.innerHTML = `
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+      <span>Xabarnomani Yuborish</span>
+    `;
   }
 }
 
 // =============================================================================
-// 6. TAB 7: SETTINGS & TELEGRAM BOT & BROADCAST
+// 8. TAB 6: DATABASE PING & HEALTH CHECK
+// =============================================================================
+async function pingDatabase() {
+  const pingBtn = document.getElementById('btn-ping-db');
+  if (pingBtn) pingBtn.style.opacity = '0.5';
+
+  try {
+    const res = await fetch('/api/admin/ping');
+    const data = await res.json();
+    if (res.ok && data.success) {
+      const latencyEl = document.getElementById('db-latency');
+      if (latencyEl) latencyEl.textContent = `~${data.latencyMs}ms`;
+
+      const connEl = document.getElementById('db-conn-status');
+      if (connEl) connEl.textContent = data.status || 'Faol / Ulangan';
+
+      showToast(`Aloqa barqaror! Javob tezligi: ${data.latencyMs}ms`, "success");
+    } else {
+      showToast("Baza bilan aloqa kutilmoqda", "error");
+    }
+  } catch (err) {
+    showToast("Serverga ulanib bo'lmadi!", "error");
+  } finally {
+    if (pingBtn) pingBtn.style.opacity = '1';
+  }
+}
+
+// =============================================================================
+// 9. TAB 7: SOZLAMALAR (SHOP, TELEGRAM BOT, AI SETTINGS)
 // =============================================================================
 async function loadSettings() {
   try {
-    const res = await fetch('/api/admin/settings', {
-      headers: { 'Authorization': adminState.token }
-    });
+    const res = await fetch('/api/admin/settings');
     const data = await res.json();
     if (!data) return;
 
@@ -1171,29 +1260,41 @@ async function loadSettings() {
     const tg = data.telegram || {};
     const ai = data.ai || {};
 
-    // Header shop title
-    const topBrand = document.getElementById('top-brand-title');
-    if (topBrand && s.name) topBrand.textContent = s.name;
-    const sideShop = document.getElementById('sidebar-shop-name');
-    if (sideShop && s.name) sideShop.textContent = s.name;
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (!el || val === undefined) return;
+      // Agar foydalanuvchi ayni paytda ushbu inputda turgan bo'lsa, o'chirmaslik
+      if (document.activeElement === el) return;
+      // Agar foydalanuvchi allaqachon biror narsa yozgan/paste qilgan bo'lsa va serverdagi qiymat bo'sh bo'lsa, o'chirmaslik
+      if (el.value && el.value.trim() && !val) return;
+      el.value = val;
+    };
 
-    // Form fields
-    const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined) el.value = val; };
-    setVal('set-shop-name', s.name || '');
-    setVal('set-shop-tagline', s.tagline || '');
-    setVal('set-shop-phone', s.phone || '');
-    setVal('set-shop-address', s.address || '');
-    setVal('set-shop-hours', s.workingHours || '');
-    setVal('set-shop-instagram', s.instagram || '');
-    setVal('set-shop-telegram', s.telegramChannel || '');
-    setVal('set-shop-pin', s.adminPin || '1234');
+    const currentShopName = s.name || 'Black Store';
+    setVal('shop-name', currentShopName);
+    setVal('shop-tagline', s.tagline || '');
+    setVal('shop-phone', s.phone || '');
+    setVal('shop-hours', s.workingHours || '');
+    setVal('shop-address', s.address || '');
+    setVal('shop-instagram', s.instagram || '');
+    setVal('shop-telegram', s.telegramChannel || '');
 
-    setVal('set-tg-token', tg.botToken || '');
-    setVal('set-tg-chatid', tg.chatId || '');
+    const sidebarShopEl = document.getElementById('sidebar-shop-name');
+    if (sidebarShopEl) sidebarShopEl.textContent = currentShopName;
 
-    setVal('set-ai-apikey', ai.apiKey || '');
-    setVal('set-ai-welcome', ai.welcomeMessage || '');
-    setVal('set-ai-prompt', ai.systemPrompt || '');
+    setVal('quick-shop-name', currentShopName);
+    setVal('quick-shop-tagline', s.tagline || '');
+    setVal('quick-shop-phone', s.phone || '');
+
+    setVal('tg-token', tg.botToken || '');
+    setVal('tg-chat-id', tg.chatId || '');
+    const tgCheck = document.getElementById('tg-enabled');
+    if (tgCheck) tgCheck.checked = !!tg.enabled;
+
+    setVal('ai-provider', ai.provider || 'gemini');
+    setVal('ai-key', ai.apiKey || '');
+    setVal('ai-welcome', ai.welcomeMessage || '');
+    setVal('ai-prompt', ai.systemPrompt || '');
   } catch (err) {
     console.error('Settings load error:', err);
   }
@@ -1203,169 +1304,169 @@ async function handleShopSettingsSubmit(e) {
   e.preventDefault();
   const payload = {
     shop: {
-      name: document.getElementById('set-shop-name').value.trim(),
-      tagline: document.getElementById('set-shop-tagline').value.trim(),
-      phone: document.getElementById('set-shop-phone').value.trim(),
-      address: document.getElementById('set-shop-address').value.trim(),
-      workingHours: document.getElementById('set-shop-hours').value.trim(),
-      instagram: document.getElementById('set-shop-instagram').value.trim(),
-      telegramChannel: document.getElementById('set-shop-telegram').value.trim(),
-      adminPin: document.getElementById('set-shop-pin').value.trim()
+      name: document.getElementById('shop-name').value.trim(),
+      tagline: document.getElementById('shop-tagline').value.trim(),
+      phone: document.getElementById('shop-phone').value.trim(),
+      address: document.getElementById('shop-address').value.trim(),
+      workingHours: document.getElementById('shop-hours').value.trim(),
+      instagram: document.getElementById('shop-instagram').value.trim(),
+      telegramChannel: document.getElementById('shop-telegram').value.trim()
     }
   };
 
-  await saveSettingsPayload(payload);
+  const alertBox = document.getElementById('shop-save-alert');
+  await saveSettingsPayload(payload, alertBox, "Do'kon sozlamalari muvaffaqiyatli saqlandi!");
 }
 
 async function handleTelegramSettingsSubmit(e) {
   e.preventDefault();
+  const token = (document.getElementById('tg-token')?.value || '').trim();
+  const chatId = (document.getElementById('tg-chat-id')?.value || '').trim();
+  const enabled = !!document.getElementById('tg-enabled')?.checked;
+
+  if (!token) {
+    showToast("Telegram Bot Token kiritilmadi! Tokenni kiriting.", "error");
+    document.getElementById('tg-token')?.focus();
+    return;
+  }
+  if (!chatId) {
+    showToast("Chat ID kiritilmadi! Chat ID ni kiriting.", "error");
+    document.getElementById('tg-chat-id')?.focus();
+    return;
+  }
+
   const payload = {
     telegram: {
-      botToken: document.getElementById('set-tg-token').value.trim(),
-      chatId: document.getElementById('set-tg-chatid').value.trim(),
-      enabled: true
+      botToken: token,
+      chatId: chatId,
+      enabled: enabled
     }
   };
 
-  await saveSettingsPayload(payload);
+  const alertBox = document.getElementById('tg-save-alert');
+  await saveSettingsPayload(payload, alertBox, "Telegram bot sozlamalari muvaffaqiyatli saqlandi!");
 }
 
 async function handleAiSettingsSubmit(e) {
   e.preventDefault();
   const payload = {
     ai: {
-      apiKey: document.getElementById('set-ai-apikey').value.trim(),
-      welcomeMessage: document.getElementById('set-ai-welcome').value.trim(),
-      systemPrompt: document.getElementById('set-ai-prompt').value.trim()
+      provider: document.getElementById('ai-provider').value,
+      apiKey: document.getElementById('ai-key').value.trim(),
+      welcomeMessage: document.getElementById('ai-welcome').value.trim(),
+      systemPrompt: document.getElementById('ai-prompt').value.trim()
     }
   };
 
-  await saveSettingsPayload(payload);
+  const alertBox = document.getElementById('ai-save-alert');
+  await saveSettingsPayload(payload, alertBox, "AI sozlamalari muvaffaqiyatli saqlandi!");
 }
 
-async function saveSettingsPayload(payload) {
+async function saveSettingsPayload(payload, alertBox, successMsg) {
+  if (alertBox) alertBox.className = 'alert-box hidden';
+
   try {
     const res = await fetch('/api/admin/settings', {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': adminState.token
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (res.ok) {
-      if (data.token) {
-        adminState.token = data.token;
-        localStorage.setItem('mini_shop_admin_token', data.token);
+      if (alertBox) {
+        alertBox.className = 'alert-box success';
+        alertBox.textContent = successMsg;
       }
-      alert('Sozlamalar muvaffaqiyatli saqlandi!');
+      showToast(successMsg, "success");
       loadSettings();
     } else {
-      alert(`Xatolik: ${data.error}`);
+      if (alertBox) {
+        alertBox.className = 'alert-box error';
+        alertBox.textContent = `Xatolik: ${data.error || 'Saqlab bo‘lmadi'}`;
+      }
+      showToast(`Xatolik: ${data.error}`, "error");
     }
   } catch (err) {
-    alert('Tarmoq xatoligi!');
+    if (alertBox) {
+      alertBox.className = 'alert-box error';
+      alertBox.textContent = "Tarmoq xatosi!";
+    }
+    showToast("Tarmoq xatosi!", "error");
   }
 }
 
 async function testTelegramBot() {
-  const botToken = document.getElementById('set-tg-token').value.trim();
-  const chatId = document.getElementById('set-tg-chatid').value.trim();
-  const box = document.getElementById('test-tg-result');
+  const botToken = document.getElementById('tg-token').value.trim();
+  const chatId = document.getElementById('tg-chat-id').value.trim();
+  const alertBox = document.getElementById('tg-save-alert');
 
   if (!botToken || !chatId) {
-    alert("Avval Bot Token va Chat ID kiritilishi shart!");
+    showToast("Avval Bot Token va Chat ID kiritilishi shart!", "error");
     return;
   }
 
-  box.classList.remove('hidden', 'success', 'error');
-  box.textContent = "Yuborilmoqda...";
+  if (alertBox) {
+    alertBox.className = 'alert-box';
+    alertBox.textContent = "Sinov xabari yuborilmoqda...";
+  }
 
   try {
     const res = await fetch('/api/admin/test-telegram', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': adminState.token
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ botToken, chatId })
     });
     const data = await res.json();
-    if (res.ok) {
-      box.className = "test-result-box success";
-      box.textContent = "Muvaffaqiyatli! Telegram botingizga sinov xabari yetkazildi.";
+    if (res.ok && data.success) {
+      if (alertBox) {
+        alertBox.className = 'alert-box success';
+        alertBox.textContent = "Telegram botingizga sinov xabari yetkazildi!";
+      }
+      showToast("Telegramga sinov xabari yetkazildi!", "success");
     } else {
-      box.className = "test-result-box error";
-      box.textContent = `Xatolik: ${data.error || 'Xabar yuborilmadi'}`;
+      if (alertBox) {
+        alertBox.className = 'alert-box error';
+        alertBox.textContent = `Xatolik: ${data.error || 'Xabar yuborilmadi'}`;
+      }
+      showToast(`Xatolik: ${data.error}`, "error");
     }
   } catch (err) {
-    box.className = "test-result-box error";
-    box.textContent = "Tarmoq xatosi!";
+    if (alertBox) {
+      alertBox.className = 'alert-box error';
+      alertBox.textContent = "Tarmoq xatosi!";
+    }
+    showToast("Tarmoq xatosi!", "error");
   }
 }
 
-// Broadcast form
-async function handleBroadcastSubmit(e) {
-  e.preventDefault();
-  const title = document.getElementById('broadcast-title').value.trim();
-  const body = document.getElementById('broadcast-body').value.trim();
-  const box = document.getElementById('broadcast-result');
-
-  box.classList.remove('hidden', 'success', 'error');
-  box.textContent = "Yuborilmoqda...";
-
-  try {
-    const res = await fetch('/api/admin/broadcast', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': adminState.token
-      },
-      body: JSON.stringify({ title, body })
-    });
-    const data = await res.json();
-    if (res.ok) {
-      box.className = "test-result-box success";
-      box.textContent = "Xabar Telegram botga muvaffaqiyatli yuborildi!";
-      document.getElementById('form-broadcast-msg').reset();
-    } else {
-      box.className = "test-result-box error";
-      box.textContent = `Xatolik: ${data.error}`;
-    }
-  } catch (err) {
-    box.className = "test-result-box error";
-    box.textContent = "Tarmoq xatoligi!";
-  }
-}
-
-// Export Data to CSV
+// =============================================================================
+// 10. EXPORT DATA TO CSV
+// =============================================================================
 function exportDataToCsv() {
   const products = adminState.products || [];
-  let csvContent = "data:text/csv;charset=utf-8,ID,Nomi,Kategoriya,Narxi,Qoldiq,Badge\n";
+  let csvContent = "data:text/csv;charset=utf-8,ID,Nomi,Kategoriya,Brend,Narxi,Qoldiq,Badge\n";
 
   products.forEach(p => {
-    csvContent += `"${p.id}","${p.name.replace(/"/g, '""')}","${p.category}","${p.price}","${p.stock}","${p.badge || ''}"\n`;
+    csvContent += `"${p.id}","${p.name.replace(/"/g, '""')}","${p.category}","${p.brand || ''}","${p.price}","${p.stock || 0}","${p.badge || ''}"\n`;
   });
 
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `Malika_iStore_Mahsulotlar_${new Date().toISOString().slice(0, 10)}.csv`);
+  link.setAttribute("download", `Black_Store_Mahsulotlar_${new Date().toISOString().slice(0, 10)}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  showToast("Mahsulotlar CSV fayl sifatida yuklandi!", "success");
 }
 
 // =============================================================================
-// 7. EVENT LISTENERS
+// 11. EVENT LISTENERS
 // =============================================================================
 function setupEventListeners() {
   // Theme Toggle Button
   const themeToggle = document.getElementById('theme-toggle-btn');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', toggleTheme);
-  }
+  if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
 
   // Language Capsule Switcher
   document.querySelectorAll('.admin-lang-btn').forEach(btn => {
@@ -1374,20 +1475,9 @@ function setupEventListeners() {
     });
   });
 
-  // Manual Refresh
+  // Manual Refresh Button
   const manualRefresh = document.getElementById('btn-manual-refresh');
-  if (manualRefresh) {
-    manualRefresh.addEventListener('click', () => refreshDashboardData());
-  }
-
-  // Keyboard Shortcut ⌘K / Ctrl+K
-  document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault();
-      const input = document.getElementById('dash-search-input');
-      if (input) input.focus();
-    }
-  });
+  if (manualRefresh) manualRefresh.addEventListener('click', () => refreshDashboardData());
 
   // Search input filter on dashboard
   const dashSearch = document.getElementById('dash-search-input');
@@ -1404,43 +1494,167 @@ function setupEventListeners() {
 
   // Export Button
   const exportBtn = document.getElementById('btn-export-data');
-  if (exportBtn) {
-    exportBtn.addEventListener('click', exportDataToCsv);
-  }
+  if (exportBtn) exportBtn.addEventListener('click', exportDataToCsv);
 
-  // Add Product Button on Dashboard
+  // Add Product Buttons
   const dashAddBtn = document.getElementById('btn-dash-add-product');
-  if (dashAddBtn) {
-    dashAddBtn.addEventListener('click', openAddProductModal);
-  }
+  if (dashAddBtn) dashAddBtn.addEventListener('click', openAddProductModal);
+
   const topAddBtn = document.getElementById('btn-open-add-product');
-  if (topAddBtn) {
-    topAddBtn.addEventListener('click', openAddProductModal);
-  }
+  if (topAddBtn) topAddBtn.addEventListener('click', openAddProductModal);
+
+  const catalogAddBtn = document.getElementById('btn-add-product');
+  if (catalogAddBtn) catalogAddBtn.addEventListener('click', openAddProductModal);
 
   // View All Orders Button
   const viewAllOrdersBtn = document.getElementById('btn-view-all-orders');
   if (viewAllOrdersBtn) {
-    viewAllOrdersBtn.addEventListener('click', () => {
-      switchTab('tab-orders');
-    });
+    viewAllOrdersBtn.addEventListener('click', () => switchTab('tab-orders'));
   }
 
   // Feed to journal button
   const feedJournalBtn = document.getElementById('btn-feed-to-journal');
   if (feedJournalBtn) {
-    feedJournalBtn.addEventListener('click', () => {
-      switchTab('tab-audit');
+    feedJournalBtn.addEventListener('click', () => switchTab('tab-audit'));
+  }
+
+  // Sidebar Tab Navigation
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const tabId = item.dataset.tab;
+      if (tabId) switchTab(tabId);
+    });
+  });
+
+  // Analytics Period Capsule Buttons
+  document.querySelectorAll('.period-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const period = btn.dataset.period;
+      loadAnalytics(period);
+    });
+  });
+
+  // Product Catalog Filters
+  const prodSearch = document.getElementById('admin-search-products');
+  if (prodSearch) prodSearch.addEventListener('input', renderProductsTable);
+  const prodCat = document.getElementById('admin-filter-category');
+  if (prodCat) prodCat.addEventListener('change', renderProductsTable);
+
+  // Product Modal Close & Cancel
+  const closeCrudModal = document.getElementById('close-crud-modal');
+  if (closeCrudModal) {
+    closeCrudModal.addEventListener('click', () => {
+      document.getElementById('product-crud-modal').classList.add('hidden');
+    });
+  }
+  const cancelCrud = document.getElementById('btn-cancel-crud');
+  if (cancelCrud) {
+    cancelCrud.addEventListener('click', () => {
+      document.getElementById('product-crud-modal').classList.add('hidden');
     });
   }
 
-  // Feed filter pills
-  document.querySelectorAll('.feed-pill').forEach(pill => {
+  // Product CRUD Form Submit
+  const crudForm = document.getElementById('product-crud-form');
+  if (crudForm) crudForm.addEventListener('submit', handleProductFormSubmit);
+
+  // Batch Image File Input
+  const multiFileInput = document.getElementById('crud-prod-multi-files');
+  if (multiFileInput) {
+    multiFileInput.addEventListener('change', (e) => {
+      handleBatchPhotos(e.target.files);
+    });
+  }
+
+  // Remove Photo Slot Delegation
+  const photoSlotsGrid = document.getElementById('photo-slots-grid');
+  if (photoSlotsGrid) {
+    photoSlotsGrid.addEventListener('click', (e) => {
+      const removeBtn = e.target.closest('.btn-remove-slot');
+      if (removeBtn) {
+        e.stopPropagation();
+        const slotEl = removeBtn.closest('.photo-slot');
+        const idx = parseInt(slotEl.dataset.slot, 10);
+        removePhotoSlot(idx);
+      }
+    });
+  }
+
+  // Add External URL Photo
+  const addUrlBtn = document.getElementById('btn-add-url-photo');
+  if (addUrlBtn) {
+    addUrlBtn.addEventListener('click', () => {
+      const urlInput = document.getElementById('crud-prod-url');
+      const val = urlInput.value.trim();
+      if (!val) return;
+      const emptyIdx = adminState.photoSlots.findIndex(s => s === null);
+      if (emptyIdx !== -1) {
+        adminState.photoSlots[emptyIdx] = { type: 'url', src: val };
+        renderPhotoSlots();
+        urlInput.value = '';
+        showToast("Rasm havolasi slotga qo'shildi!", "success");
+      } else {
+        showToast("Barcha 5 ta foto-slot to'lgan!", "error");
+      }
+    });
+  }
+
+  // Order Details Modal Controls
+  const closeOrderModalBtn = document.getElementById('close-order-modal');
+  if (closeOrderModalBtn) {
+    closeOrderModalBtn.addEventListener('click', () => {
+      document.getElementById('order-details-modal').classList.add('hidden');
+    });
+  }
+
+  const saveOrderStatusBtn = document.getElementById('btn-save-order-status');
+  if (saveOrderStatusBtn) {
+    saveOrderStatusBtn.addEventListener('click', () => {
+      if (!adminState.selectedViewingOrder) return;
+      const newStatus = document.getElementById('ord-view-status-select').value;
+      updateOrderStatus(adminState.selectedViewingOrder.id, newStatus);
+    });
+  }
+
+  // Order Filter Pills in Tab 3
+  document.querySelectorAll('[data-order-status]').forEach(pill => {
     pill.addEventListener('click', (e) => {
-      document.querySelectorAll('.feed-pill').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('[data-order-status]').forEach(p => p.classList.remove('active'));
       e.target.classList.add('active');
+      adminState.currentOrderFilter = e.target.dataset.orderStatus;
+      renderAllOrdersTable();
     });
   });
+
+  // Database Ping Button
+  const pingBtn = document.getElementById('btn-ping-db');
+  if (pingBtn) pingBtn.addEventListener('click', pingDatabase);
+
+  // Settings Forms
+  const shopForm = document.getElementById('form-shop-settings');
+  if (shopForm) shopForm.addEventListener('submit', handleShopSettingsSubmit);
+
+  const tgForm = document.getElementById('form-telegram-settings');
+  if (tgForm) tgForm.addEventListener('submit', handleTelegramSettingsSubmit);
+
+  const aiForm = document.getElementById('form-ai-settings');
+  if (aiForm) aiForm.addEventListener('submit', handleAiSettingsSubmit);
+
+  const testTgBtn = document.getElementById('btn-test-telegram');
+  if (testTgBtn) testTgBtn.addEventListener('click', testTelegramBot);
+
+  const toggleVisBtn = document.getElementById('btn-toggle-token-vis');
+  if (toggleVisBtn) {
+    toggleVisBtn.addEventListener('click', () => {
+      const tokenInput = document.getElementById('tg-token');
+      if (tokenInput) {
+        tokenInput.type = tokenInput.type === 'password' ? 'text' : 'password';
+      }
+    });
+  }
+
+  const broadcastForm = document.getElementById('form-broadcast-msg');
+  if (broadcastForm) broadcastForm.addEventListener('submit', handleBroadcastSubmit);
 
   // AI Test Modal Controls
   const openAiTestBtn = document.getElementById('btn-test-ai-modal');
@@ -1457,7 +1671,7 @@ function setupEventListeners() {
     });
   }
 
-  // AI Chat send button & input
+  // AI Chat send
   const aiChatInput = document.getElementById('ai-chat-input');
   const aiSendBtn = document.getElementById('ai-chat-send-btn');
   const aiChatMessages = document.getElementById('ai-chat-messages');
@@ -1500,102 +1714,164 @@ function setupEventListeners() {
     });
   }
 
-  // Sidebar Tab Navigation
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const tabId = item.dataset.tab;
-      if (tabId) switchTab(tabId);
-    });
-  });
+  // Profile Card and Quick Shop Modal Controls
+  initProfileCardControls();
 
-  // Analytics Period Capsule Buttons
-  document.querySelectorAll('.period-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const period = btn.dataset.period;
-      loadAnalytics(period);
-    });
-  });
-
-  // Product Catalog Filters
-  const prodSearch = document.getElementById('admin-search-products');
-  if (prodSearch) prodSearch.addEventListener('input', renderProductsTable);
-  const prodCat = document.getElementById('admin-filter-category');
-  if (prodCat) prodCat.addEventListener('change', renderProductsTable);
-
-  // Product Modal Close & Cancel
-  const closeCrudModal = document.getElementById('close-crud-modal');
-  if (closeCrudModal) closeCrudModal.addEventListener('click', () => {
-    document.getElementById('product-crud-modal').classList.add('hidden');
-  });
-  const cancelCrud = document.getElementById('btn-cancel-crud');
-  if (cancelCrud) cancelCrud.addEventListener('click', () => {
-    document.getElementById('product-crud-modal').classList.add('hidden');
-  });
-
-  // Product CRUD Form Submit
-  const crudForm = document.getElementById('product-crud-form');
-  if (crudForm) crudForm.addEventListener('submit', handleProductFormSubmit);
-
-  // Batch Image File Input
-  const multiFileInput = document.getElementById('crud-prod-multi-files');
-  if (multiFileInput) {
-    multiFileInput.addEventListener('change', (e) => {
-      handleBatchPhotos(e.target.files);
-    });
-  }
-
-  // Remove Photo Slot Delegation
-  const photoSlotsGrid = document.getElementById('photo-slots-grid');
-  if (photoSlotsGrid) {
-    photoSlotsGrid.addEventListener('click', (e) => {
-      const removeBtn = e.target.closest('.btn-remove-slot');
-      if (removeBtn) {
-        e.stopPropagation();
-        const slotEl = removeBtn.closest('.photo-slot');
-        const idx = parseInt(slotEl.dataset.slot, 10);
-        removePhotoSlot(idx);
-      }
-    });
-  }
-
-  // Add External URL Photo
-  const addUrlBtn = document.getElementById('btn-add-url-photo');
-  if (addUrlBtn) {
-    addUrlBtn.addEventListener('click', () => {
-      const urlInput = document.getElementById('crud-prod-url');
-      const val = urlInput.value.trim();
-      if (!val) return;
-      const emptyIdx = adminState.photoSlots.findIndex(s => s === null);
-      if (emptyIdx !== -1) {
-        adminState.photoSlots[emptyIdx] = { type: 'url', src: val };
-        renderPhotoSlots();
-        urlInput.value = '';
-      } else {
-        alert("Barcha 5 ta foto-slot to'lgan! Avval birortasini o'chiring.");
-      }
-    });
-  }
-
-  // Settings Forms
-  const shopForm = document.getElementById('form-shop-settings');
-  if (shopForm) shopForm.addEventListener('submit', handleShopSettingsSubmit);
-
-  const tgForm = document.getElementById('form-telegram-settings');
-  if (tgForm) tgForm.addEventListener('submit', handleTelegramSettingsSubmit);
-
-  const aiForm = document.getElementById('form-ai-settings');
-  if (aiForm) aiForm.addEventListener('submit', handleAiSettingsSubmit);
-
-  const testTgBtn = document.getElementById('btn-test-telegram');
-  if (testTgBtn) testTgBtn.addEventListener('click', testTelegramBot);
-
-  const broadcastForm = document.getElementById('form-broadcast-msg');
-  if (broadcastForm) broadcastForm.addEventListener('submit', handleBroadcastSubmit);
-
-  // Global window functions for table action inline click
+  // Global window functions for inline table calls
   window.openEditProductModal = openEditProductModal;
   window.deleteProduct = deleteProduct;
   window.updateOrderStatus = updateOrderStatus;
+  window.openOrderModal = openOrderModal;
+  window.openSampleOrderModal = openSampleOrderModal;
+  window.showToast = showToast;
+}
+
+function initProfileCardControls() {
+  const profileCard = document.getElementById('sidebar-profile-card');
+  const dropdownMenu = document.getElementById('profile-dropdown-menu');
+  const quickShopModal = document.getElementById('quick-shop-modal');
+  const closeQuickModalBtn = document.getElementById('close-quick-shop-modal');
+  const cancelQuickModalBtn = document.getElementById('btn-cancel-quick-shop');
+  const quickShopForm = document.getElementById('form-quick-shop');
+
+  // Toggle Dropdown Menu
+  if (profileCard && dropdownMenu) {
+    profileCard.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = !dropdownMenu.classList.contains('hidden');
+      if (isOpen) {
+        dropdownMenu.classList.add('hidden');
+        profileCard.classList.remove('dropdown-open');
+      } else {
+        dropdownMenu.classList.remove('hidden');
+        profileCard.classList.add('dropdown-open');
+      }
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdownMenu.contains(e.target) && !profileCard.contains(e.target)) {
+        dropdownMenu.classList.add('hidden');
+        profileCard.classList.remove('dropdown-open');
+      }
+    });
+  }
+
+  // Action 1: Settings Navigation
+  const btnSettings = document.getElementById('dropdown-btn-settings');
+  if (btnSettings) {
+    btnSettings.addEventListener('click', () => {
+      if (dropdownMenu) {
+        dropdownMenu.classList.add('hidden');
+        profileCard?.classList.remove('dropdown-open');
+      }
+      switchTab('tab-settings');
+      setTimeout(() => {
+        const nameInput = document.getElementById('shop-name');
+        if (nameInput) {
+          nameInput.focus();
+          nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          nameInput.style.transition = 'box-shadow 0.3s ease';
+          nameInput.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.4)';
+          setTimeout(() => { nameInput.style.boxShadow = ''; }, 1500);
+        }
+      }, 100);
+    });
+  }
+
+  // Action 2: Quick Edit Shop Modal
+  const btnQuickEdit = document.getElementById('dropdown-btn-quick-edit');
+  if (btnQuickEdit && quickShopModal) {
+    btnQuickEdit.addEventListener('click', () => {
+      if (dropdownMenu) {
+        dropdownMenu.classList.add('hidden');
+        profileCard?.classList.remove('dropdown-open');
+      }
+      const curName = document.getElementById('sidebar-shop-name')?.textContent?.trim() || '';
+      const curTagline = document.getElementById('shop-tagline')?.value || '';
+      const curPhone = document.getElementById('shop-phone')?.value || '';
+
+      const nameInp = document.getElementById('quick-shop-name');
+      const tagInp = document.getElementById('quick-shop-tagline');
+      const phoneInp = document.getElementById('quick-shop-phone');
+
+      if (nameInp) nameInp.value = curName;
+      if (tagInp) tagInp.value = curTagline;
+      if (phoneInp) phoneInp.value = curPhone;
+
+      quickShopModal.classList.remove('hidden');
+      nameInp?.focus();
+    });
+  }
+
+  // Close Quick Edit Modal
+  const closeQuickModal = () => {
+    quickShopModal?.classList.add('hidden');
+  };
+  if (closeQuickModalBtn) closeQuickModalBtn.addEventListener('click', closeQuickModal);
+  if (cancelQuickModalBtn) cancelQuickModalBtn.addEventListener('click', closeQuickModal);
+
+  // Submit Quick Edit Form
+  if (quickShopForm) {
+    quickShopForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newName = document.getElementById('quick-shop-name')?.value?.trim();
+      const newTagline = document.getElementById('quick-shop-tagline')?.value?.trim();
+      const newPhone = document.getElementById('quick-shop-phone')?.value?.trim();
+
+      if (!newName) {
+        showToast("Do'kon nomini kiriting!", "error");
+        return;
+      }
+
+      const payload = {
+        shop: {
+          name: newName,
+          tagline: newTagline,
+          phone: newPhone
+        }
+      };
+
+      try {
+        const res = await fetch('/api/admin/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const sidebarShopName = document.getElementById('sidebar-shop-name');
+          if (sidebarShopName) sidebarShopName.textContent = newName;
+          
+          const fullShopNameInput = document.getElementById('shop-name');
+          if (fullShopNameInput) fullShopNameInput.value = newName;
+
+          showToast("Do'kon ma'lumotlari muvaffaqiyatli yangilandi!", "success");
+          closeQuickModal();
+          loadSettings();
+        } else {
+          showToast("Saqlashda xatolik yuz berdi", "error");
+        }
+      } catch (err) {
+        showToast("Server bilan aloqa xatosi", "error");
+      }
+    });
+  }
+
+  // Action 3: Sync Store Data
+  const btnSync = document.getElementById('dropdown-btn-sync');
+  if (btnSync) {
+    btnSync.addEventListener('click', async () => {
+      if (dropdownMenu) {
+        dropdownMenu.classList.add('hidden');
+        profileCard?.classList.remove('dropdown-open');
+      }
+      showToast("Ma'lumotlar server bilan sinxronlanmoqda...", "info");
+      await refreshDashboardData(false);
+      await loadSettings();
+      showToast("Do'kon ma'lumotlari muvaffaqiyatli yangilandi!", "success");
+    });
+  }
 }
 
 function switchTab(tabId) {
@@ -1610,7 +1886,6 @@ function switchTab(tabId) {
     pane.classList.toggle('active', pane.id === tabId);
   });
 
-  // Load specific tab data if needed
   if (tabId === 'tab-analytics') {
     loadAnalytics(adminState.currentPeriod);
   } else if (tabId === 'tab-products') {
