@@ -43,8 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   startSliderAutoplay();
   loadLiveProducts();
+  loadShopSettings();
   // Har 8 soniyada dashboarddan yangi qo'shilgan mahsulotlarni avtomatik tekshirib yangilab turadi
   setInterval(loadLiveProducts, 8000);
+  // Har 10 soniyada do'kon sozlamalarini (telefon, manzil, ish vaqti) avtomatik sinxronlaydi
+  setInterval(loadShopSettings, 10000);
 });
 
 // ==========================================================================
@@ -130,6 +133,129 @@ async function loadLiveProducts() {
     }
   } catch (err) {
     console.warn("Live products sync error, fallback static products active:", err);
+  }
+}
+
+// ==========================================================================
+// DYNAMIC SHOP SETTINGS SYNC (ADMIN DASHBOARD -> CUSTOMER PANEL)
+// ==========================================================================
+async function loadShopSettings() {
+  try {
+    const res = await fetch('/api/shop');
+    if (!res.ok) return;
+    const data = await res.json();
+    const shop = data.shop || {};
+
+    // 1. Telefon raqam
+    if (shop.phone) {
+      const cleanPhone = shop.phone.replace(/[^\d+]/g, '');
+      const phoneEl = document.getElementById('footerPhoneLink');
+      if (phoneEl) {
+        phoneEl.textContent = shop.phone;
+        phoneEl.href = `tel:${cleanPhone}`;
+      }
+      const topPhone = document.getElementById('topPhoneLink');
+      if (topPhone) {
+        topPhone.textContent = shop.phone;
+        topPhone.href = `tel:${cleanPhone}`;
+      }
+    }
+
+    // 2. Manzil (Malika filiali)
+    if (shop.address) {
+      const addrEl = document.getElementById('footerAddressText');
+      if (addrEl) addrEl.textContent = shop.address;
+
+      const topAddr = document.getElementById('topAddressText') || document.getElementById('top-address');
+      if (topAddr) topAddr.textContent = shop.address;
+
+      const trustAddr = document.getElementById('trustAddressDesc');
+      if (trustAddr) trustAddr.textContent = shop.address;
+
+      const trustTitle = document.getElementById('trustAddressTitle');
+      if (trustTitle) {
+        // Masalan: "Malika B-blok 24" yoki qisqa manzil
+        const parts = shop.address.split(',');
+        trustTitle.textContent = parts[parts.length - 1]?.trim() || shop.address;
+      }
+    }
+
+    // 3. Ish vaqti
+    if (shop.workingHours) {
+      const hoursEl = document.getElementById('footerHoursText');
+      if (hoursEl) {
+        const lang = APP_STATE.lang || 'uz';
+        hoursEl.textContent = lang === 'ru' 
+          ? `Время работы: ${shop.workingHours}`
+          : `Ish vaqti: ${shop.workingHours}`;
+      }
+      const topHours = document.getElementById('topHoursText') || document.getElementById('top-hours');
+      if (topHours) topHours.textContent = shop.workingHours;
+    }
+
+    // 4. Qisqa tavsif / Tagline / Description
+    if (shop.description || shop.tagline) {
+      const descEl = document.getElementById('footerShopDesc');
+      if (descEl) {
+        descEl.textContent = shop.description || `${shop.name || 'Black Store'} — ${shop.tagline || ''}`;
+      }
+    }
+
+    // 5. Telegram kanal / havola
+    if (shop.telegramChannel) {
+      const tgBtn = document.getElementById('footerTgBtn');
+      if (tgBtn) {
+        tgBtn.href = shop.telegramChannel;
+        tgBtn.title = `Telegram: ${shop.telegramChannel}`;
+      }
+      const tgLink = document.getElementById('footerTgLink');
+      if (tgLink) {
+        tgLink.href = shop.telegramChannel;
+        const channelHandle = shop.telegramChannel.replace(/^https?:\/\/t\.me\//i, '@');
+        tgLink.textContent = `Telegram: ${channelHandle}`;
+      }
+    }
+
+    // 6. Instagram havola
+    if (shop.instagram) {
+      const instaBtn = document.getElementById('footerInstaBtn');
+      if (instaBtn) {
+        instaBtn.href = shop.instagram;
+        instaBtn.title = `Instagram: ${shop.instagram}`;
+      }
+    }
+
+    // 7. Footer Tagline & Rights
+    const tagEl = document.getElementById('footerTaglineText');
+    if (tagEl) {
+      const addrSummary = shop.address || shop.tagline || "Malika B-blok 1-do'kon";
+      const phoneSummary = shop.phone || '';
+      tagEl.textContent = phoneSummary ? `${addrSummary} · ${phoneSummary}` : addrSummary;
+    }
+
+    const rightsEl = document.getElementById('footerRightsText');
+    if (rightsEl && shop.name) {
+      rightsEl.innerHTML = `&copy; 2026 ${shop.name}.uz. Barcha huquqlar himoyalangan.`;
+    }
+
+    // 8. Do'kon Nomi
+    if (shop.name && shop.name.trim()) {
+      const brandTitles = document.querySelectorAll('.brand-title');
+      brandTitles.forEach(bt => {
+        bt.innerHTML = `${shop.name}<span class="brand-uz">.uz</span>`;
+      });
+    }
+
+    // 9. AI Yordamchi xush kelibsiz xabari (agar admin belgilagan bo'lsa)
+    if (data.aiWelcome) {
+      const welcomeEl = document.getElementById('aiWelcomeText');
+      if (welcomeEl && !welcomeEl.dataset.customized) {
+        welcomeEl.textContent = data.aiWelcome;
+        welcomeEl.dataset.customized = "true";
+      }
+    }
+  } catch (err) {
+    console.warn('Shop settings load error:', err);
   }
 }
 

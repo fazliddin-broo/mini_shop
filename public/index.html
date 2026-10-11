@@ -154,8 +154,8 @@
           <div class="trust-item trust-item-rose">
             <div class="trust-icon-box" id="trustIcon4"></div>
             <div class="trust-info">
-              <h4>Malika B-blok 1</h4>
-              <p>Toshkent sh., Malika savdo markazi</p>
+              <h4 id="trustAddressTitle">Malika B-blok 1</h4>
+              <p id="trustAddressDesc">Toshkent sh., Malika savdo markazi</p>
             </div>
           </div>
         </div>
@@ -216,17 +216,17 @@
               <span class="brand-title">BlackStore<span class="brand-uz">.uz</span></span>
             </div>
           </div>
-          <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.6; margin-bottom: 16px;">
+          <p class="footer-desc-text" id="footerShopDesc">
             BlackStore.uz — Apple mahsulotlari eng arzon narxlarda! 1 yilgacha rasmiy kafolat, tezkor yetkazib berish va sifatli xizmat ko'rsatish.
           </p>
           <div class="footer-social-row">
-            <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerTgBtn" title="Telegram: t.me/+y-KOTC5kOaFiZWUy"></a>
-            <a href="https://instagram.com/blackstore.uz?mdxt=eHRsNWNkZTRkenE%3D" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerInstaBtn" title="Instagram: @blackstore.uz"></a>
+            <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerTgBtn" title="Telegram"></a>
+            <a href="https://instagram.com/blackstore.uz?mdxt=eHRsNWNkZTRkenE%3D" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerInstaBtn" title="Instagram"></a>
           </div>
         </div>
 
         <div class="footer-col">
-          <h5>Kategoriyalar</h5>
+          <h5 data-i18n="footerCategories">Kategoriyalar</h5>
           <ul class="footer-links">
             <li><a href="#" onclick="selectCategory('smart-watch-fitnes'); return false;">Aqlli soatlar</a></li>
             <li><a href="#" onclick="selectCategory('naushniki-quloqchinlar'); return false;">Quloqchinlar</a></li>
@@ -237,7 +237,7 @@
         </div>
 
         <div class="footer-col">
-          <h5>Mijozlar uchun</h5>
+          <h5 data-i18n="footerClients">Mijozlar uchun</h5>
           <ul class="footer-links">
             <li><a href="#heroSection">Aksiyalar va chegirmalar</a></li>
             <li><a href="#" onclick="openInfoModal('delivery'); return false;">Yetkazib berish shartlari</a></li>
@@ -247,25 +247,25 @@
         </div>
 
         <div class="footer-col">
-          <h5>Aloqa va Manzil</h5>
+          <h5 data-i18n="footerContact">Aloqa va Manzil</h5>
           <ul class="footer-links">
-            <li style="display: flex; align-items: center; gap: 8px;">
-              <span id="footerPhoneIcon" style="color: var(--yellow-400);"></span>
-              <a href="tel:+998951964444" style="color: inherit; font-weight: 700;">+998 (95) 196-44-44</a>
+            <li class="footer-contact-item">
+              <span id="footerPhoneIcon" class="footer-icon-wrap"></span>
+              <a href="tel:+998951964444" id="footerPhoneLink" class="footer-phone-bold">+998 (95) 196-44-44</a>
             </li>
-            <li style="display: flex; align-items: center; gap: 8px;">
-              <span id="footerTgIcon" style="color: var(--yellow-400);"></span>
-              <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" style="color: inherit;">Telegram: @blackstore.uz</a>
+            <li class="footer-contact-item">
+              <span id="footerTgIcon" class="footer-icon-wrap"></span>
+              <a href="https://t.me/+y-KOTC5kOaFiZWUy" id="footerTgLink" target="_blank" rel="noopener noreferrer">Telegram: @blackstore.uz</a>
             </li>
-            <li style="display: flex; align-items: center; gap: 8px;">
-              <span style="color: var(--yellow-400); font-size: 0.85rem;">⚡️</span>
-              <a href="https://t.me/blackstore_admin" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: 600;">Admin: @blackstore_admin</a>
+            <li class="footer-contact-item">
+              <span class="footer-icon-wrap text-amber">⚡️</span>
+              <a href="https://t.me/blackstore_admin" id="footerAdminLink" target="_blank" rel="noopener noreferrer">Admin: @blackstore_admin</a>
             </li>
-            <li style="display: flex; align-items: center; gap: 8px;">
-              <span id="footerMapIcon" style="color: var(--yellow-400);"></span>
-              <span>Malika B-blok 1-do'kon</span>
+            <li class="footer-contact-item">
+              <span id="footerMapIcon" class="footer-icon-wrap"></span>
+              <span id="footerAddressText">Malika B-blok 1-do'kon</span>
             </li>
-            <li style="color: var(--text-muted); font-size: 0.8125rem; margin-top: 6px;" id="footerHoursText">
+            <li class="footer-hours-row" id="footerHoursText">
               Ish vaqti: 09:00 - 22:00 (dam olish kunlarisiz)
             </li>
           </ul>

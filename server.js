@@ -576,15 +576,15 @@ app.get(['/admin', '/admin.html', '/dashboard', '/blackstore-6666'], (req, res) 
 // ── API ROUTES (MongoDB ulanishini tekshirish bilan) ───────
 app.use('/api', ensureDbConnected);
 
-// 1. Public Shop Info
-app.get('/api/shop', async (req, res) => {
+// 1. Public Shop Info (Mijozlar vitrinasi uchun do'kon sozlamalari)
+app.get(['/api/shop', '/api/settings'], async (req, res) => {
   try {
     const settings = await getSettings();
     const publicShop = { ...(settings.shop || {}) };
     delete publicShop.adminPin;
-    res.json({ shop: publicShop, aiWelcome: settings.ai?.welcomeMessage || 'Salom!' });
+    res.json({ success: true, shop: publicShop, aiWelcome: settings.ai?.welcomeMessage || 'Salom!' });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
