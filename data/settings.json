@@ -1,14 +1,14 @@
 {
   "shop": {
-    "name": "Malika iStore",
-    "tagline": "Yunusobod Malika bozori • B-blok 24-do'kon",
-    "description": "Original Apple & Samsung gadjetlari, noutbuklar va eng so'nggi aksessuarlar. Toshkent bo'ylab 2 soatda tezkor yetkazib berish!",
-    "phone": "+998 90 123 45 67",
-    "address": "Toshkent sh., Yunusobod t., Malika savdo majmuasi, B-blok 24-do'kon",
-    "instagram": "https://instagram.com/malika_istore",
-    "telegramChannel": "https://t.me/malika_istore",
+    "name": "Black Store",
+    "tagline": "Malika savdo markazi • B-blok 1-do'kon",
+    "description": "BlackStore.uz — Apple mahsulotlari eng arzon narxlarda! 1 yilgacha rasmiy kafolat, tezkor yetkazib berish va sifatli xizmat ko'rsatish.",
+    "phone": "+998 (95) 196-44-44",
+    "address": "Toshkent sh., Malika savdo markazi, B-blok 1-do'kon",
+    "instagram": "https://instagram.com/blackstore.uz",
+    "telegramChannel": "https://t.me/blackstore_uz",
     "currency": "UZS",
-    "workingHours": "10:00 - 20:00 (Dam olish kunisiz)",
+    "workingHours": "09:00 - 22:00 (dam olish kunlarisiz)",
     "adminPin": "1234"
   },
   "telegram": {
@@ -19,7 +19,7 @@
   "ai": {
     "provider": "gemini",
     "apiKey": "",
-    "systemPrompt": "Siz 'Malika iStore' do'konining professional, samimiy va xushmuomala virtual sotuvchi-maslahatchisisiz. Sizning vazifangiz - xaridorlarga do'kondagi tovarlar haqida to'liq ma'lumot berish, ularning ehtiyojiga mos gadjet tanlashda yordam berish va ularni xarid qilishga (savatchaga qo'shish yoki buyurtma berishga) yo'naltirish. Faqat do'konda bor tovarlar va ularning haqiqiy narxlarini ayting. O'zbek va Rus tillarida xushmuomala javob bering.",
-    "welcomeMessage": "Assalomu alaykum! Men Malika iStore virtual maslahatchisiman 🤖 Qanday gadjet yoki telefon qidiryapsiz? Sizga qaysi narx oralig'ida tanlashda yordam beray?"
+    "systemPrompt": "Siz 'Black Store' (Apple, Samsung va zamonaviy gadjetlar do'koni)ning aqlli AI savdo maslahatchisisiz. Sizning vazifangiz — xaridorlarga do'kondagi tovarlar, kafolat (1 yil), yetkazib berish va narxlar bo'yicha professional maslahat berish. Manzil: Malika B-blok 1-do'kon. Tel: +998 (95) 196-44-44.",
+    "welcomeMessage": "Assalomu alaykum! Black Store do'koniga xush kelibsiz! Qanday gadjet yoki Apple mahsuloti qidiryapsiz?"
   }
 }
