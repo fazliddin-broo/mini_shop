@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BlackStore.uz — Apple mahsulotlari eng arzon narxlarda | Toshkent</title>
   <meta name="description" content="BlackStore.uz — Toshkentda Apple mahsulotlari eng arzon narxlarda! 1 yilgacha kafolat, tezkor yetkazib berish. Malika B-blok 1-do'kon. Tel: +998 (95) 196-44-44" />
   <meta name="keywords" content="blackstore.uz, black store, apple toshkent, iphone, airpods, apple watch, malika b-blok, arzon apple" />
@@ -18,19 +18,82 @@
   <meta property="og:image" content="images/logo.png" />
   <meta property="og:theme-color" content="#09090b" />
 
-  <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="css/style.css" />
+  <meta name="theme-color" id="metaThemeColor" content="#f8f9fa" />
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- Instant Theme Checker (Sayt birinchi ochilganda har doim Oq rejim, keyin tanlangan rejim saqlanadi) -->
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('blackstore_theme');
+        var theme = savedTheme ? savedTheme : 'light';
+        if (theme === 'light') {
+          document.documentElement.classList.add('light');
+        } else {
+          document.documentElement.classList.remove('light');
+        }
+      } catch (e) {
+        document.documentElement.classList.add('light');
+      }
+    })();
+  </script>
+
+  <!-- CSS Stylesheet (Cache-busted) -->
+  <link rel="stylesheet" href="css/style.css?v=6.2" />
 </head>
 <body>
 
   <!-- ==========================================================================
-       MAIN HEADER (Logo | Qidiruv | RU | Mavzu | Yurak | Savat)
+       CINEMATIC CURTAIN INTRO (Parda Ochilish Animatsiyasi)
+       ========================================================================== -->
+  <div class="site-curtain-intro" id="siteCurtainIntro" onclick="dismissCurtainIntro()" aria-hidden="true">
+    <!-- Chap Parda -->
+    <div class="curtain-wing curtain-wing-left">
+      <div class="curtain-fold-shading"></div>
+    </div>
+    <!-- O'ng Parda -->
+    <div class="curtain-wing curtain-wing-right">
+      <div class="curtain-fold-shading"></div>
+    </div>
+
+    <!-- Markazdagi Brend Belgisi -->
+    <div class="curtain-center-brand" id="curtainCenterBrand">
+      <div class="curtain-logo-wrapper">
+        <img src="images/logo.png" alt="BlackStore" class="curtain-brand-img" />
+      </div>
+      <div class="curtain-brand-text">
+        <span class="curtain-title">BlackStore<span class="curtain-title-dot">.uz</span></span>
+        <span class="curtain-subtitle">Original Apple Store</span>
+      </div>
+      <div class="curtain-loader-bar">
+        <div class="curtain-loader-progress" id="curtainLoaderProgress"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liquid Ambient Aura Glow Mesh (Applebox Image 4 / Liquid Aesthetic) -->
+  <div class="liquid-ambient-aura" aria-hidden="true"></div>
+
+  <!-- ==========================================================================
+       MAIN HEADER (Logo | Qidiruv | RU | Mavzu | Yurak | Savat | Kirish)
        ========================================================================== -->
   <header class="main-header" id="mainHeader">
     <div class="container">
       <div class="header-inner">
-        <!-- Logo (Ixcham, proporcional va toza) -->
-        <a href="#" class="brand-logo" onclick="resetFilters(); return false;" id="brandLogo">
+        <!-- Hamburger Menu Button (IMG_2191: Mobile chap tomondagi menyu) -->
+        <button class="mobile-hamburger-btn" onclick="openMobileNavDrawer()" id="mobileHamburgerBtn" aria-label="Menyu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Logo (Ixcham, proporcional va toza — Asosiy bo'limga silliq o'tish) -->
+        <a href="javascript:void(0)" class="brand-logo" onclick="goToHome(event)" id="brandLogo" title="BlackStore.uz Asosiy Sahifa">
           <img src="images/logo.png" alt="BlackStore.uz" class="brand-logo-img" width="34" height="34" />
           <div class="brand-text">
             <span class="brand-title">BlackStore<span class="brand-uz">.uz</span></span>
@@ -46,28 +109,37 @@
               class="search-input" 
               placeholder="Mahsulot qidirish..." 
               id="desktopSearchInput"
+              autocomplete="off"
+              spellcheck="false"
             />
             <button class="search-clear" id="desktopSearchClear" title="Tozalash"></button>
           </div>
+          <!-- Live Search Dropdown Popup (applebox.uz uslubi) -->
+          <div class="search-results-dropdown" id="desktopSearchResults" style="display: none;"></div>
         </div>
 
-        <!-- Header Actions: RU · Quyosh · Yurak · Savat -->
+        <!-- Header Actions (Screenshot 2 & Mobile IMG_2191) -->
         <div class="header-actions">
-          <!-- Til almashtirgich (RU / UZ) -->
-          <button class="btn-lang" onclick="toggleLanguage()" id="langToggleBtn" title="Til">RU</button>
-
-          <!-- Mavzu almashtirgich (Quyosh / Oy) -->
-          <button class="header-action-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Rejimni almashtirish">
+          <!-- Mobile Only Search Button (IMG_2191: O'ng tomondagi qidiruv ikonkasi) -->
+          <button class="header-action-btn mobile-only-action" onclick="toggleMobileSearchRow()" id="mobileSearchToggleBtn" title="Qidiruv">
+            <span id="mobileSearchToggleIcon"></span>
           </button>
 
-          <!-- Sevimlilar -->
-          <button class="header-action-btn" onclick="filterByWishlist()" id="headerWishlistBtn" title="Sevimlilar">
+          <!-- Til almashtirgich (RU / UZ - Desktop) -->
+          <button class="btn-lang desktop-only-action" onclick="toggleLanguage()" id="langToggleBtn" title="Til">RU</button>
+
+          <!-- Mavzu almashtirgich (Quyosh / Oy - Desktop) -->
+          <button class="header-action-btn desktop-only-action" onclick="toggleTheme()" id="themeToggleBtn" title="Rejimni almashtirish">
+          </button>
+
+          <!-- Sevimlilar (Desktop) -->
+          <button class="header-action-btn desktop-only-action" onclick="filterByWishlist()" id="headerWishlistBtn" title="Sevimlilar">
             <span id="headerWishlistIcon"></span>
             <span class="badge-count wishlist-count-badge" style="display: none;">0</span>
           </button>
 
-          <!-- Savat -->
-          <button class="header-action-btn btn-cart" onclick="toggleCartDrawer(true)" id="headerCartBtn" title="Savat">
+          <!-- Savat (Ham Desktop, ham Mobile - IMG_2191) -->
+          <button class="header-action-btn btn-cart" onclick="openCartView(event)" id="headerCartBtn" title="Savat">
             <span id="headerCartIcon"></span>
             <span class="badge-count cart-count-badge" style="display: none;">0</span>
           </button>
@@ -83,9 +155,13 @@
             class="search-input" 
             placeholder="Mahsulot qidirish..." 
             id="mobileSearchInput"
+            autocomplete="off"
+            spellcheck="false"
           />
           <button class="search-clear" id="mobileSearchClear" title="Tozalash"></button>
         </div>
+        <!-- Live Search Dropdown Popup (Mobile) -->
+        <div class="search-results-dropdown mobile-search-dropdown" id="mobileSearchResults" style="display: none;"></div>
       </div>
 
       <!-- SUB NAVIGATION BAR (Screenshot 2: Kategoriyalar · Brendlar · Hammasini ko'rish) -->
@@ -99,7 +175,7 @@
             <span class="sub-nav-icon" id="subNavBrandsIcon"></span>
             <span>Brendlar</span>
           </button>
-          <a href="#" class="sub-nav-link" onclick="resetFilters(); return false;" id="subNavAllLink">
+          <a href="javascript:void(0)" class="sub-nav-link" onclick="openAllCatalog(event)" id="subNavAllLink">
             <span>Hammasini ko'rish</span>
             <span id="subNavArrowIcon"></span>
           </a>
@@ -154,8 +230,8 @@
           <div class="trust-item trust-item-rose">
             <div class="trust-icon-box" id="trustIcon4"></div>
             <div class="trust-info">
-              <h4 id="trustAddressTitle">Malika B-blok 1</h4>
-              <p id="trustAddressDesc">Toshkent sh., Malika savdo markazi</p>
+              <h4>Malika B-blok 1</h4>
+              <p>Toshkent sh., Malika savdo markazi</p>
             </div>
           </div>
         </div>
@@ -175,30 +251,123 @@
       </div>
     </section>
 
-    <!-- PRODUCTS CATALOG -->
+    <!-- PRODUCTS CATALOG (Screenshot 1 Uslubi: Chapda Filtr kartasi, o'ngda mahsulotlar) -->
     <section class="catalog-section" id="catalogSection">
       <div class="container">
-        <!-- Active Category Header (Screenshot 1: Quloqchinlar va naushniklar · 77 ta mahsulot [Quloqchinlar va naushniklar ✕]) -->
-        <div class="category-active-header" id="categoryActiveHeader"></div>
+        <!-- 2-Column Catalog Layout (Sidebar + Main) -->
+        <div class="catalog-layout" id="catalogLayout">
+          
+          <!-- LEFT SIDEBAR: Filtr (Screenshot 1 Uslubi) -->
+          <aside class="catalog-sidebar" id="catalogSidebar" style="display: none;">
+            <div class="filter-sidebar-card">
+              <div class="filter-sidebar-header">
+                <h3 id="sidebarFilterTitle">Filtr</h3>
+              </div>
 
-        <!-- Catalog Toolbar -->
-        <div class="catalog-toolbar">
-          <div class="catalog-stats">
-            Jami: <strong id="productsCount">0</strong> ta mahsulot mavjud
+              <!-- KATEGORIYALAR -->
+              <div class="filter-group">
+                <span class="filter-group-title" id="sidebarCatTitle">KATEGORIYALAR</span>
+                <div class="filter-categories-list" id="sidebarCategoriesList">
+                  <!-- Injected via JavaScript -->
+                </div>
+              </div>
+
+              <!-- BRENDLAR -->
+              <div class="filter-group">
+                <span class="filter-group-title" id="sidebarBrandTitle">BRENDLAR</span>
+                <div class="filter-brands-list" id="sidebarBrandsList">
+                  <!-- Injected via JavaScript -->
+                </div>
+              </div>
+
+              <!-- MAVJUD TOGGLE -->
+              <div class="filter-group filter-group-switch">
+                <span class="filter-group-title" id="sidebarInStockTitle">MAVJUD</span>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="inStockToggle" onchange="toggleInStock(this.checked)" />
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- TOZALASH TUGMASI (Screenshot 1) -->
+              <button class="filter-reset-btn" onclick="resetFilters(true)" id="sidebarResetBtn">Tozalash</button>
+            </div>
+          </aside>
+
+          <!-- RIGHT MAIN: Products Content -->
+          <div class="catalog-main">
+            <!-- Home Deals Section: Hafta Chegirmalari (Horizontal Swipeable Carousel) -->
+            <div class="home-deals-section" id="homeDealsSection"></div>
+
+            <!-- Active Category Header (Barcha mahsulotlar / Kategoriya sarlavhasi) -->
+            <div class="category-active-header" id="categoryActiveHeader"></div>
+
+            <!-- Catalog Toolbar -->
+            <div class="catalog-toolbar">
+              <div class="catalog-stats">
+                Jami: <strong id="productsCount">0</strong> ta mahsulot mavjud
+              </div>
+              <div class="catalog-sort-wrap">
+                <label for="sortSelect" class="sort-label">Saralash:</label>
+                <select class="sort-select" id="sortSelect">
+                  <option value="popular">Ommabopligi bo'yicha</option>
+                  <option value="price-asc">Narxi: Arzondan qimmatga</option>
+                  <option value="price-desc">Narxi: Qimmatdan arzonga</option>
+                  <option value="rating">Yuqori reytingli</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid"></div>
           </div>
-          <div class="catalog-sort-wrap">
-            <label for="sortSelect" class="sort-label">Saralash:</label>
-            <select class="sort-select" id="sortSelect">
-              <option value="popular">Ommabopligi bo'yicha</option>
-              <option value="price-asc">Narxi: Arzondan qimmatga</option>
-              <option value="price-desc">Narxi: Qimmatdan arzonga</option>
-              <option value="rating">Yuqori reytingli</option>
-            </select>
+
+        </div>
+      </div>
+    </section>
+    <!-- ==========================================================================
+         APPLEBOX PRODUCT DETAIL PAGE VIEW (Screenshot 2 Uslubi)
+         ========================================================================== -->
+    <section class="product-detail-page-section" id="productDetailPageSection" style="display: none;">
+      <div class="container">
+        <!-- Top bar: ← Orqaga va Breadcrumb -->
+        <div class="detail-page-top-bar">
+          <button class="detail-page-back-btn" onclick="closeProductDetail()" aria-label="Orqaga">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span id="detailBackText">Orqaga</span>
+          </button>
+          <div class="detail-page-breadcrumb" id="detailPageBreadcrumb"></div>
+        </div>
+
+        <!-- Detail content injected via JavaScript -->
+        <div class="product-detail-content-wrap" id="productDetailContentWrap"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         APPLEBOX FULL CART PAGE VIEW (Screenshot 1 Uslubi: Savat & Buyurtma xulosasi)
+         ========================================================================== -->
+    <section class="cart-page-section" id="cartPageSection" style="display: none;">
+      <div class="container">
+        <!-- Top bar: ← Savat [X ta] -->
+        <div class="cart-page-header">
+          <button class="cart-page-back-btn" onclick="goToHome()" aria-label="Orqaga">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+          </button>
+          <div class="cart-page-title-wrap">
+            <h1 class="cart-page-title" id="cartPageHeading">Savat</h1>
+            <span class="cart-page-count-badge" id="cartPageCountBadge">0 ta</span>
           </div>
         </div>
 
-        <!-- Products Grid -->
-        <div class="products-grid" id="productsGrid"></div>
+        <!-- Cart items & Summary injected via JavaScript -->
+        <div class="cart-page-content" id="cartPageContent"></div>
       </div>
     </section>
   </main>
@@ -210,62 +379,63 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-col">
-          <div class="brand-logo footer-brand-logo" style="margin-bottom: 14px;">
+          <a href="javascript:void(0)" class="brand-logo footer-brand-logo" onclick="goToHome(event)" style="margin-bottom: 14px; text-decoration: none; cursor: pointer;" title="BlackStore.uz Asosiy">
             <img src="images/logo.png" alt="BlackStore.uz" class="brand-logo-img" width="34" height="34" />
             <div class="brand-text">
               <span class="brand-title">BlackStore<span class="brand-uz">.uz</span></span>
             </div>
-          </div>
-          <p class="footer-desc-text" id="footerShopDesc">
+          </a>
+          <p style="color: rgba(255, 255, 255, 0.82); font-size: 0.875rem; line-height: 1.6; margin-bottom: 16px;">
             BlackStore.uz — Apple mahsulotlari eng arzon narxlarda! 1 yilgacha rasmiy kafolat, tezkor yetkazib berish va sifatli xizmat ko'rsatish.
           </p>
           <div class="footer-social-row">
-            <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerTgBtn" title="Telegram"></a>
-            <a href="https://instagram.com/blackstore.uz?mdxt=eHRsNWNkZTRkenE%3D" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerInstaBtn" title="Instagram"></a>
+            <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerTgBtn" title="Telegram: t.me/+y-KOTC5kOaFiZWUy"></a>
+            <a href="https://instagram.com/blackstore.uz?mdxt=eHRsNWNkZTRkenE%3D" target="_blank" rel="noopener noreferrer" class="social-link-btn" id="footerInstaBtn" title="Instagram: @blackstore.uz"></a>
           </div>
         </div>
 
         <div class="footer-col">
-          <h5 data-i18n="footerCategories">Kategoriyalar</h5>
+          <h5>Kategoriyalar</h5>
           <ul class="footer-links">
-            <li><a href="#" onclick="selectCategory('smart-watch-fitnes'); return false;">Aqlli soatlar</a></li>
-            <li><a href="#" onclick="selectCategory('naushniki-quloqchinlar'); return false;">Quloqchinlar</a></li>
-            <li><a href="#" onclick="selectCategory('zaryadka-kabel'); return false;">Zaryadlovchi va kabellar</a></li>
-            <li><a href="#" onclick="selectCategory('powerbanklar'); return false;">Powerbanklar</a></li>
-            <li><a href="#" onclick="selectCategory('kompyuter-aksessuar'); return false;">Gaming aksessuarlar</a></li>
+            <li><a href="javascript:void(0)" onclick="selectCategory('smart-watch-fitnes')">Aqlli soatlar va fitnes</a></li>
+            <li><a href="javascript:void(0)" onclick="selectCategory('naushniki-quloqchinlar')">Quloqchinlar va naushniklar</a></li>
+            <li><a href="javascript:void(0)" onclick="selectCategory('zaryadka-kabel')">Zaryadlovchi va kabellar</a></li>
+            <li><a href="javascript:void(0)" onclick="selectCategory('telefon-aksessuar')">Telefon aksessuarlari</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h5 data-i18n="footerClients">Mijozlar uchun</h5>
+          <h5>Mijozlar uchun</h5>
           <ul class="footer-links">
-            <li><a href="#heroSection">Aksiyalar va chegirmalar</a></li>
-            <li><a href="#" onclick="openInfoModal('delivery'); return false;">Yetkazib berish shartlari</a></li>
-            <li><a href="#" onclick="openInfoModal('warranty'); return false;">Kafolat va qaytarish</a></li>
-            <li><a href="#" onclick="openInfoModal('payment'); return false;">To'lov usullari</a></li>
+            <li><a href="javascript:void(0)" onclick="goToHome(event)">Aksiyalar va chegirmalar</a></li>
+            <li><a href="#" onclick="showToast('Yetkazib berish Toshkentda 2 soat ichida amalga oshiriladi', 'truck'); return false;">Yetkazib berish shartlari</a></li>
+            <li><a href="#" onclick="showToast('Barcha mahsulotlarga 1 yillik kafolat beriladi', 'shieldCheck'); return false;">Kafolat va qaytarish</a></li>
+            <li><a href="javascript:void(0)" onclick="openReviewsModal();">Biz haqimizda</a></li>
           </ul>
         </div>
 
         <div class="footer-col">
-          <h5 data-i18n="footerContact">Aloqa va Manzil</h5>
+          <h5>Aloqa va Manzil</h5>
           <ul class="footer-links">
-            <li class="footer-contact-item">
-              <span id="footerPhoneIcon" class="footer-icon-wrap"></span>
-              <a href="tel:+998951964444" id="footerPhoneLink" class="footer-phone-bold">+998 (95) 196-44-44</a>
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span id="footerPhoneIcon" style="color: var(--yellow-400);"></span>
+              <a href="tel:+998951964444" style="color: inherit; font-weight: 700;">+998 (95) 196-44-44</a>
             </li>
-            <li class="footer-contact-item">
-              <span id="footerTgIcon" class="footer-icon-wrap"></span>
-              <a href="https://t.me/+y-KOTC5kOaFiZWUy" id="footerTgLink" target="_blank" rel="noopener noreferrer">Telegram: @blackstore.uz</a>
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span id="footerTgIcon" style="color: var(--yellow-400);"></span>
+              <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" style="color: inherit;">Telegram: @blackstore.uz</a>
             </li>
-            <li class="footer-contact-item">
-              <span class="footer-icon-wrap text-amber">⚡️</span>
-              <a href="https://t.me/blackstore_admin" id="footerAdminLink" target="_blank" rel="noopener noreferrer">Admin: @blackstore_admin</a>
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: var(--yellow-400); display: inline-flex; align-items: center;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              </span>
+              <a href="https://t.me/blackstore_admin" target="_blank" rel="noopener noreferrer" style="color: inherit; font-weight: 600;">Admin: @blackstore_admin</a>
             </li>
-            <li class="footer-contact-item">
-              <span id="footerMapIcon" class="footer-icon-wrap"></span>
-              <span id="footerAddressText">Malika B-blok 1-do'kon</span>
+            <li style="display: flex; align-items: center; gap: 8px;">
+              <span id="footerMapIcon" style="color: var(--yellow-400);"></span>
+              <span>Malika B-blok 1-do'kon</span>
             </li>
-            <li class="footer-hours-row" id="footerHoursText">
+            <li style="color: rgba(255, 255, 255, 0.65); font-size: 0.8125rem; margin-top: 6px;" id="footerHoursText">
               Ish vaqti: 09:00 - 22:00 (dam olish kunlarisiz)
             </li>
           </ul>
@@ -280,37 +450,149 @@
   </footer>
 
   <!-- ==========================================================================
-       MOBILE BOTTOM NAVIGATION BAR
+       MOBILE BOTTOM NAVIGATION BAR (IMG_2191: 5 ta asosiy bo'lim)
        ========================================================================== -->
   <nav class="mobile-bottom-bar" aria-label="Mobil boshqaruv paneli">
-    <button class="nav-tab-item active" onclick="resetFilters(); window.scrollTo({top: 0, behavior: 'smooth'});">
+    <button class="nav-tab-item active" onclick="goToHome(event);" id="bottomTabHome" title="Bosh sahifa">
       <span id="navHomeIcon"></span>
-      <span>Asosiy</span>
+      <span>Bosh sahifa</span>
     </button>
-    <button class="nav-tab-item" onclick="toggleCatalogDrawer(true);">
+    <button class="nav-tab-item" onclick="openCatalogView(event);" id="bottomTabCatalog" title="Kategoriyalar">
       <span id="navCatalogIcon"></span>
-      <span>Katalog</span>
+      <span>Kategoriyalar</span>
     </button>
-    <button class="nav-tab-item" onclick="focusMobileSearch();">
-      <span id="navSearchIcon"></span>
-      <span>Qidiruv</span>
-    </button>
-    <button class="nav-tab-item" onclick="filterByWishlist();">
-      <span id="navWishlistIcon"></span>
-      <span class="nav-tab-badge wishlist-count-badge" style="display: none;">0</span>
-      <span>Sevimlilar</span>
-    </button>
-    <button class="nav-tab-item" onclick="toggleCartDrawer(true);">
+    <button class="nav-tab-item" onclick="openCartView(event);" id="bottomTabCart" title="Savat">
       <span id="navCartIcon"></span>
       <span class="nav-tab-badge cart-count-badge" style="display: none;">0</span>
       <span>Savat</span>
     </button>
+    <button class="nav-tab-item" onclick="filterByWishlist();" id="bottomTabWishlist" title="Sevimlilar">
+      <span id="navWishlistIcon"></span>
+      <span class="nav-tab-badge wishlist-count-badge" style="display: none;">0</span>
+      <span>Sevimlilar</span>
+    </button>
+    <button class="nav-tab-item" onclick="openContactModal();" id="bottomTabContact" title="Aloqa">
+      <span id="navContactIcon"></span>
+      <span>Aloqa</span>
+    </button>
   </nav>
 
   <!-- ==========================================================================
-       DRAWERS (CART & CATALOG)
+       DRAWERS (MOBILE NAV, FILTER, CART & CATALOG)
        ========================================================================== -->
   <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeAllDrawers()"></div>
+
+  <!-- Mobile Left Navigation Drawer (IMG_2196: Chapdan chiquvchi to'liq menyu) -->
+  <div class="drawer drawer-left mobile-left-menu-drawer" id="mobileNavDrawer" role="dialog" aria-modal="true">
+    <div class="mobile-left-drawer-header">
+      <button class="mobile-left-drawer-close" onclick="closeMobileNavDrawer()" id="mobileNavCloseBtn" aria-label="Yopish">
+        <span id="mobileNavCloseIcon"></span>
+      </button>
+      <a href="javascript:void(0)" class="brand-logo" onclick="goToHome(event); closeMobileNavDrawer();">
+        <img src="images/logo.png" alt="BlackStore.uz" class="brand-logo-img" width="28" height="28" />
+        <div class="brand-text">
+          <span class="brand-title">BlackStore<span class="brand-uz">.uz</span></span>
+        </div>
+      </a>
+    </div>
+
+    <div class="mobile-left-drawer-body">
+      <!-- Top controls strip: O'zbek tili [RU] + Mavzu (Quyosh) -->
+      <div class="mobile-drawer-controls">
+        <button class="mobile-drawer-lang-pill" onclick="toggleLanguage()" id="mDrawerLangBtn">
+          <span id="mDrawerLangText">O'zbek tili</span>
+          <span class="m-lang-tag" id="mDrawerLangTag">RU</span>
+        </button>
+        <button class="mobile-drawer-theme-btn" onclick="toggleTheme()" id="mDrawerThemeBtn" title="Rejim">
+          <span id="mDrawerThemeIcon"></span>
+        </button>
+      </div>
+
+      <!-- Navigation links (IMG_2196) -->
+      <nav class="mobile-drawer-nav">
+        <a href="javascript:void(0)" class="mobile-drawer-item" onclick="goToHome(event); closeMobileNavDrawer();">
+          <span class="m-drawer-icon" id="mDHomeIcon"></span>
+          <span id="mDHomeText">Bosh sahifa</span>
+        </a>
+
+        <a href="javascript:void(0)" class="mobile-drawer-item" onclick="openAllCatalog(event); closeMobileNavDrawer();">
+          <span class="m-drawer-icon" id="mDAllIcon"></span>
+          <span id="mDAllText">Hammasini ko'rish</span>
+        </a>
+
+        <a href="javascript:void(0)" class="mobile-drawer-item" onclick="filterByWishlist(); closeMobileNavDrawer();">
+          <span class="m-drawer-icon" id="mDWishIcon"></span>
+          <span id="mDWishText">Sevimlilar</span>
+          <span class="badge-count wishlist-count-badge" style="display: none; margin-left: auto;">0</span>
+        </a>
+
+        <a href="javascript:void(0)" class="mobile-drawer-item" onclick="openCartView(event); closeMobileNavDrawer();">
+          <span class="m-drawer-icon" id="mDCartIcon"></span>
+          <span id="mDCartText">Savat</span>
+          <span class="badge-count cart-count-badge" style="display: none; margin-left: auto;">0</span>
+        </a>
+
+        <button class="mobile-drawer-item" onclick="closeMobileNavDrawer(); openCatalogView(event);">
+          <span class="m-drawer-icon" id="mDCatIcon"></span>
+          <span id="mDCatText">Kategoriyalar</span>
+          <span class="m-drawer-arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg></span>
+        </button>
+
+        <button class="mobile-drawer-item" onclick="closeMobileNavDrawer(); toggleBrandsDrawer(true);">
+          <span class="m-drawer-icon" id="mDBrandIcon"></span>
+          <span id="mDBrandText">Brendlar</span>
+          <span class="m-drawer-arrow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg></span>
+        </button>
+
+        <a href="javascript:void(0)" class="mobile-drawer-item" onclick="openContactModal(); closeMobileNavDrawer();">
+          <span class="m-drawer-icon" id="mDContactIcon"></span>
+          <span id="mDContactText">Aloqa va Manzil</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Mobile Filter Bottom Sheet (Huddi kompyuter versiyadagidek: Kategoriyalar, Brendlar, Mavjud, Tozalash) -->
+  <div class="drawer drawer-bottom mobile-filter-sheet" id="mobileFilterDrawer" role="dialog" aria-modal="true">
+    <div class="mobile-filter-sheet-header">
+      <button class="mobile-filter-sheet-close" onclick="toggleMobileFilterDrawer(false)" id="mobileFilterCloseBtn" aria-label="Yopish">
+        <span id="mobileFilterCloseIcon"></span>
+      </button>
+      <h3 class="mobile-filter-sheet-title" id="mobileFilterDrawerTitle">Filtr</h3>
+    </div>
+
+    <div class="mobile-filter-sheet-body" id="mobileFilterSheetBody">
+      <!-- KATEGORIYALAR (Pastga-tepaga suriladigan ro'yxat) -->
+      <div class="mfilter-section">
+        <h4 class="mfilter-section-title" id="mfilterCatTitle">KATEGORIYALAR</h4>
+        <div class="mfilter-list" id="mobileFilterCategoryList"></div>
+      </div>
+
+      <!-- BRENDLAR (Pastga-tepaga suriladigan ro'yxat) -->
+      <div class="mfilter-section">
+        <h4 class="mfilter-section-title" id="mfilterBrandTitle">BRENDLAR</h4>
+        <div class="mfilter-list" id="mobileFilterBrandList"></div>
+      </div>
+
+      <!-- MAVJUD TOGGLE SWITCH -->
+      <div class="mfilter-section mfilter-switch-section">
+        <span class="mfilter-section-title" id="mfilterInStockTitle" style="margin: 0;">MAVJUD</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="mobileInStockToggle" onchange="toggleMobileFilterInStock(this.checked)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mobile-filter-sheet-footer">
+      <button class="mobile-filter-reset-btn" id="mobileFilterResetBtn" onclick="resetMobileFilters()">
+        Tozalash
+      </button>
+      <button class="mobile-filter-apply-btn" id="mobileFilterApplyBtn" onclick="applyMobileFilterAndClose()">
+        Qo'llash
+      </button>
+    </div>
+  </div>
 
   <!-- Cart Drawer -->
   <div class="drawer drawer-right" id="cartDrawer" role="dialog" aria-modal="true">
@@ -325,10 +607,6 @@
     <div class="drawer-body" id="cartDrawerItems"></div>
 
     <div class="drawer-footer">
-      <div class="promo-row">
-        <input type="text" class="promo-input" id="promoInput" placeholder="Promo-kod (BLACK10)" />
-        <button class="btn-promo" onclick="applyPromoCode()">Qo'llash</button>
-      </div>
       <div class="cart-total-row">
         <span class="cart-total-label">Jami hisob:</span>
         <span class="cart-total-amount" id="cartTotalAmount">0 so'm</span>
@@ -349,7 +627,9 @@
       <h3 class="catalog-drawer-heading">Kategoriyalar</h3>
     </div>
 
-    <div class="drawer-body" id="catalogDrawerList" style="padding: 12px 14px; gap: 4px;"></div>
+    <div class="drawer-body" style="padding: 12px 14px;">
+      <div class="category-drawer-list" id="catalogDrawerGrid"></div>
+    </div>
   </div>
 
   <!-- Brands Drawer (Left - Image 5 Uslubida: ✕ Brendlar) -->
@@ -398,7 +678,9 @@
 
         <div class="contact-info-list" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
           <a href="tel:+998951964444" class="contact-quick-card">
-            <div class="contact-card-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--yellow-400);">📞</div>
+            <div class="contact-card-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--yellow-400);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
             <div style="flex: 1;">
               <div style="font-size: 0.8rem; color: var(--text-muted);">Telefon raqam</div>
               <div style="font-size: 1rem; font-weight: 700;">+998 (95) 196-44-44</div>
@@ -407,7 +689,9 @@
           </a>
 
           <a href="https://t.me/+y-KOTC5kOaFiZWUy" target="_blank" rel="noopener noreferrer" class="contact-quick-card">
-            <div class="contact-card-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">✈️</div>
+            <div class="contact-card-icon" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </div>
             <div style="flex: 1;">
               <div style="font-size: 0.8rem; color: var(--text-muted);">Telegram kanal & Narxlar</div>
               <div style="font-size: 1rem; font-weight: 700;">t.me/+y-KOTC5kOaFiZWUy</div>
@@ -416,7 +700,9 @@
           </a>
 
           <a href="https://instagram.com/blackstore.uz" target="_blank" rel="noopener noreferrer" class="contact-quick-card">
-            <div class="contact-card-icon" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">📸</div>
+            <div class="contact-card-icon" style="background: rgba(236, 72, 153, 0.15); color: #ec4899;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </div>
             <div style="flex: 1;">
               <div style="font-size: 0.8rem; color: var(--text-muted);">Instagram profil (30,6K)</div>
               <div style="font-size: 1rem; font-weight: 700;">@blackstore.uz</div>
@@ -425,7 +711,9 @@
           </a>
 
           <div class="contact-quick-card" style="cursor: default;">
-            <div class="contact-card-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--yellow-400);">📍</div>
+            <div class="contact-card-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--yellow-400);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            </div>
             <div style="flex: 1;">
               <div style="font-size: 0.8rem; color: var(--text-muted);">Do'konimiz manzili</div>
               <div style="font-size: 0.95rem; font-weight: 700;">Toshkent sh., Malika savdo markazi, B-blok 1-do'kon</div>
@@ -470,12 +758,18 @@
 
         <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
           <div style="padding: 12px 14px; background: var(--bg-card); border-radius: var(--radius-md); border-left: 3px solid var(--yellow-400);">
-            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-main);">⚡️ Eng arzon narxlar kafolati</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Apple mahsulotlari (iPhone, AirPods, Apple Watch) Toshkentdagi eng arzon va qulay narxlarda.</div>
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.875rem; color: var(--text-main);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--yellow-400)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <span>Eng arzon narxlar kafolati</span>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Apple mahsulotlari (iPhone, AirPods, Apple Watch) Toshkentdagi eng arzon va qulay narxlarda.</div>
           </div>
           <div style="padding: 12px 14px; background: var(--bg-card); border-radius: var(--radius-md); border-left: 3px solid var(--yellow-400);">
-            <div style="font-weight: 600; font-size: 0.875rem; color: var(--text-main);">📍 Malika B-blok 1-do'kon</div>
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Do'konimizga tashrif buyurib, istalgan mahsulotni jonli ko'rishingiz va mutaxassis maslahatini olishingiz mumkin.</div>
+            <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.875rem; color: var(--text-main);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--yellow-400)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              <span>Malika B-blok 1-do'kon</span>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Do'konimizga tashrif buyurib, istalgan mahsulotni jonli ko'rishingiz va mutaxassis maslahatini olishingiz mumkin.</div>
           </div>
         </div>
 
@@ -487,85 +781,17 @@
     </div>
   </div>
 
-  <!-- Info Modal (Yetkazib berish / Kafolat / To'lov usullari) -->
-  <div class="modal-backdrop" id="infoModal" onclick="if(event.target === this) closeInfoModal();">
-    <div class="modal-card" style="max-width: 480px;">
-      <button class="modal-close-btn" onclick="closeInfoModal()" id="infoCloseBtn" aria-label="Yopish"></button>
-      <div class="modal-body" id="infoModalBody" style="padding: 24px;"></div>
-    </div>
-  </div>
-
-  <!-- ==========================================================================
-       FLOATING AI ASSISTANT WIDGET
-       ========================================================================== -->
-  <aside class="ai-widget-wrapper" id="aiWidgetWrapper" aria-label="AI Maslahatchi">
-    <!-- Chat Trigger Bubble -->
-    <button class="ai-fab-btn" id="aiFabBtn" onclick="toggleAiChat()" title="AI Maslahatchi bilan suhbat" aria-label="AI Maslahatchi">
-      <div class="ai-avatar-pulse">
-        <span class="ai-robot-emoji">🤖</span>
-      </div>
-      <div class="ai-fab-label">
-        <span class="ai-fab-title">AI Maslahatchi</span>
-        <span class="ai-fab-status">Onlayn</span>
-      </div>
-    </button>
-
-    <!-- AI Chat Popup Box -->
-    <div class="ai-chat-window hidden" id="aiChatWindow">
-      <div class="ai-chat-header">
-        <div class="ai-header-left">
-          <div class="ai-status-dot"></div>
-          <div>
-            <h4 class="ai-chat-title">Black Store AI Yordamchi</h4>
-            <span class="ai-chat-subtitle">Tovarlar va narxlar bo'yicha 24/7 aqlli yordamchi</span>
-          </div>
-        </div>
-        <button class="ai-chat-close-btn" id="aiChatCloseBtn" onclick="toggleAiChat(false)" aria-label="Yopish">&times;</button>
-      </div>
-
-      <!-- Messages Stream -->
-      <div class="ai-messages-container" id="aiMessagesContainer">
-        <!-- Initial Welcome Message -->
-        <div class="ai-msg ai-msg-bot">
-          <div class="ai-bot-avatar">🤖</div>
-          <div class="ai-msg-bubble">
-            <p id="aiWelcomeText">Assalomu alaykum! Men Black Store do'konining sun'iy intellekt maslahatchisiman. Sizga qaysi gadjet yoki aksessuar haqida ma'lumot kerak?</p>
-          </div>
-        </div>
-
-        <!-- Suggestion Chips -->
-        <div class="ai-suggestions-wrap" id="aiSuggestionsWrap">
-          <button type="button" class="ai-chip" onclick="sendAiPrompt('iPhone 16 chexollari bormi?')">iPhone 16 chexollari?</button>
-          <button type="button" class="ai-chip" onclick="sendAiPrompt('Samsung S24 Ultra bormi?')">Samsung S24 bormi?</button>
-          <button type="button" class="ai-chip" onclick="sendAiPrompt('Yetkazib berish shartlari qanaqa?')">Yetkazib berish qancha?</button>
-          <button type="button" class="ai-chip" onclick="sendAiPrompt('Kafolat muddati qancha?')">Kafolat bormi?</button>
-        </div>
-      </div>
-
-      <!-- Input Area -->
-      <form class="ai-chat-input-row" id="aiChatForm" onsubmit="handleAiFormSubmit(event)">
-        <input type="text" id="aiUserInput" placeholder="Savolingizni yozing..." autocomplete="off">
-        <button type="submit" class="ai-send-btn" id="aiSendBtn" aria-label="Yuborish">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;">
-            <line x1="22" y1="2" x2="11" y2="13"></line>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-          </svg>
-        </button>
-      </form>
-    </div>
-  </aside>
-
   <!-- ==========================================================================
        TOAST CONTAINER
        ========================================================================== -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- ==========================================================================
-       SCRIPTS (PURE SVG ICONS + DATA + LOGIC)
+       SCRIPTS (PURE SVG ICONS + DATA + LOGIC - Cache-busted)
        ========================================================================== -->
-  <script src="js/icons.js"></script>
-  <script src="js/products-data.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/icons.js?v=6.2"></script>
+  <script src="js/products-data.js?v=6.2"></script>
+  <script src="js/app.js?v=6.2"></script>
 
   <!-- Inject Static Vector Icons into Placeholders -->
   <script>
@@ -587,6 +813,10 @@
       if (mSearchIcon) mSearchIcon.innerHTML = getIcon('search');
       const mSearchClear = document.getElementById('mobileSearchClear');
       if (mSearchClear) mSearchClear.innerHTML = getIcon('close');
+
+      // Mobile Header Icons (IMG_2191)
+      const mSearchToggle = document.getElementById('mobileSearchToggleIcon');
+      if (mSearchToggle) mSearchToggle.innerHTML = getIcon('search');
 
       const wishIcon = document.getElementById('headerWishlistIcon');
       if (wishIcon) wishIcon.innerHTML = getIcon('heart');
@@ -626,12 +856,36 @@
       if (navHome) navHome.innerHTML = getIcon('home');
       const navCat = document.getElementById('navCatalogIcon');
       if (navCat) navCat.innerHTML = getIcon('grid');
-      const navSearch = document.getElementById('navSearchIcon');
-      if (navSearch) navSearch.innerHTML = getIcon('search');
       const navWish = document.getElementById('navWishlistIcon');
       if (navWish) navWish.innerHTML = getIcon('heart');
       const navCart = document.getElementById('navCartIcon');
       if (navCart) navCart.innerHTML = getIcon('shoppingBag');
+      const navContact = document.getElementById('navContactIcon');
+      if (navContact) navContact.innerHTML = getIcon('phone');
+
+      // Mobile Nav Drawer
+      const mDClose = document.getElementById('mobileNavCloseIcon');
+      if (mDClose) mDClose.innerHTML = getIcon('close');
+      const mDHome = document.getElementById('mDHomeIcon');
+      if (mDHome) mDHome.innerHTML = getIcon('home');
+      const mDAll = document.getElementById('mDAllIcon');
+      if (mDAll) mDAll.innerHTML = getIcon('grid');
+      const mDWish = document.getElementById('mDWishIcon');
+      if (mDWish) mDWish.innerHTML = getIcon('heart');
+      const mDCart = document.getElementById('mDCartIcon');
+      if (mDCart) mDCart.innerHTML = getIcon('shoppingBag');
+      const mDCat = document.getElementById('mDCatIcon');
+      if (mDCat) mDCat.innerHTML = getIcon('grid');
+      const mDBrand = document.getElementById('mDBrandIcon');
+      if (mDBrand) mDBrand.innerHTML = getIcon('tag');
+      const mDContact = document.getElementById('mDContactIcon');
+      if (mDContact) mDContact.innerHTML = getIcon('phone');
+      const mDTheme = document.getElementById('mDrawerThemeIcon');
+      if (mDTheme) mDTheme.innerHTML = getIcon('sun');
+
+      // Mobile Filter Drawer (IMG_2194)
+      const mFClose = document.getElementById('mobileFilterCloseIcon');
+      if (mFClose) mFClose.innerHTML = getIcon('close');
 
       // Drawers & Modals Close buttons
       const cartClose = document.getElementById('cartDrawerCloseBtn');
@@ -654,9 +908,6 @@
       const brandsDrawerCloseIcon = document.getElementById('brandsDrawerCloseIcon');
       if (brandsDrawerCloseIcon) brandsDrawerCloseIcon.innerHTML = getIcon('close');
 
-      const infoClose = document.getElementById('infoCloseBtn');
-      if (infoClose) infoClose.innerHTML = getIcon('close');
-
       const pDetailClose = document.getElementById('productDetailCloseBtn');
       if (pDetailClose) pDetailClose.innerHTML = getIcon('close');
       const checkoutClose = document.getElementById('checkoutCloseBtn');
@@ -667,7 +918,69 @@
       if (reviewsClose) reviewsClose.innerHTML = getIcon('close');
     });
 
+    function toggleMobileSearchRow() {
+      const row = document.querySelector('.mobile-search-row');
+      const input = document.getElementById('mobileSearchInput');
+      if (row) {
+        if (row.classList.contains('active')) {
+          row.classList.remove('active');
+          if (typeof closeSearchDropdowns === 'function') closeSearchDropdowns();
+        } else {
+          row.classList.add('active');
+          if (input) {
+            input.focus();
+            if (input.value.trim() && typeof renderLiveSearchDropdown === 'function') {
+              renderLiveSearchDropdown(document.getElementById('mobileSearchResults'), input.value);
+            }
+          }
+        }
+      }
+    }
+
+    function openMobileNavDrawer() {
+      const drawer = document.getElementById('mobileNavDrawer');
+      const backdrop = document.getElementById('drawerBackdrop');
+      if (drawer && backdrop) {
+        drawer.classList.add('active');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeMobileNavDrawer() {
+      const drawer = document.getElementById('mobileNavDrawer');
+      const backdrop = document.getElementById('drawerBackdrop');
+      if (drawer) drawer.classList.remove('active');
+      if (backdrop) backdrop.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function toggleMobileFilterDrawer(isOpen) {
+      if (typeof window.toggleMobileFilterDrawerGlobal === 'function') {
+        window.toggleMobileFilterDrawerGlobal(isOpen);
+        return;
+      }
+      const drawer = document.getElementById('mobileFilterDrawer');
+      const backdrop = document.getElementById('drawerBackdrop');
+      if (drawer && backdrop) {
+        if (isOpen) {
+          if (typeof renderMobileFilterDrawerContent === 'function') {
+            renderMobileFilterDrawerContent();
+          }
+          drawer.classList.add('active');
+          backdrop.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        } else {
+          drawer.classList.remove('active');
+          backdrop.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+    }
+
     function focusMobileSearch() {
+      const row = document.querySelector('.mobile-search-row');
+      if (row) row.style.display = 'block';
       const input = document.getElementById('mobileSearchInput');
       if (input) {
         input.focus();

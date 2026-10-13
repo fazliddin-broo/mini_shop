@@ -3,27 +3,21 @@
 // ==========================================================================
 
 const CATEGORIES = [
-  { id: 'all', name_uz: 'Barchasi', name_ru: 'Все', icon: 'grid', count: 77 },
-  { id: 'naushniki-quloqchinlar', name_uz: 'Quloqchinlar va naushniklar', name_ru: 'Наушники и гарнитуры', icon: 'headphones', count: 77 },
-  { id: 'zaryadka-kabel', name_uz: 'Zaryadlovchi va kabellar', name_ru: 'Зарядные устройства и кабели', icon: 'plug', count: 54 },
-  { id: 'telefon-aksessuar', name_uz: 'Telefon aksessuarlari', name_ru: 'Аксессуары для телефонов', icon: 'casePhone', count: 62 },
-  { id: 'smart-watch-fitnes', name_uz: 'Aqlli soatlar va fitnes', name_ru: 'Умные часы и фитнес', icon: 'watch', count: 48 },
-  { id: 'powerbanklar', name_uz: 'Powerbanklar', name_ru: 'Повербанки', icon: 'battery', count: 35 },
-  { id: 'kolonki-audio', name_uz: 'Karnaylar va audio', name_ru: 'Колонки и аудио', icon: 'speaker', count: 29 },
-  { id: 'blogger-jihozlar', name_uz: 'Blogerlar jihozlari', name_ru: 'Оборудование для блогеров', icon: 'tools', count: 21 },
-  { id: 'kompyuter-aksessuar', name_uz: 'Playstation va Kompyuter aksessuarlari', name_ru: 'Аксессуары для PlayStation и ПК', icon: 'gamepad', count: 43 },
-  { id: 'telefon-planshet', name_uz: 'Telefon va planshetlar', name_ru: 'Телефоны и планшеты', icon: 'tablet', count: 18 },
-  { id: 'smart-texnika', name_uz: 'Smart qurilmalar va uy texnikasi', name_ru: 'Умные устройства и техника', icon: 'homeTech', count: 26 },
-  { id: 'gozellik-avto', name_uz: 'Go\'zallik, avto va boshqalar', name_ru: 'Красота, авто и прочее', icon: 'sparkles', count: 31 },
-  { id: 'holderlar-va-smart-parfyumlar', name_uz: 'Holderlar va Smart Parfyumlar', name_ru: 'Держатели и Умный Парфюм', icon: 'droplet', count: 19 },
-  { id: 'sumkalar', name_uz: 'Sumkalar', name_ru: 'Сумки и чехлы', icon: 'bag', count: 15 }
+  { id: 'all', name_uz: 'Barchasi', name_ru: 'Все', name_en: 'All', icon: 'grid', count: 35 },
+  { id: 'telefon-planshetlar', name_uz: 'Telefon va planshetlar', name_ru: 'Телефоны и планшеты', name_en: 'Phones & Tablets', icon: 'tablet', count: 12 },
+  { id: 'telefon-aksessuar', name_uz: 'Telefon aksessuarlari', name_ru: 'Аксессуары для телефонов', name_en: 'Phone Accessories', icon: 'casePhone', count: 14 },
+  { id: 'naushniki-quloqchinlar', name_uz: 'Quloqchinlar va naushniklar', name_ru: 'Наушники и гарнитуры', name_en: 'Headphones & Audio', icon: 'headphones', count: 8 },
+  { id: 'smart-watch-fitnes', name_uz: 'Aqlli soatlar va fitnes', name_ru: 'Умные часы и фитнес', name_en: 'Smart Watches & Fitness', icon: 'watch', count: 6 },
+  { id: 'zaryadka-kabel', name_uz: 'Zaryadlovchi va kabellar', name_ru: 'Зарядные устройства и кабели', name_en: 'Chargers & Cables', icon: 'plug', count: 7 },
+  { id: 'powerbanklar', name_uz: 'Powerbanklar', name_ru: 'Повербанки', name_en: 'Power Banks', icon: 'battery', count: 6 }
 ];
 
 const BRANDS = [
   { id: 'Apple', name: 'Apple', logo: 'images/brands/apple.png' },
+  { id: 'BlackStore', name: 'BlackStore', logo: 'images/logo.png' },
   { id: 'Samsung', name: 'Samsung', logo: 'images/brands/samsung.png' },
   { id: 'WHOOP', name: 'WHOOP', logo: 'images/brands/whoop.png' },
-  { id: 'Meta', name: 'Meta', logo: 'images/brands/meta.png' },
+  { id: 'Ray-Ban', name: 'Ray-Ban', logo: 'images/brands/meta.png' },
   { id: 'Google', name: 'Google', logo: 'images/brands/google.png' },
   { id: 'Canon', name: 'Canon', logo: 'images/brands/canon.png' }
 ];
@@ -34,32 +28,44 @@ const BANNERS = [
     id: 10,
     title_uz: 'Apple mahsulotlari',
     title_ru: 'Продукция Apple',
+    title_en: 'Apple Products',
     subtitle_uz: 'Applening eng sifatli mahsulotlarini bizdan harid qiling!',
     subtitle_ru: 'Покупайте самую качественную оригинальную технику Apple у нас!',
+    subtitle_en: 'Shop premium authentic Apple ecosystem devices with official warranty!',
     cta_uz: "Ko'rish",
     cta_ru: 'Смотреть',
+    cta_en: 'View Collection',
     brand_filter: 'Apple',
     category_filter: 'all',
     badge_uz: '100% Original · Apple Ekosistema',
     badge_ru: '100% Оригинал · Экосистема Apple',
+    badge_en: '100% Authentic · Apple Ecosystem',
     bg_style: 'linear-gradient(90deg, rgba(8, 8, 10, 0.95) 0%, rgba(18, 18, 22, 0.7) 45%, rgba(0, 0, 0, 0.3) 100%)',
     image: 'images/banner_apple_ecosystem.png',
+    image_ru: 'images/banner_apple_ecosystem_ru.png',
+    mobile_image: 'images/banner_mobile_applebox.png',
+    mobile_image_ru: 'images/banner_mobile_applebox_ru.png',
     features: ['iPhone 16 Pro Max', 'AirPods Max', 'Apple Watch Ultra', 'MagSafe Ecosystem'],
     is_graphic: true
   },
   {
     id: 11,
     title_uz: 'Smartfoningiz uchun premium himoya va quvvat!',
-    title_ru: 'Премиум защита и зарядка для вашего смартфона!',
+    title_ru: 'Премиум защита и зарядка для смартфона!',
+    title_en: 'Premium Protection & Fast Power for Smartphones!',
     subtitle_uz: "Yuqori sifatli chexollar, zamonaviy simsiz quloqchinlar va kuchli powerbanklar to'plami. Qurilmangizga eng yaxshisini sovg'a qiling.",
-    subtitle_ru: 'Коллекция качественных чехлов, беспроводных наушников и мощных повербанков. Подарите лучшее своему устройству.',
+    subtitle_ru: 'Коллекция качественных чехлов, наушников и мощных повербанков.',
+    subtitle_en: 'High-end protective cases, wireless audio, and ultra-fast magnetic charging.',
     cta_uz: "To'plamni ko'rish",
-    cta_ru: 'Посмотреть коллекцию',
+    cta_ru: 'Посмотреть всё',
+    cta_en: 'Discover Now',
     category_filter: 'telefon-aksessuar',
     badge_uz: 'Silicone Case · MagSafe · Carbon Fiber',
     badge_ru: 'Silicone Case · MagSafe · Carbon Fiber',
+    badge_en: 'Silicone Case · MagSafe · Carbon Fiber',
     bg_style: 'linear-gradient(90deg, rgba(8, 8, 10, 0.95) 0%, rgba(20, 20, 24, 0.75) 45%, rgba(0, 0, 0, 0.35) 100%)',
     image: 'images/banner_cases_protection.png',
+    image_ru: 'images/banner_cases_protection_ru.png',
     features: ['Shockproof Cases', 'MagSafe Wireless', 'Ultra-Durable Glass', 'Fast Power'],
     is_graphic: true
   },
@@ -67,13 +73,17 @@ const BANNERS = [
     id: 1,
     title_uz: 'AirPods Killer – Premium ANC Earbuds',
     title_ru: 'AirPods Killer – Премиум ANC Наушники',
+    title_en: 'AirPods Killer – Premium ANC Earbuds',
     subtitle_uz: '50 dB ANC, Hi-Res Audio, LDAC, 43 soatgacha batareya va ChatGPT integratsiyasiga ega premium simsiz quloqchin.',
     subtitle_ru: '50 дБ ANC, Hi-Res Audio, LDAC, до 43 часов автономности и интеграция с ChatGPT.',
+    subtitle_en: '50 dB Active Noise Cancelling, Hi-Res Audio, 43 hours battery life & AI integration.',
     cta_uz: 'Ketdik',
     cta_ru: 'Купить сейчас',
+    cta_en: 'Buy Now',
     category_filter: 'naushniki-quloqchinlar',
     badge_uz: 'Hi-Res Audio · LDAC',
     badge_ru: 'Hi-Res Audio · LDAC',
+    badge_en: 'Hi-Res Audio · LDAC',
     bg_style: 'linear-gradient(90deg, rgba(8, 8, 10, 0.96) 0%, rgba(18, 18, 22, 0.88) 50%, rgba(0, 0, 0, 0.45) 100%)',
     image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=1000&auto=format&fit=crop&q=80',
     features: ['43 HOURS of total playback', 'CUSTOMISABLE SMART DIAL', '50 dB Hybrid ANC', 'SPATIAL AUDIO EFFECT', 'CHATGPT INTEGRATED']
@@ -82,13 +92,17 @@ const BANNERS = [
     id: 2,
     title_uz: 'Smart Watch M99 & H100 – 4G SIM & Kamera',
     title_ru: 'Smart Watch M99 & H100 – 4G SIM и Камера',
+    title_en: 'Smart Watch M99 & H100 – 4G SIM & Camera',
     subtitle_uz: 'Bilakdagi to\'laqonli Android mini-smartfon: 4G qo\'ng\'iroqlar, 190° aylanuvchi kamera va AMOLED displey.',
     subtitle_ru: 'Полноценный Android мини-смартфон на руке: звонки 4G, поворотная камера 190° и AMOLED дисплей.',
+    subtitle_en: 'Full standalone wrist mini-smartphone with 4G calls, 190° rotating camera and AMOLED display.',
     cta_uz: 'Hoziroq xarid qilish',
     cta_ru: 'Купить сейчас',
+    cta_en: 'Order Now',
     category_filter: 'smart-watch-fitnes',
     badge_uz: '4G Nano-SIM · 190° Kamera',
     badge_ru: '4G Nano-SIM · Камера 190°',
+    badge_en: '4G Nano-SIM · 190° Camera',
     bg_style: 'linear-gradient(90deg, rgba(8, 8, 10, 0.96) 0%, rgba(22, 22, 28, 0.88) 50%, rgba(245, 158, 11, 0.3) 100%)',
     image: 'https://api.applebox.uz/images/products/3ea4b929d84849019a931ff546d9cbe8.png',
     features: ['190° Rotating HD Camera', 'Google Play & Telegram', 'AMOLED 2.02" Display', 'Super Fast 4G LTE']
@@ -97,13 +111,17 @@ const BANNERS = [
     id: 3,
     title_uz: 'Baseus 100W GaN Pro & MagSafe Power',
     title_ru: 'Baseus 100W GaN Pro и MagSafe Повербанк',
+    title_en: 'Baseus 100W GaN Pro & MagSafe Charging',
     subtitle_uz: 'MacBook, iPad va iPhone uchun ultra-tezkor zaryadlash stansiyalari va yupqa magnitli powerbanklar.',
     subtitle_ru: 'Ультрабыстрые зарядные станции и тонкие магнитные повербанки для MacBook, iPad и iPhone.',
+    subtitle_en: 'Ultra-fast charging stations and magnetic slim packs for MacBook, iPad, and iPhone.',
     cta_uz: 'Katalogga o\'tish',
     cta_ru: 'В каталог',
+    cta_en: 'Go to Catalog',
     category_filter: 'zaryadka-kabel',
     badge_uz: '100W GaN5 · MagSafe 15W',
     badge_ru: '100W GaN5 · MagSafe 15W',
+    badge_en: '100W GaN5 · MagSafe 15W',
     bg_style: 'linear-gradient(90deg, rgba(8, 8, 10, 0.96) 0%, rgba(18, 18, 22, 0.88) 50%, rgba(0, 0, 0, 0.5) 100%)',
     image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=1000&auto=format&fit=crop&q=80',
     features: ['100W Power Delivery', 'Multi-Device Fast Charge', 'GaN5 Pro Technology', 'Safe Temperature Shield']
@@ -120,9 +138,16 @@ const I18N = {
     seeAll: "Hammasini ko'rish",
     login: "Kirish",
     all: "Barchasi",
+    allProducts: "Barcha mahsulotlar",
     totalCount: "Jami",
     productsAvailable: "ta mahsulot mavjud",
     productsUnit: "ta mahsulot",
+    filterBtn: "Filtr",
+    filterTitle: "Filtr",
+    filterCategories: "KATEGORIYALAR",
+    filterBrands: "BRENDLAR",
+    applyFilter: "Qo'llash",
+    resetFilter: "Tozalash",
     sort: "Saralash:",
     sortPopular: "Ommabopligi bo'yicha",
     sortPriceAsc: "Narxi: Arzondan qimmatga",
@@ -149,11 +174,15 @@ const I18N = {
     trust4Desc: "Toshkent sh., Malika savdo markazi",
 
     // Stories (Instagram Highlights)
-    storyPrices: "Narxlar 🔥",
+    storyPrices: "Narxlar",
     storyCases: "Silicone Case",
     storyGoods: "Tovarlar",
     storyReviews: "Mijozlar",
     storyContact: "Bog'lanish",
+
+    // Hafta chegirmalari (Uzum / Applebox Horizontal Carousel)
+    weeklyDealsTitle: "Hafta chegirmalari",
+    weeklyDealsSubtitle: "Eng arzon narxlar va maxsus chegirmalar",
 
     // Qidiruv va bo'sh holatlar
     emptyTitle: "Hech qanday mahsulot topilmadi",
@@ -181,16 +210,14 @@ const I18N = {
     phoneNumber: "Telefon raqamingiz",
     deliveryAddress: "Yetkazib berish manzili",
     addressPlaceholder: "Shahar, tuman, ko'cha, uy raqami",
-    paymentMethod: "Yetkazib berish usulini tanlang",
-    yandexDelivery: "Yandex kuryer",
-    pickupDelivery: "Borib olish",
+    paymentMethod: "To'lov usulini tanlang",
     cashDelivery: "Naqd",
     totalPayment: "Jami to'lov:",
     confirmOrder: "Buyurtmani tasdiqlash",
     orderSuccessTitle: "Buyurtmangiz qabul qilindi!",
     orderSuccessDesc: "Rahmat, menejerimiz tez orada siz bilan bog'lanadi.",
     orderCode: "Buyurtma kodi:",
-    orderPaymentMethod: "Yetkazish usuli:",
+    orderPaymentMethod: "To'lov usuli:",
     orderAddress: "Manzil:",
     orderItemsCount: "Mahsulotlar soni:",
     backToHome: "Bosh sahifaga qaytish",
@@ -214,12 +241,12 @@ const I18N = {
     linkWarranty: "Kafolat va qaytarish",
     linkPayment: "To'lov usullari",
 
-    // Mobil pastki navigatsiya
-    navHome: "Asosiy",
-    navCatalog: "Katalog",
-    navSearch: "Qidiruv",
+    // Mobil pastki navigatsiya (IMG_2191 / Image 2: Bosh sahifa, Kategoriyalar, Savat, Sevimlilar, Profil)
+    navHome: "Bosh sahifa",
+    navCategories: "Kategoriyalar",
+    navCart: "Savat",
     navWishlist: "Sevimlilar",
-    navCart: "Savat"
+    navProfile: "Profil"
   },
 
   ru: {
@@ -230,9 +257,16 @@ const I18N = {
     seeAll: "Посмотреть все",
     login: "Войти",
     all: "Все",
+    allProducts: "Все товары",
     totalCount: "Всего",
     productsAvailable: "товаров",
     productsUnit: "товаров",
+    filterBtn: "Фильтр",
+    filterTitle: "Фильтр",
+    filterCategories: "КАТЕГОРИИ",
+    filterBrands: "БРЕНДЫ",
+    applyFilter: "Применить",
+    resetFilter: "Сбросить",
     sort: "Сортировка:",
     sortPopular: "По популярности",
     sortPriceAsc: "Цена: Сначала дешевые",
@@ -259,11 +293,15 @@ const I18N = {
     trust4Desc: "г. Ташкент, ТЦ Малика, магазин 1",
 
     // Stories (Instagram Highlights)
-    storyPrices: "Цены 🔥",
+    storyPrices: "Цены",
     storyCases: "Silicone Case",
     storyGoods: "Товары",
     storyReviews: "Отзывы",
     storyContact: "Контакты",
+
+    // Hafta chegirmalari (Uzum / Applebox Horizontal Carousel)
+    weeklyDealsTitle: "Скидки недели",
+    weeklyDealsSubtitle: "Лучшие цены со скидкой и выгодные предложения",
 
     // Qidiruv va bo'sh holatlar
     emptyTitle: "Ничего не найдено",
@@ -291,16 +329,14 @@ const I18N = {
     phoneNumber: "Номер телефона",
     deliveryAddress: "Адрес доставки",
     addressPlaceholder: "Город, район, улица, дом, квартира",
-    paymentMethod: "Выберите способ получения",
-    yandexDelivery: "Яндекс курьер",
-    pickupDelivery: "Самовывоз",
+    paymentMethod: "Выберите способ оплаты",
     cashDelivery: "Наличные",
     totalPayment: "Итого к оплате:",
     confirmOrder: "Подтвердить заказ",
     orderSuccessTitle: "Ваш заказ принят!",
     orderSuccessDesc: "Спасибо, наш менеджер свяжется с вами в ближайшее время.",
     orderCode: "Код заказа:",
-    orderPaymentMethod: "Способ получения:",
+    orderPaymentMethod: "Способ оплаты:",
     orderAddress: "Адрес:",
     orderItemsCount: "Количество товаров:",
     backToHome: "Вернуться на главную",
@@ -324,18 +360,176 @@ const I18N = {
     linkWarranty: "Гарантия и возврат",
     linkPayment: "Способы оплаты",
 
-    // Mobil pastki navigatsiya
+    // Mobil pastki navigatsiya (IMG_2191 / Image 2: Главная, Категории, Корзина, Избранное, Профиль)
     navHome: "Главная",
-    navCatalog: "Каталог",
-    navSearch: "Поиск",
+    navCategories: "Категории",
+    navCart: "Корзина",
     navWishlist: "Избранное",
-    navCart: "Корзина"
+    navProfile: "Профиль"
+  },
+
+  en: {
+    // Header & Subnav
+    searchPlaceholder: "Search products...",
+    categories: "Categories",
+    brands: "Brands",
+    seeAll: "View all",
+    login: "Sign In",
+    all: "All",
+    allProducts: "All products",
+    totalCount: "Total",
+    productsAvailable: "products available",
+    productsUnit: "products",
+    filterBtn: "Filter",
+    filterTitle: "Filter",
+    filterCategories: "CATEGORIES",
+    filterBrands: "BRANDS",
+    inStock: "IN STOCK",
+    applyFilter: "Apply",
+    resetFilter: "Clear",
+    sort: "Sort by:",
+    sortPopular: "Most Popular",
+    sortPriceAsc: "Price: Low to High",
+    sortPriceDesc: "Price: High to Low",
+    sortRating: "Top Rated",
+
+    // Product Card & Actions
+    addToCart: "Add to cart",
+    addToCartFull: "Add to Cart",
+    inCart: "In Cart",
+    quickView: "Quick View",
+    wishlistAdd: "Add to Wishlist",
+    wishlistRemove: "Remove from Wishlist",
+    wishlistEmpty: "Your wishlist is empty",
+
+    // Trust strip
+    trust1Title: "Best Prices",
+    trust1Desc: "Apple products at lowest prices",
+    trust2Title: "Up to 1 Year Warranty",
+    trust2Desc: "Official service support",
+    trust3Title: "Fast Delivery",
+    trust3Desc: "Across Tashkent and regions",
+    trust4Title: "Malika B-Block 1",
+    trust4Desc: "Tashkent, Malika shopping mall",
+
+    // Stories
+    storyPrices: "Prices",
+    storyCases: "Silicone Case",
+    storyGoods: "Goods",
+    storyReviews: "Reviews",
+    storyContact: "Contact",
+
+    // Hafta chegirmalari (Uzum / Applebox Horizontal Carousel)
+    weeklyDealsTitle: "Weekly Discounts",
+    weeklyDealsSubtitle: "Top-rated deals and best discounted prices",
+
+    // Empty states
+    emptyTitle: "No products found",
+    emptyDesc: "Try a different search term or select another category.",
+    viewAllBtn: "View all products",
+
+    // Cart
+    cartTitle: "Your Cart",
+    cartEmptyTitle: "Your cart is empty",
+    cartEmptyDesc: "Browse the catalog to add devices and accessories.",
+    startShopping: "Start Shopping",
+    promoPlaceholder: "Promo code (BLACK10)",
+    apply: "Apply",
+    totalSum: "Total amount:",
+    checkout: "Proceed to Checkout",
+    color: "Color:",
+    availColors: "Available colors:",
+    buyNow: "Buy Now",
+
+    // Checkout Modal
+    checkoutTitle: "Complete Order",
+    checkoutSubtitle: "Fill in your details and our courier will contact you shortly.",
+    fullName: "Full Name",
+    namePlaceholder: "e.g., John Doe",
+    phoneNumber: "Phone Number",
+    deliveryAddress: "Delivery Address",
+    addressPlaceholder: "City, district, street, apt / house number",
+    paymentMethod: "Select Payment Method",
+    cashDelivery: "Cash on delivery",
+    totalPayment: "Total to pay:",
+    confirmOrder: "Confirm Order",
+    orderSuccessTitle: "Order Received!",
+    orderSuccessDesc: "Thank you! Our manager will contact you shortly.",
+    orderCode: "Order Code:",
+    orderPaymentMethod: "Payment Method:",
+    orderAddress: "Address:",
+    orderItemsCount: "Items Count:",
+    backToHome: "Back to Home",
+    selectProductFirst: "Please select a product first",
+
+    // Brands Modal
+    brandsTitle: "Brands",
+
+    // Footer
+    footerAbout: "BlackStore.uz — Apple devices and accessories at the lowest prices! Official warranty up to 1 year, express delivery and premium service.",
+    footerCategories: "Categories",
+    footerClients: "For Customers",
+    footerContact: "Contact & Location",
+    footerHours: "Working hours: 09:00 - 22:00 (every day)",
+    footerRights: "© 2026 BlackStore.uz. All rights reserved.",
+    footerTagline: "Malika B-Block Store #1 · +998 (95) 196-44-44",
+
+    // Footer Links
+    linkPromotions: "Promotions & Discounts",
+    linkDelivery: "Delivery Terms",
+    linkWarranty: "Warranty & Return",
+    linkPayment: "Payment Methods",
+
+    // Mobile Bottom Nav
+    navHome: "Home",
+    navCategories: "Categories",
+    navCart: "Cart",
+    navWishlist: "Wishlist",
+    navProfile: "Profile"
   }
 };
 
 // 6 ta rasmiy brend bo'yicha mahsulotlar to'plami (Apple, Samsung, WHOOP, Ray-Ban, Google, Canon)
-let PRODUCTS = [
+const PRODUCTS = [
   // --- APPLE ---
+  {
+    id: 100,
+    name_uz: 'Apple iPhone 15 Pro 128GB Natural Titanium | 100% Original',
+    name_ru: 'Apple iPhone 15 Pro 128GB Натуральный титан | 100% Оригинал',
+    category: 'telefon-aksessuar',
+    brand: 'Apple',
+    price: 1099,
+    old_price: 1199,
+    discount_percent: 8,
+    currency: '$',
+    rating: 5.0,
+    reviews_count: 142,
+    badge_uz: 'Top Flagman',
+    badge_ru: 'Флагман',
+    badge_type: 'hot',
+    in_stock: true,
+    main_image: 'images/iphone-15-pro-natural-titanium.png',
+    images: ['images/iphone-15-pro-natural-titanium.png'],
+    colors: ['Natural Titanium', 'Black Titanium', 'White Titanium', 'Blue Titanium'],
+    specs_uz: {
+      'Protsessor': 'Apple A17 Pro (3 nm) 6 yadroli GPU',
+      'Ekran': '6.1" Super Retina XDR OLED, 120Hz ProMotion, Dynamic Island',
+      'Xotira': '128 GB / 256 GB NVMe',
+      'Kamera': '48 MP asosiy (f/1.78) + 12 MP ultra-keng + 12 MP 3x telefoto',
+      'Korpus': 'Aerokosmik sinfdagi titan ramka (Grade 5 Titanium)',
+      'Ulagich': 'USB Type-C (USB 3 - 10 Gbit/s gacha)'
+    },
+    specs_ru: {
+      'Процессор': 'Apple A17 Pro (3 нм) с 6-ядерным GPU',
+      'Экран': '6.1" Super Retina XDR OLED, 120Гц ProMotion, Dynamic Island',
+      'Память': '128 ГБ / 256 ГБ NVMe',
+      'Камера': '48 МП основная (f/1.78) + 12 МП ультраширокая + 12 МП 3x телефото',
+      'Корпус': 'Аэрокосмический титан (Grade 5 Titanium)',
+      'Разъем': 'USB Type-C (USB 3 - до 10 Гбит/с)'
+    },
+    description_uz: 'Apple iPhone 15 Pro Natural Titanium — aerokosmik titan korpus, eng kuchli A17 Pro chipi, 48 MP professional kamera tizimi va yangi dasturlanuvchi Action Button bilan jihozlangan flagman smartfon.',
+    description_ru: 'Apple iPhone 15 Pro Натуральный титан — премиальный флагманский смартфон в легком титановом корпусе с мощнейшим процессором A17 Pro, передовой 48 МП камерой и кнопкой Action Button.'
+  },
   {
     id: 101,
     name_uz: 'Apple EarPods Type-C simli quloqchin | 100% Original',
@@ -445,6 +639,7 @@ let PRODUCTS = [
     main_image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=700&auto=format&fit=crop&q=80',
     images: ['https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=700&auto=format&fit=crop&q=80'],
     colors: ['Qora (Black)', 'Denim Moviy', 'Plum Binafsha', 'Yulduzli Oq'],
+    variant_note: 'Silicone Case / MagSafe',
     specs_uz: {
       'Mos kelishi': 'iPhone 16 Pro / 16 Pro Max',
       'Material': 'Soft-touch silikon va mikrofibra astar',
@@ -476,6 +671,7 @@ let PRODUCTS = [
     main_image: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=700&auto=format&fit=crop&q=80',
     images: ['https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=700&auto=format&fit=crop&q=80'],
     colors: ['Kristall Shaffof'],
+    variant_note: 'Shaffof / Clear',
     specs_uz: {
       'Material': 'Optik tiniq polikarbonat va TPU',
       'Himoya': 'Zarbaga chidamli burchak himoyasi',
@@ -507,6 +703,7 @@ let PRODUCTS = [
     main_image: 'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=700&auto=format&fit=crop&q=80',
     images: ['https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=700&auto=format&fit=crop&q=80'],
     colors: ['Qora / Kulrang Carbon'],
+    variant_note: 'Qora / Carbon',
     specs_uz: {
       'Qalinligi': 'Atigi 0.95 mm ultra-yupqa',
       'Og\'irligi': '18 gramm',
@@ -519,6 +716,253 @@ let PRODUCTS = [
     },
     description_uz: 'Po\'latdan 5 barobar mustahkam haqiqiy aramid uglerod tolasidan tayyorlangan premium darajadagi eng yupqa va yengil himoya g\'ilofi.',
     description_ru: 'Легендарный ультратонкий чехол из настоящего арамидного волокна 600D. В 5 раз прочнее стали при минимальной толщине.'
+  },
+  {
+    id: 124,
+    name_uz: 'iPhone uchun MagSafe Magnitli Simsiz Zaryadlovchi | 15W',
+    name_ru: 'Магнитная беспроводная зарядка MagSafe для iPhone | 15W',
+    category: 'zaryadka-kabel',
+    brand: 'Apple',
+    price: 99000,
+    old_price: 150000,
+    discount_percent: 34,
+    rating: 4.8,
+    reviews_count: 87,
+    badge_uz: 'MagSafe 15W',
+    badge_ru: 'MagSafe 15W',
+    badge_type: 'hot',
+    in_stock: true,
+    variant_note: 'Normal',
+    main_image: 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=700&auto=format&fit=crop&q=80'],
+    colors: ['Oq (White)'],
+    specs_uz: {
+      'Quvvat': '15W Fast Wireless',
+      'Ulagich': 'USB Type-C',
+      'Moslik': 'iPhone 12/13/14/15/16 Pro Max'
+    },
+    specs_ru: {
+      'Мощность': '15W Fast Wireless',
+      'Разъем': 'USB Type-C',
+      'Совместимость': 'iPhone 12/13/14/15/16 Pro Max'
+    },
+    description_uz: 'iPhone uchun xavfsiz va qulay MagSafe magnitli simsiz tezkor zaryadlovchi qurilma.',
+    description_ru: 'Магнитная беспроводная зарядка MagSafe обеспечивает быстрое и удобное пополнение энергии.'
+  },
+  {
+    id: 125,
+    name_uz: 'Pitaka Case for iPhone 17 Pro Max | MagSafe Aramid Fiber',
+    name_ru: 'Чехол Pitaka Case для iPhone 17 Pro Max | MagSafe Aramid Fiber',
+    category: 'telefon-aksessuar',
+    brand: 'Apple',
+    price: 699000,
+    old_price: 799000,
+    discount_percent: 13,
+    rating: 5.0,
+    reviews_count: 42,
+    badge_uz: 'Aramid 1500D',
+    badge_ru: 'Арамид 1500D',
+    badge_type: 'hot',
+    in_stock: true,
+    variant_note: 'qora',
+    main_image: 'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=700&auto=format&fit=crop&q=80'],
+    colors: ['Qora (Black)'],
+    specs_uz: {
+      'Material': 'Aerokosmik aramid tolasi',
+      'MagSafe': 'Kuchli magnit halqa o\'rnatilgan',
+      'Vazni': 'Atigi 19 gramm'
+    },
+    specs_ru: {
+      'Материал': 'Аэрокосмическое арамидное волокно',
+      'MagSafe': 'Встроенное мощное магнитное кольцо',
+      'Вес': 'Всего 19 грамм'
+    },
+    description_uz: 'Pitaka original aramid tolali yupqa va yuqori darajada mustahkam chexoli.',
+    description_ru: 'Оригинальный премиум чехол Pitaka из арамидного волокна с поддержкой MagSafe.'
+  },
+  {
+    id: 126,
+    name_uz: 'Pitaka Sunset G\'ilofi iPhone Air uchun | Aramid tolali himoya',
+    name_ru: 'Чехол Pitaka Sunset для iPhone Air | Арамидная защита',
+    category: 'telefon-aksessuar',
+    brand: 'Apple',
+    price: 699000,
+    old_price: 799000,
+    discount_percent: 13,
+    rating: 4.9,
+    reviews_count: 36,
+    badge_uz: 'Sunset Edition',
+    badge_ru: 'Sunset Edition',
+    badge_type: 'rec',
+    in_stock: true,
+    variant_note: 'Sunset (quyosh)',
+    main_image: 'https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1605236453806-6ff36851218e?w=700&auto=format&fit=crop&q=80'],
+    colors: ['Sunset To\'q Sariq / Qora'],
+    specs_uz: {
+      'Dizayn': 'Sunset gradient to\'qimali naqsh',
+      'Moslik': 'iPhone Air / 16 / 17',
+      'Himoya': 'Kamera ramkasi bo\'rtma metall'
+    },
+    specs_ru: {
+      'Дизайн': 'Градиентный узор Sunset',
+      'Совместимость': 'iPhone Air / 16 / 17',
+      'Защита': 'Металлическое обрамление камеры'
+    },
+    description_uz: 'Quyosh botishi aks etgan maxsus Sunset to\'qimali nafis aramid g\'ilof.',
+    description_ru: 'Эксклюзивная серия Pitaka Sunset с градиентным плетением и титановым кольцом.'
+  },
+  {
+    id: 127,
+    name_uz: 'Metal Pure Frame Case | iPhone 13/14/15/16 Pro Max uchun',
+    name_ru: 'Чехол Metal Pure Frame Case для iPhone 13/14/15/16 Pro Max',
+    category: 'telefon-aksessuar',
+    brand: 'Apple',
+    price: 150000,
+    old_price: 199000,
+    discount_percent: 25,
+    rating: 4.7,
+    reviews_count: 59,
+    badge_uz: 'Aluminiy Ramka',
+    badge_ru: 'Алюминиевая рамка',
+    badge_type: 'sale',
+    in_stock: true,
+    variant_note: 'Qizil / 15 pro max',
+    main_image: 'https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=700&auto=format&fit=crop&q=80'],
+    colors: ['Qizil (Red)', 'Qora', 'Kumush'],
+    specs_uz: {
+      'Material': 'Aviatsiya aluminiy ramkasi',
+      'Orqa qismi': 'Tiniq qattiq polikarbonat',
+      'Moslik': 'iPhone 13/14/15/16 Pro Max'
+    },
+    specs_ru: {
+      'Материал': 'Авиационный алюминий и поликарбонат',
+      'Совместимость': 'iPhone 13/14/15/16 Pro Max'
+    },
+    description_uz: 'Mustahkam metall ramka va shaffof orqa panel uyg\'unligi.',
+    description_ru: 'Стильный чехол с прочной алюминиевой рамкой и прозрачной задней панелью.'
+  },
+  {
+    id: 128,
+    name_uz: 'Battery Case 4500mAh for iPhone 12 Pro Max | Zaryadlovchi chexol',
+    name_ru: 'Чехол-аккумулятор Battery Case 4500mAh для iPhone 12 Pro Max',
+    category: 'telefon-aksessuar',
+    brand: 'Apple',
+    price: 279000,
+    old_price: 349000,
+    discount_percent: 20,
+    rating: 4.6,
+    reviews_count: 31,
+    badge_uz: '4500mAh Power',
+    badge_ru: '4500mAh Аккумулятор',
+    badge_type: 'hot',
+    in_stock: true,
+    variant_note: 'Normal',
+    main_image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1580910051074-3eb694886505?w=700&auto=format&fit=crop&q=80'],
+    colors: ['Qora (Black)'],
+    specs_uz: {
+      'Sig\'im': '4500 mAh qo\'shimcha quvvat',
+      'Himoya': 'Qisqa tutashuvdan ko\'p bosqichli himoya'
+    },
+    specs_ru: {
+      'Емкость': '4500 мАч дополнительной энергии',
+      'Защита': 'Многоуровневая защита от перегрузок'
+    },
+    description_uz: 'Kun bo\'yi qo\'shimcha quvvat ta\'minlovchi o\'rnatilgan batareyali g\'ilof.',
+    description_ru: 'Надежный чехол со встроенным аккумулятором для длительной автономной работы.'
+  },
+  {
+    id: 129,
+    name_uz: 'Keephone Kevlar Norra Case | iPhone 17 Pro uchun | MagSafe',
+    name_ru: 'Чехол Keephone Kevlar Norra для iPhone 17 Pro | MagSafe',
+    category: 'telefon-aksessuar',
+    brand: 'Apple',
+    price: 380000,
+    old_price: 450000,
+    discount_percent: 16,
+    rating: 4.8,
+    reviews_count: 45,
+    badge_uz: 'Kevlar Armor',
+    badge_ru: 'Кевлар Броня',
+    badge_type: 'rec',
+    in_stock: true,
+    variant_note: 'Normal',
+    main_image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=700&auto=format&fit=crop&q=80'],
+    colors: ['Kevlar Matt Qora'],
+    specs_uz: {
+      'Material': 'Dupont Kevlar sintetik tolasi',
+      'MagSafe': 'Maksimal magnit kuchi'
+    },
+    specs_ru: {
+      'Материал': 'Синтетическое волокно Dupont Kevlar',
+      'MagSafe': 'Максимальная сила притяжения'
+    },
+    description_uz: 'Haqiqiy Dupont Kevlar tolasidan ishlangan zarbaga nihoyatda chidamli korpus.',
+    description_ru: 'Ударопрочный чехол из оригинального кевлара с поддержкой MagSafe.'
+  },
+  {
+    id: 130,
+    name_uz: '7 Milliard Phone Case | iPhone 16 Pro Max uchun | Premium Matt',
+    name_ru: 'Чехол 7 Milliard Phone Case для iPhone 16 Pro Max | Премиум матт',
+    category: 'telefon-aksessuar',
+    brand: 'Apple',
+    price: 79000,
+    old_price: 120000,
+    discount_percent: 34,
+    rating: 4.9,
+    reviews_count: 112,
+    badge_uz: 'Hamyonbop',
+    badge_ru: 'Выгодный',
+    badge_type: 'sale',
+    in_stock: true,
+    variant_note: 'Qora matt',
+    main_image: 'https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=700&auto=format&fit=crop&q=80'],
+    colors: ['Qora matt', 'To\'q Ko\'k', 'Binafsha'],
+    specs_uz: {
+      'Material': 'Matt soft-touch polimer',
+      'Xususiyat': 'Barmoq izi qolmaydi'
+    },
+    specs_ru: {
+      'Материал': 'Матовый полимер soft-touch',
+      'Особенность': 'Не оставляет отпечатков'
+    },
+    description_uz: 'Qo\'lda sirpanmaydigan, yoqimli teginish hissini beruvchi zamonaviy matviy g\'ilof.',
+    description_ru: 'Стильный матовый чехол с защитой от отпечатков и скольжения.'
+  },
+  {
+    id: 131,
+    name_uz: 'Pitaka Ultra Guard Sunset G\'ilofi iPhone 17 Pro uchun',
+    name_ru: 'Чехол Pitaka Ultra Guard Sunset для iPhone 17 Pro',
+    category: 'telefon-aksessuar',
+    brand: 'Apple',
+    price: 699000,
+    old_price: 799000,
+    discount_percent: 13,
+    rating: 5.0,
+    reviews_count: 28,
+    badge_uz: 'Ultra Guard',
+    badge_ru: 'Ultra Guard',
+    badge_type: 'hot',
+    in_stock: true,
+    variant_note: 'Normal',
+    main_image: 'https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1512499617640-c74ae3a79d37?w=700&auto=format&fit=crop&q=80'],
+    colors: ['Sunset / Carbon Black'],
+    specs_uz: {
+      'Himoya': 'Harbiy standartdagi MIL-STD zarba himoyasi',
+      'Material': 'Aramid tolasi va zarba yutuvchi TPU ramka'
+    },
+    specs_ru: {
+      'Защита': 'Военный стандарт противоударности MIL-STD',
+      'Материал': 'Арамидное волокно и амортизирующий бампер'
+    },
+    description_uz: 'Pitaka kompaniyasining eng yuqori darajada himoya qiluvchi kuchaytirilgan g\'ilofi.',
+    description_ru: 'Усиленная версия чехла Pitaka Ultra Guard для максимальной защиты устройства.'
   },
   {
     id: 123,
@@ -555,7 +999,7 @@ let PRODUCTS = [
     id: 104,
     name_uz: 'Apple MagSafe Magnitli Simsiz Power Bank 15W Tezkor Quvvatlash',
     name_ru: 'Apple MagSafe Магнитный внешний аккумулятор 15W',
-    category: 'powerbanklar',
+    category: 'zaryadka-kabel',
     brand: 'Apple',
     price: 420000,
     old_price: 520000,
@@ -566,8 +1010,8 @@ let PRODUCTS = [
     badge_ru: 'MagSafe',
     badge_type: 'hot',
     in_stock: true,
-    main_image: 'https://images.unsplash.com/photo-1609592426867-640a233b8fb3?w=700&auto=format&fit=crop&q=80',
-    images: ['https://images.unsplash.com/photo-1609592426867-640a233b8fb3?w=700&auto=format&fit=crop&q=80'],
+    main_image: 'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=700&auto=format&fit=crop&q=80'],
     colors: ['Oq', 'Space Gray'],
     specs_uz: {
       'Texnologiya': 'MagSafe 15W simsiz',
@@ -746,8 +1190,8 @@ let PRODUCTS = [
     badge_ru: '3-в-1',
     badge_type: 'rec',
     in_stock: true,
-    main_image: 'https://images.unsplash.com/photo-1622445262464-84b14e323553?w=700&auto=format&fit=crop&q=80',
-    images: ['https://images.unsplash.com/photo-1622445262464-84b14e323553?w=700&auto=format&fit=crop&q=80'],
+    main_image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=700&auto=format&fit=crop&q=80'],
     colors: ['Qora', 'Oq'],
     specs_uz: {
       'Imkoniyat': 'Telefon + Soat + Quloqchinni bir vaqtda quvvatlash',
@@ -806,8 +1250,8 @@ let PRODUCTS = [
     badge_ru: 'Any-Wear',
     badge_type: 'rec',
     in_stock: true,
-    main_image: 'https://images.unsplash.com/photo-1510519138111-550da6ee4003?w=700&auto=format&fit=crop&q=80',
-    images: ['https://images.unsplash.com/photo-1510519138111-550da6ee4003?w=700&auto=format&fit=crop&q=80'],
+    main_image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=700&auto=format&fit=crop&q=80',
+    images: ['https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=700&auto=format&fit=crop&q=80'],
     colors: ['Qora'],
     specs_uz: {
       'Joylashuv': 'Yelka / Bilak mushagi (Bicep)',
@@ -824,7 +1268,7 @@ let PRODUCTS = [
     id: 303,
     name_uz: 'WHOOP 4.0 Simsiz Zaryadlash Battery Pack 4.0',
     name_ru: 'Беспроводной блок зарядки WHOOP Battery Pack 4.0',
-    category: 'powerbanklar',
+    category: 'zaryadka-kabel',
     brand: 'WHOOP',
     price: 780000,
     old_price: 920000,
@@ -855,7 +1299,7 @@ let PRODUCTS = [
     id: 401,
     name_uz: 'Ray-Ban Meta Wayfarer Smart Audio Ko\'zoynak (Matte Black)',
     name_ru: 'Умные очки Ray-Ban Meta Wayfarer (Matte Black)',
-    category: 'blogger-jihozlar',
+    category: 'telefon-aksessuar',
     brand: 'Meta',
     price: 4200000,
     old_price: 4900000,
@@ -884,7 +1328,7 @@ let PRODUCTS = [
     id: 402,
     name_uz: 'Ray-Ban Meta Skyler Smart Audio Ko\'zoynak (Chalky Gray)',
     name_ru: 'Умные очки Ray-Ban Meta Skyler (Chalky Gray)',
-    category: 'blogger-jihozlar',
+    category: 'telefon-aksessuar',
     brand: 'Meta',
     price: 4450000,
     old_price: 5100000,
@@ -913,7 +1357,7 @@ let PRODUCTS = [
     id: 403,
     name_uz: 'Ray-Ban Aviator Classic Polarized Quyosh Ko\'zoynagi',
     name_ru: 'Солнцезащитные очки Ray-Ban Aviator Classic Polarized',
-    category: 'gozellik-avto',
+    category: 'telefon-aksessuar',
     brand: 'Meta',
     price: 1850000,
     old_price: 2200000,
@@ -1033,7 +1477,7 @@ let PRODUCTS = [
     id: 601,
     name_uz: 'Canon EOS R50 Mirrorless Creator Vlogging Kamera Kit',
     name_ru: 'Беззеркальная камера Canon EOS R50 Creator Kit',
-    category: 'blogger-jihozlar',
+    category: 'telefon-aksessuar',
     brand: 'Canon',
     price: 8900000,
     old_price: 9900000,
@@ -1062,7 +1506,7 @@ let PRODUCTS = [
     id: 602,
     name_uz: 'Canon LP-E17 Original Batareya & Dual USB Zaryadlovchi',
     name_ru: 'Оригинальный аккумулятор Canon LP-E17 и зарядное устройство',
-    category: 'blogger-jihozlar',
+    category: 'telefon-aksessuar',
     brand: 'Canon',
     price: 540000,
     old_price: 650000,
@@ -1091,7 +1535,7 @@ let PRODUCTS = [
     id: 603,
     name_uz: 'Canon RF 50mm f/1.8 STM Portret Ob\'yektivi',
     name_ru: 'Портретный объектив Canon RF 50mm f/1.8 STM',
-    category: 'blogger-jihozlar',
+    category: 'telefon-aksessuar',
     brand: 'Canon',
     price: 2150000,
     old_price: 2500000,
@@ -1119,9 +1563,15 @@ let PRODUCTS = [
 ];
 
 function formatPrice(amount) {
-  const safeAmount = Number(amount) || 0;
+  if (typeof amount === 'string') return amount;
+  if (!amount && amount !== 0) return '';
+  const num = Math.round(amount);
+  // Dollar ($) narxlari: agar narx 5000 dan kam bo'lsa (masalan, 1099$), dollarda ko'rsatamiz
+  if (num > 0 && num <= 5000) {
+    return new Intl.NumberFormat('en-US').format(num).replace(/,/g, ' ') + ' $';
+  }
   const currentLang = (typeof APP_STATE !== 'undefined' && APP_STATE.lang) ? APP_STATE.lang : 'uz';
   const currency = currentLang === 'ru' ? 'сум' : "so'm";
   const locale = currentLang === 'ru' ? 'ru-RU' : 'uz-UZ';
-  return new Intl.NumberFormat(locale).format(safeAmount) + ' ' + currency;
+  return new Intl.NumberFormat(locale).format(num) + ' ' + currency;
 }

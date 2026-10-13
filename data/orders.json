@@ -1,5 +1,28 @@
 [
   {
+    "id": "ORD-40450",
+    "createdAt": "2026-10-12T10:24:00.516Z",
+    "formattedDate": "15:24, 12/10/2026",
+    "customer": {
+      "name": "Test Mijoz",
+      "phone": "+998901234567",
+      "address": "Toshkent sh., Malika",
+      "deliveryMethod": "pickup",
+      "notes": "Click tolov"
+    },
+    "items": [
+      {
+        "id": "test-1",
+        "name": "iPhone 15 Pro",
+        "price": 12500000,
+        "quantity": 1
+      }
+    ],
+    "total": 12500000,
+    "status": "new",
+    "telegramSent": false
+  },
+  {
     "id": "ORD-23606",
     "createdAt": "2026-10-11T17:10:23.607Z",
     "formattedDate": "22:10, 11/10/2026",

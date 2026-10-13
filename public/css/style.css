@@ -88,17 +88,10 @@ html.light {
 }
 
 /* Reset va bazaviy stillar */
-html, body {
-  overflow-x: hidden !important;
-  max-width: 100vw;
-  -webkit-text-size-adjust: 100%;
-}
-
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  touch-action: manipulation;
 }
 
 body {
@@ -161,7 +154,7 @@ img {
 .main-header {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 500;
   background-color: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -304,6 +297,268 @@ img {
   color: var(--yellow-400);
 }
 
+/* ==========================================================================
+   LIVE SEARCH AUTOCOMPLETE DROPDOWN (applebox.uz style floating popup)
+   ========================================================================== */
+.search-results-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: var(--bg-card);
+  border-radius: 20px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.16), 0 4px 14px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  z-index: 1000;
+  animation: searchDropSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+html.light .search-results-dropdown {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, 0.13), 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.light) .search-results-dropdown {
+  background-color: #181820;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+@keyframes searchDropSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.search-dropdown-list {
+  max-height: 460px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 0;
+}
+
+.search-dropdown-list::-webkit-scrollbar {
+  width: 6px;
+}
+.search-dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.search-dropdown-list::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 150, 0.28);
+  border-radius: 9999px;
+}
+
+.search-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  cursor: pointer;
+  transition: background-color 0.14s ease;
+  border-bottom: 1px solid var(--border-subtle);
+  user-select: none;
+}
+
+html.light .search-item-row {
+  border-bottom-color: #f1f1f4;
+}
+html:not(.light) .search-item-row {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.search-item-row:last-child {
+  border-bottom: none;
+}
+
+.search-item-row:hover,
+.search-item-row.is-active {
+  background-color: rgba(245, 158, 11, 0.08);
+}
+
+html.light .search-item-row:hover,
+html.light .search-item-row.is-active {
+  background-color: #f6f6f9;
+}
+
+html:not(.light) .search-item-row:hover,
+html:not(.light) .search-item-row.is-active {
+  background-color: #22222b;
+}
+
+.search-item-left {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  flex: 1;
+}
+
+.search-item-thumb-box {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  background-color: #f3f3f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+html:not(.light) .search-item-thumb-box {
+  background-color: #272731;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.search-item-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.search-item-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.search-item-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+html.light .search-item-title {
+  color: #1f2937;
+}
+html:not(.light) .search-item-title {
+  color: #ffffff;
+}
+
+.search-item-title mark {
+  background: transparent;
+  color: var(--yellow-500);
+  font-weight: 700;
+}
+
+.search-item-variant {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html.light .search-item-variant {
+  color: #8e8e93;
+}
+html:not(.light) .search-item-variant {
+  color: #9ca3af;
+}
+
+.search-item-price {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  margin-left: 16px;
+  text-align: right;
+  flex-shrink: 0;
+  letter-spacing: -0.2px;
+}
+
+html.light .search-item-price {
+  color: #111827;
+}
+html:not(.light) .search-item-price {
+  color: #f9fafb;
+}
+
+/* Footer "Barcha natijalarni ko'rish" button */
+.search-dropdown-footer {
+  padding: 12px 18px;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--yellow-500);
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+html.light .search-dropdown-footer {
+  background-color: #fafafc;
+  border-top-color: #eeeeef;
+}
+
+html:not(.light) .search-dropdown-footer {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.search-dropdown-footer:hover {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: var(--yellow-400);
+}
+
+.search-dropdown-footer-icon {
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.search-dropdown-footer:hover .search-dropdown-footer-icon {
+  transform: translateX(4px);
+}
+
+/* Empty state */
+.search-empty-state {
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.search-empty-icon {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  opacity: 0.75;
+}
+
+.search-empty-title {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 5px;
+}
+
+.search-empty-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  max-width: 380px;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+
 /* Header Actions (Screenshot 2: RU · Quyosh · Sevimli · Savat · Kirish) */
 .header-actions {
   display: flex;
@@ -356,6 +611,17 @@ img {
   transform: scale(1.06);
 }
 
+.header-action-btn.active {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.header-action-btn.active svg {
+  fill: #ef4444;
+  stroke: #ef4444;
+}
+
 .header-action-btn.btn-cart {
   color: var(--text-main);
 }
@@ -365,7 +631,33 @@ img {
   border-color: var(--yellow-400);
 }
 
+/* Kirish tugmasi (Screenshot 2) */
+.header-login-btn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
 
+@media (min-width: 960px) {
+  .header-login-btn {
+    display: flex;
+  }
+}
+
+.header-login-btn:hover {
+  color: var(--yellow-400);
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+}
 
 /* Badges on Buttons */
 .badge-count {
@@ -386,16 +678,21 @@ img {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* Mobile Search Bar Row */
+/* Mobile Search Bar Row (IMG_2191: Odatiy holatda yopiq, faqat qidiruv ikonkasi bosilganda ochiladi) */
 .mobile-search-row {
-  display: block;
+  display: none !important;
   padding: 10px 0;
   border-top: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+.mobile-search-row.active {
+  display: block !important;
 }
 
 @media (min-width: 680px) {
   .mobile-search-row {
-    display: none;
+    display: none !important;
   }
 }
 
@@ -405,59 +702,83 @@ img {
 .sub-nav-bar {
   background: transparent;
   border-top: 1px solid var(--border-subtle);
-  padding: 8px 0 4px;
-  margin-top: 2px;
+  padding: 10px 0 6px;
+  margin-top: 4px;
 }
 
 .sub-nav-inner {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 28px;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.sub-nav-btn {
+.sub-nav-btn,
+.sub-nav-link {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: 0.88rem;
+  font-weight: 600;
   color: var(--text-main);
-  background: transparent;
-  border: none;
-  padding: 4px 0;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-subtle);
+  padding: 8px 18px;
+  border-radius: 9999px; /* Dumaloq pill tugma shakli */
   cursor: pointer;
-  transition: all var(--transition-fast);
+  text-decoration: none;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
-.sub-nav-btn:hover {
-  color: var(--yellow-400);
+html.light .sub-nav-btn,
+html.light .sub-nav-link {
+  background: #ffffff;
+  border-color: #e5e7eb;
+  color: #1f2937;
 }
 
-.sub-nav-btn .sub-nav-icon {
+html.dark .sub-nav-btn,
+html:not(.light) .sub-nav-btn,
+html.dark .sub-nav-link,
+html:not(.light) .sub-nav-link {
+  background: #18181f;
+  border-color: #2a2a35;
+  color: #f3f4f6;
+}
+
+.sub-nav-btn .sub-nav-icon,
+.sub-nav-link #subNavArrowIcon,
+.sub-nav-btn svg,
+.sub-nav-link svg {
   display: flex;
   align-items: center;
-  color: var(--text-muted);
-  transition: color var(--transition-fast);
+  color: inherit;
+  transition: all 0.2s ease;
 }
 
-.sub-nav-btn:hover .sub-nav-icon {
-  color: var(--yellow-400);
-}
-
-.sub-nav-link {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--yellow-400);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: all var(--transition-fast);
-}
-
+/* Hover: mishka borganda shu so'zlar dumaloq ichiga to'lib qoladi huddi tugmadek (Applebox Screenshot 2) */
+.sub-nav-btn:hover,
 .sub-nav-link:hover {
-  color: var(--yellow-300);
-  transform: translateX(2px);
+  background: #f59e0b !important;
+  border-color: #f59e0b !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.38);
+}
+
+.sub-nav-btn:hover .sub-nav-icon,
+.sub-nav-btn:hover svg,
+.sub-nav-link:hover svg,
+.sub-nav-link:hover #subNavArrowIcon {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.sub-nav-btn:active,
+.sub-nav-link:active {
+  transform: translateY(0);
 }
 
 /* Faol Kategoriya sarlavhasi */
@@ -1230,6 +1551,7 @@ html.light .cat-card.active .cat-card-title {
   flex-direction: column;
   transition: all var(--transition-normal);
   position: relative;
+  cursor: pointer;
 }
 
 .product-card:hover {
@@ -1311,31 +1633,9 @@ html:not(.light) .product-image-box {
   fill: #ef4444 !important;
 }
 
-/* Quick View Overlay */
+/* Quick View Overlay (Foydalanuvchi talabi bilan olib tashlandi) */
 .quick-view-overlay {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%) translateY(20px);
-  opacity: 0;
-  background: rgba(0, 0, 0, 0.88);
-  backdrop-filter: blur(8px);
-  color: #ffffff;
-  border: 1px solid var(--border-subtle);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  pointer-events: none;
-  transition: all var(--transition-fast);
-}
-
-.product-card:hover .quick-view-overlay {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
+  display: none !important;
 }
 
 /* Card Content */
@@ -1426,7 +1726,7 @@ html:not(.light) .product-image-box {
   border-radius: var(--radius-sm);
 }
 
-/* Card Button Add to Cart (Applebox skrinshotidagi kabi: Sariq/Oltin fon, oq aravacha va oq yozuv) */
+/* Card Button Add to Cart (Black Store Premium Qora Fonli Savatga Tugmasi) */
 .btn-add-cart {
   width: 100%;
   display: flex;
@@ -1434,14 +1734,15 @@ html:not(.light) .product-image-box {
   justify-content: center;
   gap: 8px;
   padding: 12px 16px;
-  background: #f59e0b;
+  background: #09090b;
   color: #ffffff;
   font-weight: 700;
   font-size: 0.95rem;
   border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
   transition: all var(--transition-fast);
-  border: none;
+  border: 1px solid #09090b;
+  cursor: pointer;
 }
 
 .btn-add-cart svg {
@@ -1457,20 +1758,186 @@ html:not(.light) .product-image-box {
 }
 
 .btn-add-cart:hover {
-  background: #d97706;
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+  background: #27272a;
+  border-color: #3f3f46;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   transform: translateY(-1px);
 }
 
-.btn-add-cart.added {
-  background: #10b981;
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+.btn-add-cart:active {
+  transform: scale(0.96);
 }
 
-.btn-add-cart.added svg {
-  color: #ffffff;
-  stroke: #ffffff;
+/* 1-bosqich: Azgina aylanib (Loading spinner) */
+.btn-add-cart.is-loading {
+  background: #27272a;
+  pointer-events: none;
+}
+
+.btn-spinner {
+  width: 17px;
+  height: 17px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: btnCartSpin 0.5s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes btnCartSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 2-bosqich: Har doim yashil ptichka chiqib (Success - Yashil Ptichka va Yashil Effekt) */
+.btn-add-cart.is-success,
+.deal-cart-btn.is-success,
+.applebox-detail-add-btn.is-success {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border: 1.5px solid #10b981 !important;
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.45) !important;
+  pointer-events: none !important;
+}
+
+.btn-add-cart.is-success .btn-check-icon,
+.deal-cart-btn.is-success .btn-check-icon,
+.applebox-detail-add-btn.is-success .btn-check-icon {
+  width: 20px !important;
+  height: 20px !important;
+  stroke: #10b981 !important;
+  color: #10b981 !important;
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  animation: checkmarkPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+
+.btn-add-cart.is-success span,
+.deal-cart-btn.is-success span,
+.applebox-detail-add-btn.is-success span,
+.btn-check-text {
+  color: #10b981 !important;
+  font-weight: 700 !important;
+}
+
+@keyframes checkmarkPop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Savat soni nishoni yangilanish animatsiyasi */
+@keyframes badgePopAnimation {
+  0% { transform: scale(0.6); }
+  50% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+.badge-pop-anim {
+  animation: badgePopAnimation 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Savatga narsa tushganda savat ikonkasi sakrashi (cart jump animation) */
+@keyframes cartBounceJump {
+  0% { transform: scale(1) translateY(0); }
+  20% { transform: scale(0.85) translateY(3px); }
+  40% { transform: scale(1.28) translateY(-12px) rotate(-8deg); }
+  55% { transform: scale(1.15) translateY(-5px) rotate(6deg); }
+  70% { transform: scale(0.96) translateY(2px) rotate(-3deg); }
+  85% { transform: scale(1.05) translateY(-1px) rotate(1deg); }
+  100% { transform: scale(1) translateY(0) rotate(0); }
+}
+
+/* Mobil pastki panel uchun kuchli, elastik va ko'zga yaqqol tashlanadigan baland sakrash animatsiyasi */
+@keyframes mobileCartSpringJump {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  15% {
+    /* Siqilish (sakrashga tayyorgarlik) */
+    transform: scale(1.22, 0.75) translateY(4px);
+  }
+  35% {
+    /* Yuqoriga baland va elastik sakrash */
+    transform: scale(0.88, 1.3) translateY(-18px) rotate(-8deg);
+    color: var(--yellow-400);
+    filter: drop-shadow(0 8px 16px rgba(245, 158, 11, 0.7));
+  }
+  50% {
+    /* Cho'qqida burilish */
+    transform: scale(1.18, 0.9) translateY(-10px) rotate(6deg);
+    color: var(--yellow-400);
+    filter: drop-shadow(0 6px 12px rgba(245, 158, 11, 0.6));
+  }
+  68% {
+    /* Pastga qaytish */
+    transform: scale(0.95, 1.08) translateY(-2px) rotate(-3deg);
+  }
+  82% {
+    /* Tebranish */
+    transform: scale(1.06, 0.96) translateY(1px) rotate(1deg);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0) rotate(0deg);
+    filter: none;
+  }
+}
+
+.cart-jump-anim {
+  animation: cartBounceJump 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  transform-origin: center center;
+}
+
+.bottom-cart-jump-anim {
+  animation: mobileCartSpringJump 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  transform-origin: center bottom !important;
+  will-change: transform, filter !important;
+  z-index: 60 !important;
+}
+
+.bottom-cart-jump-anim #navCartIcon svg {
+  stroke: var(--yellow-400) !important;
+  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.8)) !important;
+}
+
+/* Pastdagi hisoblagich (badge) ning olovdek yorqin va baland sakrashi */
+.nav-tab-badge.badge-pop-anim {
+  animation: mobileBadgeSpringPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+@keyframes mobileBadgeSpringPop {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.3;
+  }
+  45% {
+    transform: scale(1.65);
+    background: #fbbf24;
+    color: #000;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 1), 0 0 6px #fff;
+  }
+  75% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Telefonda yuqoridagi savat tugmasi va ikonkasi QIMIRLAMAYDI (faqat pastda qimirlaydi) */
+@media (max-width: 991px) {
+  #headerCartBtn,
+  .header-action-btn.btn-cart,
+  #headerCartBtn svg,
+  .header-action-btn.btn-cart svg,
+  #headerCartBtn .badge-count,
+  .header-action-btn.btn-cart .badge-count {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 /* Bo'sh qidiruv holati */
@@ -1481,6 +1948,91 @@ html:not(.light) .product-image-box {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
+}
+
+/* Applebox Sevimlilar bo'sh holati (Screenshot 2 / IMG_2195) */
+.applebox-empty-view {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 52vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.applebox-empty-circle {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: #fef3c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
+}
+
+[data-theme="dark"] .applebox-empty-circle {
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.applebox-empty-circle svg {
+  width: 38px;
+  height: 38px;
+  stroke: #f59e0b;
+}
+
+.applebox-empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.01em;
+}
+
+.applebox-empty-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0 0 24px 0;
+}
+
+.applebox-empty-btn {
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 13px 44px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
+  transition: all 0.2s ease;
+}
+
+.applebox-empty-btn:hover {
+  background: #d97706;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+.applebox-empty-btn:active {
+  transform: scale(0.97);
+}
+
+/* Wishlist View faol bo'lganda katalog setkasini markazlashtirish va yon filtrni yashirish */
+body.wishlist-view-active #catalogLayout {
+  display: block !important;
+}
+
+body.wishlist-view-active #catalogSidebar {
+  display: none !important;
+}
+
+body.wishlist-view-active .catalog-main {
+  width: 100% !important;
 }
 
 .empty-state-icon {
@@ -1515,7 +2067,7 @@ html:not(.light) .product-image-box {
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(6px);
-  z-index: 100;
+  z-index: 1100;
   opacity: 0;
   visibility: hidden;
   transition: all var(--transition-normal);
@@ -1534,7 +2086,7 @@ html:not(.light) .product-image-box {
   max-width: 440px;
   background: var(--bg-secondary);
   box-shadow: var(--shadow-lg);
-  z-index: 101;
+  z-index: 1101;
   display: flex;
   flex-direction: column;
   transition: transform var(--transition-smooth);
@@ -1553,8 +2105,21 @@ html:not(.light) .product-image-box {
   border-right: 1px solid var(--border-subtle);
 }
 
+.drawer.drawer-bottom {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
+  max-height: 82vh;
+  border-radius: 24px 24px 0 0;
+  transform: translateY(100%);
+  border-top: 1px solid var(--border-subtle);
+}
+
 .drawer.active {
-  transform: translateX(0);
+  transform: translate(0, 0);
 }
 
 .drawer-header {
@@ -1635,6 +2200,152 @@ html:not(.light) .product-image-box {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--text-main);
+}
+
+/* ==========================================================================
+   KATEGORIYALAR DRAYVERI (Applebox Uslubidagi To'liq Kenglikdagi Qatorlar)
+   ========================================================================== */
+#catalogDrawer {
+  max-width: 360px;
+  width: 100%;
+}
+
+.category-drawer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0 20px;
+}
+
+.category-drawer-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 2px 8px 6px;
+}
+
+.category-drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: var(--text-main);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  text-align: left;
+}
+
+.category-drawer-item:hover {
+  background: var(--bg-card-hover, #f8fafc);
+  transform: translateX(3px);
+}
+
+html.light .category-drawer-item:hover {
+  background: #f1f5f9;
+}
+
+html:not(.light) .category-drawer-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.category-drawer-item.active {
+  background: #fff7ed;
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #d97706;
+  font-weight: 700;
+}
+
+html.dark .category-drawer-item.active,
+html:not(.light) .category-drawer-item.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+}
+
+.category-drawer-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+html:not(.light) .category-drawer-icon-wrap {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+.category-drawer-icon-wrap svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.2px;
+}
+
+.category-drawer-item:hover .category-drawer-icon-wrap {
+  border-color: var(--yellow-400);
+  color: var(--yellow-400);
+}
+
+.category-drawer-item.active .category-drawer-icon-wrap {
+  background: #ffffff;
+  border-color: #f59e0b;
+  color: #d97706;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.18);
+}
+
+html:not(.light) .category-drawer-item.active .category-drawer-icon-wrap {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: #f59e0b;
+  color: #fbbf24;
+  box-shadow: none;
+}
+
+.category-drawer-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: inherit;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-drawer-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  flex-shrink: 0;
+  margin-left: auto;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.category-drawer-item:hover .category-drawer-arrow {
+  transform: translateX(2px);
+  color: var(--yellow-400);
+}
+
+.category-drawer-item.active .category-drawer-arrow {
+  color: #d97706;
+}
+
+html:not(.light) .category-drawer-item.active .category-drawer-arrow {
+  color: #fbbf24;
 }
 
 .catalog-category-row {
@@ -1895,39 +2606,9 @@ html.light .brand-drawer-card.active .brand-drawer-name {
   gap: 14px;
 }
 
+/* Promo row (Foydalanuvchi talabi bilan olib tashlandi) */
 .promo-row {
-  display: flex;
-  gap: 8px;
-}
-
-.promo-input {
-  flex: 1;
-  background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
-  font-size: 0.85rem;
-  color: var(--text-main);
-  text-transform: uppercase;
-}
-
-.promo-input:focus {
-  border-color: var(--yellow-400);
-}
-
-.btn-promo {
-  padding: 8px 16px;
-  background: var(--bg-card-hover);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  color: var(--text-main);
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-
-.btn-promo:hover {
-  border-color: var(--yellow-400);
-  color: var(--yellow-400);
+  display: none !important;
 }
 
 .cart-total-row {
@@ -1978,7 +2659,7 @@ html.light .brand-drawer-card.active .brand-drawer-name {
   inset: 0;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(8px);
-  z-index: 200;
+  z-index: 1200;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2276,11 +2957,17 @@ html.light .brand-drawer-card.active .brand-drawer-name {
 .payment-methods-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 10px;
+}
+
+@media (min-width: 540px) {
+  .payment-methods-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .payment-option {
-  padding: 16px 12px;
+  padding: 12px 8px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
@@ -2288,28 +2975,53 @@ html.light .brand-drawer-card.active .brand-drawer-name {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   transition: all var(--transition-fast);
-  user-select: none;
 }
 
 .payment-option:hover {
   border-color: var(--yellow-400);
-  background: rgba(255, 255, 255, 0.03);
 }
 
 .payment-option.active {
   border-color: var(--yellow-400);
-  background: rgba(245, 158, 11, 0.14);
+  background: rgba(245, 158, 11, 0.12);
   color: var(--yellow-400);
-  box-shadow: 0 0 14px rgba(245, 158, 11, 0.18);
 }
 
 .payment-name {
-  font-size: 0.88rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  text-align: center;
+}
+
+.delivery-methods-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.delivery-option {
+  padding: 12px 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.delivery-option:hover {
+  border-color: var(--yellow-400);
+}
+
+.delivery-option.active {
+  border-color: var(--yellow-400);
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--yellow-400);
+  font-weight: 700;
 }
 
 /* ==========================================================================
@@ -2381,6 +3093,7 @@ html.light .brand-drawer-card.active .brand-drawer-name {
   align-items: center;
   justify-content: space-around;
   padding: 0 10px;
+  overflow: visible;
 }
 
 @media (min-width: 992px) {
@@ -2431,15 +3144,29 @@ html.light .brand-drawer-card.active .brand-drawer-name {
 }
 
 /* ==========================================================================
-   FOOTER (THEME-AWARE: KUN VA TUN REJIMIGA 100% MOSLANUVCHI)
+   FOOTER (Har doim to'q qora fond va 100% OQ matnlar — Screenshot 2 dagi xatoni tuzatish)
    ========================================================================== */
 .footer {
-  background: #09090d;
-  border-top: 1px solid var(--border-subtle);
+  background: #060608 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: 50px 0 30px;
   margin-top: 50px;
-  color: var(--text-secondary);
-  transition: background-color var(--transition-normal), border-color var(--transition-normal);
+  color: #ffffff !important;
+}
+
+/* Footer logosi va BlackStore matni OQ rangda */
+.footer .brand-logo .brand-title,
+.footer-brand-logo .brand-title {
+  color: #ffffff !important;
+}
+
+.footer .brand-logo .brand-uz,
+.footer-brand-logo .brand-uz {
+  color: var(--yellow-400) !important;
+}
+
+.footer p {
+  color: rgba(255, 255, 255, 0.82) !important;
 }
 
 .footer-grid {
@@ -2459,15 +3186,7 @@ html.light .brand-drawer-card.active .brand-drawer-name {
   font-family: var(--font-heading);
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 16px;
-  letter-spacing: -0.01em;
-}
-
-.footer-desc-text {
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  line-height: 1.6;
+  color: #ffffff !important;
   margin-bottom: 16px;
 }
 
@@ -2478,47 +3197,18 @@ html.light .brand-drawer-card.active .brand-drawer-name {
   gap: 10px;
 }
 
-.footer-links a,
-.footer-links span {
-  color: var(--text-secondary);
+.footer-links a {
+  color: rgba(255, 255, 255, 0.82) !important;
   font-size: 0.875rem;
   transition: color var(--transition-fast);
 }
 
 .footer-links a:hover {
-  color: var(--yellow-400);
-}
-
-.footer-contact-item {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 0.875rem;
-}
-
-.footer-icon-wrap {
-  color: var(--yellow-400);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.footer-phone-bold {
-  font-weight: 700 !important;
-  color: var(--text-main) !important;
-  font-size: 0.95rem !important;
-}
-
-.footer-phone-bold:hover {
   color: var(--yellow-400) !important;
 }
 
-.footer-hours-row {
-  color: var(--text-muted);
-  font-size: 0.8125rem;
-  margin-top: 6px;
-  line-height: 1.45;
+.footer-links li {
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 .footer-social-row {
@@ -2531,9 +3221,9 @@ html.light .brand-drawer-card.active .brand-drawer-name {
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-main);
+  background: #15151a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2549,95 +3239,386 @@ html.light .brand-drawer-card.active .brand-drawer-name {
 
 .footer-bottom {
   padding-top: 24px;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.65) !important;
+}
+
+/* ==========================================================================
+   CATEGORY VIEW & 2-COLUMN CATALOG LAYOUT (Screenshot 1: Applebox Uslubi)
+   ========================================================================== */
+.catalog-layout {
+  display: block;
+  width: 100%;
+}
+
+.catalog-layout.has-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+@media (min-width: 992px) {
+  .catalog-layout.has-sidebar {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+}
+
+.catalog-sidebar {
+  display: none;
+}
+
+.catalog-layout.has-sidebar .catalog-sidebar {
+  display: block;
+}
+
+.catalog-main {
+  min-width: 0;
+  width: 100%;
+}
+
+/* Filtr Kartochkasi (Screenshot 1 Uslubida) */
+.filter-sidebar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 22px 18px 24px;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.filter-sidebar-header {
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.filter-sidebar-header h3 {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.3px;
+}
+
+.filter-group {
+  margin-bottom: 20px;
+}
+
+.filter-group-title {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
   color: var(--text-muted);
+  margin-bottom: 10px;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   KUNDUZGI REJIM (LIGHT MODE): TO'LIQ ANIQLIK VA YUQORI KONTRAST
-   ───────────────────────────────────────────────────────────────────────────── */
-html.light .footer {
-  background: #f4f5f8;
-  border-top-color: #e2e8f0;
+/* Kategoriyalar ro'yxati (Applebox Screenshot 1: Ixcham 175px scroll maydoni) */
+.filter-categories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 175px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
 }
 
-html.light .footer-brand-logo .brand-title {
-  color: #09090b !important;
+.filter-categories-list::-webkit-scrollbar {
+  width: 5px;
 }
 
-html.light .footer-col h5 {
-  color: #09090b !important;
+.filter-categories-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
 }
 
-html.light .footer-desc-text {
-  color: #475569 !important;
+html.dark .filter-categories-list::-webkit-scrollbar-thumb,
+html:not(.light) .filter-categories-list::-webkit-scrollbar-thumb {
+  background: #3f3f46;
 }
 
-html.light .footer-links a,
-html.light .footer-links span {
-  color: #334155 !important;
+.sidebar-cat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: var(--text-main);
+  font-size: 0.83rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 100%;
 }
 
-html.light .footer-links a:hover {
-  color: #d97706 !important;
+.sidebar-cat-item:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-main);
 }
 
-html.light .footer-phone-bold {
-  color: #0f172a !important;
-}
-
-html.light .footer-phone-bold:hover {
-  color: #d97706 !important;
-}
-
-html.light .footer-icon-wrap {
-  color: #d97706 !important;
-}
-
-html.light .footer-hours-row {
-  color: #64748b !important;
-}
-
-html.light .footer-bottom {
-  border-top-color: #e2e8f0 !important;
-  color: #64748b !important;
-}
-
-html.light .footer-bottom span {
-  color: #64748b !important;
-}
-
-html.light .social-link-btn {
-  background: #ffffff !important;
-  border-color: #e2e8f0 !important;
-  color: #0f172a !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-html.light .social-link-btn:hover {
-  border-color: #d97706 !important;
-  color: #d97706 !important;
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2) !important;
-}
-
-html.light .mobile-bottom-bar {
-  background: rgba(255, 255, 255, 0.95);
-  border-top-color: #e2e8f0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
-}
-
-html.light .nav-tab-item {
-  color: #64748b;
-}
-
-html.light .nav-tab-item.active {
+.sidebar-cat-item.active {
+  background: #fff7ed;
+  border-color: #f59e0b;
   color: #d97706;
+  font-weight: 700;
+}
+
+html.dark .sidebar-cat-item.active,
+html:not(.light) .sidebar-cat-item.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+.sidebar-cat-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.sidebar-cat-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.sidebar-cat-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+/* Brendlar ro'yxati (Applebox Screenshot 1: Ixcham 165px scroll maydoni) */
+.filter-brands-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 165px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.filter-brands-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.filter-brands-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
+}
+
+html.dark .filter-brands-list::-webkit-scrollbar-thumb,
+html:not(.light) .filter-brands-list::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
+.sidebar-brand-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: var(--text-main);
+  font-size: 0.83rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+.sidebar-brand-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.sidebar-brand-item.active {
+  background: #fff7ed;
+  border-color: #f59e0b;
+  color: #d97706;
+  font-weight: 700;
+}
+
+html.dark .sidebar-brand-item.active,
+html:not(.light) .sidebar-brand-item.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+.sidebar-brand-icon-wrap {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+/* Tozalash tugmasi (Applebox Screenshot 1: Oq/kulrang hoshiyali yumaloq tugma) */
+.filter-reset-btn {
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: center;
+}
+
+.filter-reset-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: #d1d5db;
+  color: var(--text-main);
+}
+
+.sidebar-brand-item:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-main);
+}
+
+.sidebar-brand-item.active {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: var(--yellow-500);
+  font-weight: 700;
+}
+
+.sidebar-brand-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+/* Switch Toggle (Mavjud) */
+.filter-group-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle);
+  margin-bottom: 18px;
+}
+
+.filter-group-switch .filter-group-title {
+  margin-bottom: 0;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg-card-hover);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  transition: 0.25s;
+}
+
+.toggle-slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transition: 0.25s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--yellow-400);
+  border-color: var(--yellow-400);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(18px);
+  background-color: #000000;
+}
+
+/* Tozalash Tugmasi */
+.filter-reset-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-reset-btn:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: var(--yellow-400);
+  color: var(--yellow-400);
+}
+
+/* Category View Active holatida yashirish */
+body.category-view-active .hero-section,
+body.category-view-active .trust-strip,
+body.category-view-active .categories-section {
+  display: none !important;
+}
+
+body.category-view-active .catalog-section {
+  padding-top: 24px;
 }
 
 @media (max-width: 640px) {
@@ -2654,708 +3635,2828 @@ html.light .nav-tab-item.active {
 }
 
 /* ==========================================================================
-   FLOATING AI ASSISTANT WIDGET (BLACK STORE THEME)
+   MOBILE DESIGN SYSTEM (6 TELEGRAM REFERENCE SCREENS MATCHING)
    ========================================================================== */
-.ai-widget-wrapper {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 90;
+
+/* 1. Mobile Header & Action Buttons (IMG_2191) */
+.mobile-hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.15s;
 }
 
-.ai-fab-btn {
+.mobile-hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+html.light .mobile-hamburger-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.mobile-only-action {
+  display: none !important;
+}
+
+.desktop-only-action {
+  display: flex !important;
+}
+
+.mobile-profile-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
-  gap: 12px;
-  background: linear-gradient(135deg, #18181f 0%, #0d0d12 100%);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  padding: 8px 18px 8px 10px;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 16px rgba(245, 158, 11, 0.25);
-  transition: all var(--transition-normal);
+  justify-content: center;
   color: var(--text-main);
+}
+
+html.light .mobile-profile-btn {
+  background: #f4f4f7;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 767px) {
+  .mobile-hamburger-btn {
+    display: flex !important;
+  }
+  .desktop-only-action {
+    display: none !important;
+  }
+  .mobile-only-action {
+    display: flex !important;
+  }
+  .search-container {
+    display: none !important;
+  }
+  .header-inner {
+    padding: 10px 0 6px;
+    gap: 8px;
+  }
+  .brand-logo {
+    margin-right: auto;
+  }
+  .sub-nav-bar {
+    display: none !important;
+  }
+}
+
+/* 2. Mobile Left Navigation Drawer (IMG_2196) */
+.mobile-left-menu-drawer {
+  width: 84%;
+  max-width: 320px;
+  background-color: var(--bg-card);
+}
+
+html.light .mobile-left-menu-drawer {
+  background-color: #ffffff;
+}
+html:not(.light) .mobile-left-menu-drawer {
+  background-color: #16161d;
+}
+
+.mobile-left-drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+html.light .mobile-left-drawer-header {
+  border-bottom-color: #f0f0f3;
+}
+
+.mobile-left-drawer-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.mobile-left-drawer-body {
+  padding: 14px 16px 30px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.mobile-drawer-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.mobile-drawer-lang-pill {
+  flex: 1;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-input);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+html.light .mobile-drawer-lang-pill {
+  background: #f4f4f7;
+  border-color: #e5e7eb;
+}
+
+.m-lang-tag {
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.mobile-drawer-theme-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-input);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+html.light .mobile-drawer-theme-btn {
+  background: #f4f4f7;
+  border-color: #e5e7eb;
+}
+
+.mobile-drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 14px;
+  border-radius: 14px;
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mobile-drawer-item:hover,
+.mobile-drawer-item:active {
+  background-color: rgba(245, 158, 11, 0.09);
+  color: #f59e0b;
+}
+
+html.light .mobile-drawer-item:hover {
+  background-color: #f7f7fa;
+}
+
+.m-drawer-icon {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6; /* Blue icon style as shown in IMG_2196 */
+}
+
+html.light .m-drawer-icon {
+  color: #2563eb;
+}
+
+.m-drawer-arrow {
+  margin-left: auto;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+/* 3. Mobile Filter Bottom Sheet (IMG_2194 / Image 3) */
+.mobile-filter-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 88vh;
+  border-radius: 24px 24px 0 0 !important;
+  background-color: #ffffff;
+  z-index: 1101;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+}
+
+html:not(.light) .mobile-filter-sheet {
+  background-color: #171720;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-filter-sheet.active {
+  transform: translateY(0);
+}
+
+.mobile-filter-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 22px 10px;
+  border-bottom: none !important;
+}
+
+.mobile-filter-sheet-close {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.mobile-filter-sheet-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.mobile-filter-sheet-body {
+  padding: 8px 18px 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.mfilter-section {
+  margin-bottom: 22px;
+}
+
+.mfilter-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #8e8e93;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 14px 0 8px 4px;
+}
+
+/* Mobile Filter Kategoriyalar & Brendlar pastga-tepaga suriladigan ro'yxati (Huddi kompyuter sidebaridagidek) */
+.mfilter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 180px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 5px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.mfilter-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.mfilter-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mfilter-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 9999px;
+}
+
+html.dark .mfilter-list::-webkit-scrollbar-thumb,
+html:not(.light) .mfilter-list::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
+/* Itemlar — Huddi kompyuterdagidek pill shaklidagi chiroyli tugmalar */
+.mfilter-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1.5px solid transparent;
+  color: var(--text-main);
+  font-size: 0.84rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast, 0.15s);
+  width: 100%;
   user-select: none;
 }
 
-.ai-fab-btn:hover {
-  transform: translateY(-3px) scale(1.02);
-  border-color: var(--yellow-400);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(245, 158, 11, 0.45);
+.mfilter-item:hover,
+.mfilter-item:active {
+  background-color: var(--bg-card-hover);
 }
 
-.ai-avatar-pulse {
-  position: relative;
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-full);
-  background: var(--grad-yellow);
+.mfilter-item.active {
+  background-color: #fff7ed !important;
+  border-color: #f59e0b !important;
+  color: #d97706 !important;
+  font-weight: 700 !important;
+}
+
+html.dark .mfilter-item.active,
+html:not(.light) .mfilter-item.active {
+  background-color: rgba(245, 158, 11, 0.16) !important;
+  border-color: #f59e0b !important;
+  color: #fbbf24 !important;
+}
+
+.mfilter-item-icon {
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  opacity: 0.9;
 }
 
-.ai-avatar-pulse::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--yellow-400);
-  animation: ai-pulse-ring 2s infinite;
+.mfilter-item-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
-@keyframes ai-pulse-ring {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(1.35); opacity: 0; }
-}
-
-.ai-robot-emoji {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.ai-fab-label {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.ai-fab-title {
-  font-family: var(--font-heading);
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
-}
-
-.ai-fab-status {
-  font-size: 0.68rem;
-  color: #10b981;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.ai-fab-status::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  background: #10b981;
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 6px #10b981;
-}
-
-/* AI Chat Window Popup */
-.ai-chat-window {
-  position: absolute;
-  bottom: calc(100% + 14px);
-  right: 0;
-  width: 380px;
-  max-width: calc(100vw - 32px);
-  height: 500px;
-  max-height: calc(100vh - 120px);
-  background: rgba(18, 18, 24, 0.96);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  border-radius: var(--radius-lg);
-  display: flex;
-  flex-direction: column;
+.mfilter-item-name {
+  white-space: nowrap;
   overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(245, 158, 11, 0.15);
-  animation: ai-chat-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 100;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
-.ai-chat-window.hidden {
-  display: none !important;
-}
-
-@keyframes ai-chat-pop {
-  from { opacity: 0; transform: translateY(12px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.ai-chat-header {
-  padding: 14px 16px;
-  background: rgba(14, 14, 18, 0.98);
-  border-bottom: 1px solid var(--border-subtle);
+/* MAVJUD Switch qatori (Mobil filtr) */
+.mfilter-switch-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 12px 6px 4px;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 14px;
+  margin-bottom: 6px;
 }
 
-.ai-header-left {
+.mobile-filter-sheet-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px 24px;
+  border-top: 1px solid var(--border-subtle);
+  background: inherit;
+}
+
+.mobile-filter-reset-btn {
+  flex: 1;
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mobile-filter-reset-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.mobile-filter-apply-btn {
+  flex: 2;
+  height: 48px;
+  background-color: #f59e0b;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  transition: background 0.15s;
+}
+
+.mobile-filter-apply-btn:hover {
+  background-color: #d97706;
+}
+
+/* 4. Category Tiles, Hover Effects & Deals Header (Applebox Screenshot 1 & Screenshot 2) */
+.trust-strip {
+  display: none !important;
+}
+
+.categories-section .section-head {
+  display: none !important;
+}
+
+.categories-section {
+  padding: 16px 0 10px !important;
+}
+
+.cat-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0 4px;
+  width: 88px;
+  user-select: none;
+  text-decoration: none;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cat-tile-box {
+  width: 76px;
+  height: 76px;
+  border-radius: 20px;
+  background-color: #ffffff;
+  border: 1px solid #ededf1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #18181b;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.light .cat-tile-box {
+  background-color: #ffffff;
+  border-color: #ededf1;
+  color: #18181b;
+}
+
+html.dark .cat-tile-box,
+html:not(.light) .cat-tile-box {
+  background-color: #141417;
+  border-color: #26262c;
+  color: #fafafa;
+}
+
+.cat-tile-box svg {
+  width: 34px;
+  height: 34px;
+  stroke-width: 2px;
+  transition: transform 0.2s ease;
+}
+
+.cat-tile-label {
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: #374151;
+  text-align: center;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: transparent;
+  border: 1px solid transparent;
+  max-width: 88px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.7em;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.dark .cat-tile-label,
+html:not(.light) .cat-tile-label {
+  color: #d1d5db;
+}
+
+/* Hover: mishka borganda sozlar dumaloq ichiga to'lib qoladi huddi tugmadek (Applebox Screenshot 2) */
+.cat-tile:hover .cat-tile-box {
+  transform: translateY(-4px);
+  border-color: #f59e0b;
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.18);
+}
+
+.cat-tile:hover .cat-tile-box svg {
+  transform: scale(1.08);
+}
+
+.cat-tile:hover .cat-tile-label {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Active holat */
+.cat-tile.active .cat-tile-box {
+  background-color: #fff7ed;
+  border-color: #f59e0b;
+  color: #d97706;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.25);
+}
+
+html.dark .cat-tile.active .cat-tile-box,
+html:not(.light) .cat-tile.active .cat-tile-box {
+  background-color: rgba(245, 158, 11, 0.16);
+  border-color: #f59e0b;
+  color: #fbbf24;
+}
+
+.cat-tile.active .cat-tile-label {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(245, 158, 11, 0.3);
+}
+
+/* 5. Mobile & Desktop Catalog Header & Deals Section Header */
+.home-catalog-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 16px;
+  margin-bottom: 6px;
+  width: 100%;
+}
+
+.home-catalog-title-group {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.ai-status-dot {
-  width: 10px;
-  height: 10px;
-  background: #10b981;
-  border-radius: var(--radius-full);
-  box-shadow: 0 0 8px #10b981;
-  flex-shrink: 0;
+.home-catalog-flame-icon {
+  font-size: 1.4rem;
+  display: inline-flex;
+  align-items: center;
 }
 
-.ai-chat-title {
+.home-catalog-section-title {
   font-family: var(--font-heading);
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.3px;
   margin: 0;
 }
 
-.ai-chat-subtitle {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  display: block;
+.home-catalog-see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #2563eb;
+  text-decoration: none;
+  transition: all 0.15s ease;
 }
 
-.ai-chat-close-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  font-size: 1.5rem;
-  cursor: pointer;
-  line-height: 1;
-  padding: 4px 6px;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-fast);
+.home-catalog-see-all:hover {
+  color: #1d4ed8;
+  transform: translateX(3px);
 }
 
-.ai-chat-close-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+.desktop-active-cat-row {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+  width: 100%;
 }
 
-.ai-messages-container {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
+.desktop-active-cat-left {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalog-toolbar {
+  display: none !important;
+}
+
+/* ==========================================================================
+   HAFTA CHEGIRMALARI (UZUM MARKET / APPLEBOX HORIZONTAL DEALS SLIDER)
+   Uzum Market uslubidagi binafsha gradient, sof oq kartalar va silliq suriluvchi lenta
+   ========================================================================== */
+.home-deals-section {
+  width: 100%;
+  margin: 0 0 34px 0;
+  display: none; /* JS faqat bosh sahifada ko'rsatadi */
+}
+
+.deals-card-container {
+  background: linear-gradient(145deg, #09090b 0%, #15151a 50%, #0d0d12 100%);
+  border-radius: 24px;
+  padding: 22px 20px 24px 20px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45), 0 0 35px rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Fon oltin nurlanish effekti */
+.deals-card-container::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.16) 0%, rgba(251, 191, 36, 0.04) 50%, transparent 75%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.deals-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.deals-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  user-select: none;
+  min-width: 0;
+  flex: 1;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.deals-title-group:hover {
+  transform: translateX(3px);
+}
+
+.deals-header-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  backdrop-filter: blur(8px);
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+
+.deals-section-title {
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #fafafa;
+  letter-spacing: -0.4px;
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.deals-title-arrow {
+  display: none;
+}
+
+.deals-header-right {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
 
-.ai-msg {
+.deals-nav-arrows {
   display: flex;
+  align-items: center;
   gap: 8px;
-  max-width: 90%;
-  animation: ai-bubble-in 0.2s ease;
 }
 
-@keyframes ai-bubble-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.ai-msg-bot {
-  align-self: flex-start;
-}
-
-.ai-msg-user {
-  align-self: flex-end;
-  flex-direction: row-reverse;
-}
-
-.ai-bot-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius-full);
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+.deals-scroll-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
-  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
 }
 
-.ai-msg-bubble {
-  padding: 10px 14px;
-  border-radius: 16px;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  white-space: pre-wrap;
-  word-break: break-word;
+.deals-scroll-btn:hover {
+  background: #f59e0b;
+  color: #09090b;
+  border-color: #f59e0b;
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
 }
 
-.ai-msg-bot .ai-msg-bubble {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-subtle);
-  color: #f3f4f6;
-  border-top-left-radius: 4px;
+.deals-scroll-btn:active {
+  transform: scale(0.95);
 }
 
-.ai-msg-bot .ai-msg-bubble strong {
-  color: var(--yellow-400);
-}
-
-.ai-msg-user .ai-msg-bubble {
-  background: var(--grad-yellow);
-  color: #000;
-  font-weight: 500;
-  border-top-right-radius: 4px;
-}
-
-.ai-suggestions-wrap {
-  display: flex;
-  flex-wrap: wrap;
+.deals-see-all-link {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
-  margin-top: 4px;
+  color: #e4e4e7;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-.ai-chip {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  color: var(--yellow-400);
-  font-size: 0.72rem;
-  padding: 6px 11px;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all var(--transition-fast);
+.deals-see-all-link .see-all-desktop {
+  display: inline;
 }
 
-.ai-chip:hover {
-  background: rgba(245, 158, 11, 0.22);
-  border-color: var(--yellow-400);
-  transform: translateY(-1px);
+.deals-see-all-link .see-all-mobile {
+  display: none;
 }
 
-.ai-typing-indicator {
+.deals-see-all-link:hover {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  transform: translateX(2px);
+}
+
+/* Gorizontal suriluvchi lenta (Horizontal Track) */
+.deals-slider-track {
   display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-subtle);
-  border-radius: 12px;
-  width: fit-content;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px 10px 2px;
+  cursor: grab;
+  user-select: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
 }
 
-.ai-typing-indicator span {
-  width: 6px;
+.deals-slider-track.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+}
+
+.deals-slider-track::-webkit-scrollbar {
   height: 6px;
-  background: var(--yellow-400);
-  border-radius: var(--radius-full);
-  animation: ai-typing-blink 1.2s infinite ease-in-out;
 }
 
-.ai-typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.ai-typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes ai-typing-blink {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-  40% { transform: scale(1.1); opacity: 1; }
+.deals-slider-track::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
 }
 
-.ai-chat-input-row {
-  padding: 10px 12px;
-  background: rgba(14, 14, 18, 0.98);
-  border-top: 1px solid var(--border-subtle);
+.deals-slider-track::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+}
+
+.deals-slider-track::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Karta dizayni (Uzum Market uslubidagi oq karta) */
+.deal-card {
+  flex: 0 0 215px;
+  width: 215px;
+  min-width: 215px;
+  scroll-snap-align: start;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 18px;
+  padding: 12px;
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.8);
 }
 
-.ai-chat-input-row input {
-  flex: 1;
-  height: 40px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-full);
-  padding: 0 14px;
-  color: #fff;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  outline: none;
-  transition: border-color var(--transition-fast);
+.deal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
-.ai-chat-input-row input:focus {
-  border-color: var(--yellow-400);
-}
-
-.ai-send-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: var(--grad-yellow);
-  border: none;
-  color: #000;
+/* Rasm qutisi va nishonlar */
+.deal-image-box {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  background: #f8fafc;
+  border-radius: 14px;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: transform var(--transition-fast);
+  margin-bottom: 11px;
 }
 
-.ai-send-btn:hover {
+.deal-image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.deal-card:hover .deal-image-box img {
   transform: scale(1.06);
 }
 
-@media (max-width: 991px) {
-  .ai-widget-wrapper {
-    bottom: 76px;
-    right: 16px;
+/* Qizil chegirma nishoni (↓ -30%) */
+.deal-discount-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 2;
+  background: #e11d48;
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(225, 29, 72, 0.35);
+  letter-spacing: -0.2px;
+}
+
+/* Sevimlilar yurak tugmasi */
+.deal-wishlist-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(6px);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 0;
+}
+
+.deal-wishlist-btn:hover {
+  color: #e11d48;
+  transform: scale(1.12);
+  background: #ffffff;
+}
+
+.deal-wishlist-btn.active {
+  color: #e11d48;
+  background: #fff1f2;
+}
+
+/* Karta matnlari va narxlar */
+.deal-content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.deal-price-block {
+  margin-bottom: 7px;
+}
+
+.deal-current-price {
+  font-family: var(--font-heading);
+  font-size: 1.16rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
+
+.deal-old-price-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+  font-size: 0.78rem;
+}
+
+.deal-old-price {
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.deal-drop-tag {
+  color: #e11d48;
+  font-weight: 700;
+  font-size: 0.76rem;
+}
+
+.deal-title {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #334155;
+  line-height: 1.35;
+  margin: 0 0 10px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.7em;
+}
+
+.deal-footer-action {
+  margin-top: auto;
+}
+
+/* Savatga tugmasi (Black Store uslubidagi oqlangan tugma) */
+.deal-cart-btn {
+  width: 100%;
+  border: 1px solid #09090b;
+  background: #09090b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.84rem;
+  padding: 9px 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.deal-cart-btn:hover {
+  background: #27272a;
+  color: #ffffff;
+  border-color: #3f3f46;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.deal-cart-btn:active {
+  transform: scale(0.97);
+}
+
+.deal-cart-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Mobil moslashuv */
+@media (max-width: 768px) {
+  .home-deals-section {
+    margin-bottom: 20px;
+  }
+
+  .deals-card-container {
+    border-radius: 18px;
+    padding: 14px 12px 16px 12px;
+  }
+
+  .deals-header {
+    margin-bottom: 12px;
+    gap: 8px;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .deals-title-group {
+    gap: 6px;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .deals-header-badge {
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .deals-header-badge svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .deals-section-title {
+    font-size: 1.02rem !important;
+    letter-spacing: -0.2px;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    min-width: 0 !important;
+  }
+
+  .deals-title-arrow {
+    display: none !important;
+  }
+
+  .deals-header-right {
+    flex-shrink: 0 !important;
+  }
+
+  .deals-nav-arrows {
+    display: none !important;
+  }
+
+  .deals-see-all-link {
+    font-size: 0.76rem !important;
+    padding: 4px 9px !important;
+    gap: 3px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .deals-see-all-link .see-all-desktop {
+    display: none !important;
+  }
+
+  .deals-see-all-link .see-all-mobile {
+    display: inline !important;
+  }
+
+  .deals-see-all-link svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .deals-slider-track {
+    gap: 10px;
+    padding-bottom: 6px;
+  }
+
+  .deal-card {
+    flex: 0 0 160px;
+    width: 160px;
+    min-width: 160px;
+    padding: 9px;
+    border-radius: 15px;
+  }
+
+  .deal-image-box {
+    height: 135px;
+    border-radius: 11px;
+    margin-bottom: 7px;
+  }
+
+  .deal-current-price {
+    font-size: 0.98rem !important;
+    letter-spacing: -0.2px;
+  }
+
+  .deal-old-price-row {
+    font-size: 0.72rem !important;
+    gap: 4px;
+  }
+
+  .deal-title {
+    font-size: 0.75rem !important;
+    height: 2.5em !important;
+    line-height: 1.25 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .deal-cart-btn {
+    font-size: 0.78rem !important;
+    padding: 7px 8px !important;
+    border-radius: 10px !important;
+  }
+
+  .home-catalog-section-head {
+    padding: 10px 0 6px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .home-catalog-section-title {
+    font-size: 1.12rem !important;
+    white-space: nowrap;
+  }
+
+  .home-catalog-count-pill {
+    font-size: 0.76rem !important;
+    white-space: nowrap;
   }
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN SYSTEM: MOBILE · TABLET · LAPTOP / MAC · DESKTOP
+   DARK MODE CONTRAST: Tungi rejimda (Dark mode) barcha Savatga tugmalari OQ bo'ladi
+   (Kunduzgi oq rejimda esa qora tugmalar bo'ladi)
    ========================================================================== */
+html:not(.light) .btn-add-cart:not(.is-success) {
+  background: #ffffff !important;
+  color: #09090b !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.14) !important;
+}
 
-/* 1. MOBILE SMARTPHONES (<= 640px) */
-@media (max-width: 640px) {
-  /* Prevent iOS Safari input focus auto-zoom */
-  input, select, textarea, .search-input, .form-input {
-    font-size: 16px !important;
+html:not(.light) .btn-add-cart:not(.is-success) svg {
+  color: #09090b !important;
+  stroke: #09090b !important;
+  fill: none !important;
+}
+
+html:not(.light) .btn-add-cart:not(.is-success) span {
+  color: #09090b !important;
+  font-weight: 700 !important;
+}
+
+html:not(.light) .btn-add-cart:not(.is-success):hover {
+  background: #e4e4e7 !important;
+  border-color: #d4d4d8 !important;
+  color: #09090b !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25) !important;
+}
+
+html:not(.light) .btn-add-cart.is-loading {
+  background: #e4e4e7 !important;
+}
+
+html:not(.light) .btn-add-cart.is-loading .btn-spinner {
+  border-color: rgba(9, 9, 11, 0.25) !important;
+  border-top-color: #09090b !important;
+}
+
+/* Hafta chegirmalaridagi Savatga tugmasi (Dark Mode) */
+html:not(.light) .deal-cart-btn:not(.is-success) {
+  background: #ffffff !important;
+  color: #09090b !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.14) !important;
+}
+
+html:not(.light) .deal-cart-btn:not(.is-success) svg {
+  color: #09090b !important;
+  stroke: #09090b !important;
+  fill: none !important;
+}
+
+html:not(.light) .deal-cart-btn:not(.is-success) span {
+  color: #09090b !important;
+  font-weight: 700 !important;
+}
+
+html:not(.light) .deal-cart-btn:not(.is-success):hover {
+  background: #e4e4e7 !important;
+  border-color: #d4d4d8 !important;
+  color: #09090b !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(255, 255, 255, 0.22) !important;
+}
+
+/* Detail Modal Savatga tugmasi (Dark Mode) */
+html:not(.light) .applebox-detail-add-btn:not(.is-success) {
+  background: #ffffff !important;
+  color: #09090b !important;
+  border: 1px solid #ffffff !important;
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.18) !important;
+}
+
+html:not(.light) .applebox-detail-add-btn:not(.is-success) svg {
+  color: #09090b !important;
+  stroke: #09090b !important;
+  fill: none !important;
+}
+
+html:not(.light) .applebox-detail-add-btn:not(.is-success) span {
+  color: #09090b !important;
+  font-weight: 700 !important;
+}
+
+html:not(.light) .applebox-detail-add-btn:not(.is-success):hover {
+  background: #e4e4e7 !important;
+  border-color: #d4d4d8 !important;
+  color: #09090b !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Dark Modeda Deal kartochkasining o'zi ham qorong'u rejimga moslashishi */
+html:not(.light) .deal-card {
+  background: #141419;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fafafa;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+html:not(.light) .deal-card:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.7);
+}
+
+html:not(.light) .deal-image-box {
+  background: #0d0d12;
+}
+
+html:not(.light) .deal-current-price {
+  color: #fafafa;
+}
+
+html:not(.light) .deal-old-price {
+  color: #71717a;
+}
+
+html:not(.light) .deal-title {
+  color: #d4d4d8;
+}
+
+html:not(.light) .deal-wishlist-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #a1a1aa;
+}
+
+html:not(.light) .deal-wishlist-btn:hover {
+  background: #ffffff;
+  color: #e11d48;
+}
+
+html:not(.light) .deal-wishlist-btn.active {
+  background: rgba(225, 29, 72, 0.25);
+  color: #fb7185;
+}
+
+/* ==========================================================================
+   DESKTOP VS MOBILE CATALOG LAYOUT (Applebox Image 1 & Image 2)
+   ========================================================================== */
+@media (min-width: 992px) {
+  /* Desktop Bosh sahifada yon panel yo'q, 100% to'liq kenglik */
+  .catalog-layout {
+    display: block !important;
+    width: 100% !important;
   }
 
-  .container {
-    padding: 0 10px;
+  /* Faqat Kategoriya rejimida (has-sidebar) 2 ustunli bo'ladi (Screenshot 1) */
+  .catalog-layout.has-sidebar {
+    display: grid !important;
+    grid-template-columns: 260px 1fr !important;
+    gap: 28px !important;
+    align-items: start !important;
+    width: 100% !important;
   }
 
-  /* Header Bar on Mobile */
-  .header-inner {
-    padding: 7px 0 5px;
-    gap: 8px;
+  .catalog-sidebar {
+    display: none !important;
   }
 
-  .brand-logo-img {
-    width: 28px;
-    height: 28px;
+  .catalog-layout.has-sidebar .catalog-sidebar {
+    display: block !important;
+    position: sticky !important;
+    top: 86px !important;
+    align-self: start !important;
+    height: fit-content !important;
+    z-index: 20 !important;
   }
 
-  .brand-title {
-    font-size: 1rem;
+  .filter-sidebar-card {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: 20px !important;
+    padding: 22px 18px 24px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04) !important;
+    max-height: calc(100vh - 104px) !important;
+    overflow-y: auto !important;
+    scrollbar-width: thin !important;
   }
 
-  .header-actions {
-    gap: 6px;
+  .catalog-main {
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
-  .btn-lang {
-    height: 32px;
-    padding: 0 8px;
-    font-size: 0.72rem;
-    border-radius: 7px;
+  /* Bosh sahifada to'liq 4 ustun (Screenshot 2) */
+  .catalog-layout:not(.has-sidebar) .products-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 24px !important;
+    width: 100% !important;
   }
 
-  .header-action-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
+  /* Kategoriya ko'rinishida yon panel yonida 4 ustun (Screenshot 1) */
+  .catalog-layout.has-sidebar .products-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 18px !important;
+    width: 100% !important;
   }
 
-  .header-action-btn svg {
-    width: 17px;
-    height: 17px;
+  .mobile-catalog-header-wrap {
+    display: none !important;
   }
 
-  /* Mobile Search Bar */
-  .mobile-search-row {
-    padding: 6px 0;
+  .mobile-filter-pill-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .catalog-layout {
+    display: block !important;
+    width: 100% !important;
   }
 
-  .mobile-search-row .search-input-wrap {
-    height: 38px;
+  .catalog-sidebar {
+    display: none !important;
   }
 
-  .mobile-search-row .search-input {
-    height: 38px;
-    font-size: 16px !important;
-    padding-left: 36px;
+  .catalog-main {
+    width: 100% !important;
   }
 
-  .mobile-search-row .search-icon {
-    left: 12px;
+  .desktop-active-cat-row {
+    display: none !important;
   }
 
-  /* Sub Navigation (Horizontal Scrollable Pills) */
-  .sub-nav-bar {
-    padding: 4px 0;
+  .mobile-catalog-header-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 4px 18px !important;
+    margin-top: 2px !important;
+    width: 100%;
   }
 
-  .sub-nav-inner {
-    gap: 14px;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding-bottom: 2px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .sub-nav-inner::-webkit-scrollbar {
-    display: none;
-  }
-
-  .sub-nav-btn, .sub-nav-link {
-    font-size: 0.8rem;
-    flex-shrink: 0;
-    gap: 5px;
-    padding: 3px 0;
-  }
-
-  /* Product Grid: 2 Columns, Perfectly Proportioned */
+  /* Mobilda 2 ustunli to'r */
   .products-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .mobile-filter-pill-btn {
+    display: inline-flex !important;
+  }
+}
+
+body.wishlist-view-active .catalog-sidebar {
+  display: none !important;
+}
+
+body.wishlist-view-active .catalog-layout {
+  display: block !important;
+}
+
+/* Desktop Sidebar elementlari (Applebox Image 1) */
+.sidebar-cat-pill,
+.sidebar-brand-pill {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 4px;
+}
+
+.sidebar-cat-pill:hover,
+.sidebar-brand-pill:hover,
+.sidebar-cat-item:hover,
+.sidebar-brand-item:hover {
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.sidebar-cat-pill.active,
+.sidebar-brand-pill.active,
+.sidebar-cat-item.active,
+.sidebar-brand-item.active {
+  background: #fff7ed !important;
+  color: #d97706 !important;
+  font-weight: 700 !important;
+}
+
+html:not(.light) .sidebar-cat-pill.active,
+html:not(.light) .sidebar-brand-pill.active,
+html:not(.light) .sidebar-cat-item.active,
+html:not(.light) .sidebar-brand-item.active {
+  background: rgba(245, 158, 11, 0.16) !important;
+  color: #f59e0b !important;
+}
+
+.sidebar-cat-item,
+.sidebar-brand-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-bottom: 2px;
+}
+
+.sidebar-cat-icon,
+.sidebar-brand-icon-wrap {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #111827;
+}
+
+html:not(.light) .sidebar-cat-icon,
+html:not(.light) .sidebar-brand-icon-wrap {
+  color: #ffffff;
+}
+
+.sidebar-cat-item.active .sidebar-cat-icon,
+.sidebar-brand-item.active .sidebar-brand-icon-wrap {
+  color: #d97706 !important;
+}
+
+html:not(.light) .sidebar-cat-item.active .sidebar-cat-icon,
+html:not(.light) .sidebar-brand-item.active .sidebar-brand-icon-wrap {
+  color: #f59e0b !important;
+}
+
+.sidebar-cat-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2px;
+}
+
+/* ==========================================================================
+   LIQUID GLASS & AMBIENT AURA (Applebox Image 4 / Liquid Aesthetic)
+   ========================================================================== */
+.liquid-ambient-aura {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 540px;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.liquid-ambient-aura::before {
+  content: '';
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 980px;
+  height: 480px;
+  background: radial-gradient(ellipse 65% 55% at 50% 30%, rgba(245, 158, 11, 0.22) 0%, rgba(251, 191, 36, 0.12) 45%, rgba(56, 189, 248, 0.10) 75%, transparent 100%);
+  filter: blur(65px);
+  border-radius: 50%;
+  animation: liquidAuraPulse 14s ease-in-out infinite alternate;
+}
+
+.liquid-ambient-aura::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: 8%;
+  width: 480px;
+  height: 340px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.14) 0%, rgba(129, 140, 248, 0.08) 50%, transparent 80%);
+  filter: blur(55px);
+  border-radius: 50%;
+  animation: liquidAuraFloat 18s ease-in-out infinite alternate;
+}
+
+@keyframes liquidAuraPulse {
+  0% { transform: translateX(-50%) scale(1) translateY(0); }
+  50% { transform: translateX(-48%) scale(1.06) translateY(24px); }
+  100% { transform: translateX(-52%) scale(0.96) translateY(-12px); }
+}
+
+@keyframes liquidAuraFloat {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-35px, 25px); }
+}
+
+html:not(.light) .liquid-ambient-aura::before {
+  background: radial-gradient(ellipse 65% 55% at 50% 30%, rgba(245, 158, 11, 0.16) 0%, rgba(234, 88, 12, 0.10) 45%, rgba(99, 102, 241, 0.12) 75%, transparent 100%);
+}
+
+html:not(.light) .liquid-ambient-aura::after {
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(168, 85, 247, 0.09) 50%, transparent 80%);
+}
+
+/* Liquid Glass Frosted Header */
+.main-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 500 !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(25px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(190%) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  transition: background 0.3s ease;
+}
+
+html:not(.light) .main-header {
+  background: rgba(14, 14, 20, 0.80) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Liquid Glass Subnav */
+.sub-nav-bar {
+  background: rgba(255, 255, 255, 0.68) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+html:not(.light) .sub-nav-bar {
+  background: rgba(14, 14, 20, 0.72) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Liquid Search Container */
+.search-container .search-input-wrap,
+.mobile-search-row .search-input-wrap {
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.60) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+html:not(.light) .search-container .search-input-wrap,
+html:not(.light) .mobile-search-row .search-input-wrap {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.search-container .search-input-wrap:focus-within,
+.mobile-search-row .search-input-wrap:focus-within {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22), 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+  background: #ffffff !important;
+}
+
+html:not(.light) .search-container .search-input-wrap:focus-within,
+html:not(.light) .mobile-search-row .search-input-wrap:focus-within {
+  background: rgba(24, 24, 32, 0.95) !important;
+}
+
+@media (min-width: 768px) {
+  .mobile-filter-sheet {
+    max-width: 440px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, 100%);
+    border-radius: 24px 24px 0 0 !important;
+  }
+  .mobile-filter-sheet.active {
+    transform: translate(-50%, 0) !important;
+  }
+}
+
+.mobile-catalog-title-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mobile-catalog-main-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.3px;
+  line-height: 1.2;
+}
+
+.mobile-catalog-sub-count {
+  font-size: 0.85rem;
+  color: #8e8e93;
+  font-weight: 500;
+}
+
+.mobile-filter-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.15s;
+}
+
+html.light .mobile-filter-pill-btn {
+  background-color: #ffffff;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+
+html:not(.light) .mobile-filter-pill-btn {
+  background-color: #1e1e28;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.mobile-filter-pill-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.mobile-filter-pill-btn:hover {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+/* 5. Mobile Empty Cart View (IMG_2195) */
+.cart-empty-applebox-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.cart-empty-circle-badge {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: #fef3c7;
+  color: #d97706;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+html:not(.light) .cart-empty-circle-badge {
+  background-color: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
+}
+
+.cart-empty-heading {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 6px;
+}
+
+.cart-empty-subtext {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0 0 24px;
+}
+
+.cart-empty-action-btn {
+  padding: 12px 34px;
+  background-color: #f59e0b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.32);
+  transition: all 0.15s;
+}
+
+.cart-empty-action-btn:hover {
+  background-color: #d97706;
+}
+
+/* 6. Bottom Navigation Bar Active Indicator (IMG_2191) */
+.mobile-bottom-bar {
+  box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.06);
+}
+
+html.light .mobile-bottom-bar {
+  background-color: #ffffff;
+  border-top: 1px solid #eeeeef;
+}
+html:not(.light) .mobile-bottom-bar {
+  background-color: #14141a;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-tab-item {
+  position: relative;
+  transition: color 0.15s;
+}
+
+.nav-tab-item.active {
+  color: #f59e0b !important;
+  font-weight: 700 !important;
+}
+
+.nav-tab-item.active::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 22%;
+  right: 22%;
+  height: 3px;
+  background-color: #f59e0b;
+  border-radius: 0 0 3px 3px;
+}
+
+/* 7. Product Cards in 2-Column Mobile Grid (IMG_2192) */
+@media (max-width: 640px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
   }
 
   .product-card {
-    border-radius: 14px;
+    border-radius: 18px !important;
   }
 
-  .product-image-box {
-    padding: 10px;
-    border-radius: 13px 13px 0 0;
-  }
-
-  .btn-wishlist {
-    width: 30px;
-    height: 30px;
-    top: 6px;
-    right: 6px;
-  }
-
-  .btn-wishlist svg {
-    width: 15px;
-    height: 15px;
+  html.light .product-card {
+    background: #ffffff !important;
+    border: 1px solid #eef0f3 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
   }
 
   .product-content {
-    padding: 8px 10px 10px;
+    padding: 10px 12px 14px !important;
   }
 
   .product-brand {
-    font-size: 0.68rem;
-  }
-
-  .product-rating {
-    font-size: 0.68rem;
-    gap: 2px;
+    font-size: 0.7rem !important;
+    color: #8e8e93 !important;
   }
 
   .product-title {
-    font-size: 0.82rem;
-    line-height: 1.25;
-    height: 2.5em;
-    margin-bottom: 6px;
-  }
-
-  .product-price-row {
-    margin-bottom: 8px;
-    gap: 1px;
+    font-size: 0.86rem !important;
+    line-height: 1.3 !important;
+    height: 2.6em !important;
+    margin-bottom: 8px !important;
   }
 
   .current-price {
-    font-size: 0.98rem;
+    font-size: 1.05rem !important;
   }
 
   .old-price {
-    font-size: 0.72rem;
-  }
-
-  .discount-badge {
-    font-size: 0.62rem;
-    padding: 1px 4px;
-  }
-
-  /* Mobile Ergonomic Buttons: Qulay, ixcham va chiroyli */
-  .btn-add-cart {
-    width: 100% !important;
-    padding: 7px 10px !important;
     font-size: 0.78rem !important;
-    height: 36px !important;
-    border-radius: 9px !important;
-    gap: 5px !important;
-    font-weight: 700 !important;
-  }
-
-  .btn-add-cart svg {
-    width: 15px !important;
-    height: 15px !important;
-  }
-
-  /* Mobile Bottom Navigation Bar */
-  .mobile-bottom-bar {
-    height: 58px;
-    padding: 0 4px;
-  }
-
-  .nav-tab-item {
-    font-size: 0.64rem;
-    gap: 2px;
-    padding: 4px 0;
-  }
-
-  .nav-tab-item svg {
-    width: 19px;
-    height: 19px;
-  }
-
-  /* Drawers (Cart, Catalog, Brands) */
-  .drawer {
-    width: 88vw;
-    max-width: 340px;
-  }
-
-  .drawer-header, .catalog-drawer-nav-header {
-    padding: 12px 14px;
-  }
-
-  .drawer-title, .catalog-drawer-heading {
-    font-size: 0.98rem;
-  }
-
-  .drawer-footer {
-    padding: 12px 14px;
-  }
-
-  .btn-checkout {
-    padding: 10px 14px;
-    font-size: 0.88rem;
-    height: 42px;
-    border-radius: 10px;
-  }
-
-  /* Modals (Checkout & Detail) */
-  .modal-backdrop {
-    padding: 8px;
-    align-items: flex-end;
-  }
-
-  .modal-card {
-    border-radius: 18px 18px 12px 12px;
-    max-height: 92vh;
-  }
-
-  .modal-body {
-    padding: 16px 14px;
-  }
-
-  .modal-close-btn {
-    top: 10px;
-    right: 10px;
-    width: 32px;
-    height: 32px;
-  }
-
-  .payment-methods-grid {
-    gap: 8px;
-  }
-
-  .payment-option {
-    padding: 10px 6px;
-    border-radius: 9px;
-  }
-
-  .payment-name {
-    font-size: 0.78rem;
-  }
-
-  /* AI Widget on Mobile */
-  .ai-fab-label {
-    display: none;
-  }
-
-  .ai-fab-btn {
-    padding: 8px;
-    width: 44px;
-    height: 44px;
-  }
-
-  .ai-chat-window {
-    width: calc(100vw - 20px);
-    right: -6px;
-    bottom: 58px;
-    height: 440px;
-    border-radius: 16px;
-  }
-
-  /* Footer on Mobile */
-  .footer {
-    padding: 28px 0 82px;
-    margin-top: 28px;
-  }
-
-  .footer-grid {
-    gap: 22px;
-    margin-bottom: 22px;
-  }
-
-  .footer-col h5 {
-    font-size: 0.92rem;
-    margin-bottom: 10px;
-  }
-
-  .footer-desc-text, .footer-links a, .footer-links span, .footer-contact-item {
-    font-size: 0.8rem;
-  }
-
-  .social-link-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-  }
-
-  .footer-bottom {
-    padding-top: 16px;
-    font-size: 0.72rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-
-/* 2. TABLET SCREENS (641px - 1023px) */
-@media (min-width: 641px) and (max-width: 1023px) {
-  .products-grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
   }
 
   .btn-add-cart {
-    padding: 10px 14px;
-    font-size: 0.88rem;
-    height: 40px;
+    padding: 9px 10px !important;
+    font-size: 0.88rem !important;
+    border-radius: 12px !important;
+  }
+
+  .btn-wishlist {
+    width: 34px !important;
+    height: 34px !important;
+    top: 10px !important;
+    right: 10px !important;
+  }
+
+  /* Compact Mobile Hero Banner (Reference Image 3 / Applebox) */
+  .hero-slider-section {
+    padding: 6px 0 12px !important;
+  }
+  .hero-slider-wrap {
+    border-radius: 22px !important;
+    margin: 0 !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+  }
+  .hero-slide {
+    min-height: 220px !important;
+    height: 220px !important;
+    background-size: cover !important;
+    background-position: center !important;
+  }
+  .hero-slide-graphic {
+    min-height: 220px !important;
+    height: 220px !important;
+    background-size: 100% 100% !important;
+    background-position: center !important;
+  }
+  .hero-slide-content {
+    padding: 16px 18px 20px !important;
+    gap: 6px !important;
+    max-width: 100% !important;
+  }
+  .hero-slide-badge {
+    display: none !important;
+  }
+  .hero-slide-title {
+    font-size: 1.35rem !important;
+    line-height: 1.2 !important;
+    margin-bottom: 2px !important;
+  }
+  .hero-slide-desc {
+    font-size: 0.8rem !important;
+    line-height: 1.3 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+  .hero-features-strip {
+    display: none !important;
+  }
+  .hero-slide-btn {
+    padding: 7px 18px !important;
+    font-size: 0.85rem !important;
+    margin-top: 4px !important;
+    border-radius: 999px !important;
+  }
+  .slider-btn {
+    display: none !important;
+  }
+  .slider-dashes {
+    bottom: 8px !important;
+  }
+  .slider-dash {
+    height: 3px !important;
+  }
+  .slider-dash.active {
+    width: 22px !important;
   }
 }
 
-/* 3. LAPTOP / MACBOOK (1024px - 1439px) */
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1240px;
-    padding: 0 24px;
+/* ==========================================================================
+   APPLEBOX SMOOTH ENTRY ANIMATIONS (Sayt qimirlamasdan chiqish animatsiyasi)
+   ========================================================================== */
+@keyframes appleboxProductIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
   }
-
-  .products-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 22px;
-  }
-
-  .btn-add-cart {
-    height: 44px;
-    font-size: 0.92rem;
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
-/* 4. LARGE DESKTOP & PC (1440px+) */
-@media (min-width: 1440px) {
-  .container {
-    max-width: 1360px;
-    padding: 0 28px;
-  }
+.product-card {
+  animation: appleboxProductIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 
-  .products-grid {
-    gap: 24px;
+.products-grid .product-card:nth-child(1) { animation-delay: 0.02s; }
+.products-grid .product-card:nth-child(2) { animation-delay: 0.05s; }
+.products-grid .product-card:nth-child(3) { animation-delay: 0.08s; }
+.products-grid .product-card:nth-child(4) { animation-delay: 0.11s; }
+.products-grid .product-card:nth-child(5) { animation-delay: 0.14s; }
+.products-grid .product-card:nth-child(6) { animation-delay: 0.17s; }
+.products-grid .product-card:nth-child(7) { animation-delay: 0.20s; }
+.products-grid .product-card:nth-child(8) { animation-delay: 0.23s; }
+
+/* ==========================================================================
+   APPLEBOX MOBILE & DESKTOP CART VIEW (Screenshot 1 Uslubi)
+   ========================================================================== */
+@keyframes appleboxFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cart-page-section {
+  padding: 16px 0 60px;
+  min-height: calc(100vh - 180px);
+  background: var(--bg-main);
+  animation: appleboxFadeIn 0.25s ease both;
+}
+
+.cart-page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 18px;
+}
+
+.cart-page-back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.cart-page-back-btn:hover {
+  background: var(--bg-card-hover);
+  transform: translateX(-2px);
+}
+
+.cart-page-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cart-page-title {
+  font-family: var(--font-heading);
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.4px;
+  margin: 0;
+}
+
+.cart-page-count-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 9999px;
+  background: #f1f1f5;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+html.dark .cart-page-count-badge,
+html:not(.light) .cart-page-count-badge {
+  background: #1f1f26;
+  color: #9ca3af;
+}
+
+.applebox-cart-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+  .applebox-cart-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 28px;
+    max-width: 1100px;
+    align-items: start;
+  }
+}
+
+.applebox-cart-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Individual Cart Card (Image 1) */
+.applebox-cart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.applebox-cart-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.applebox-cart-img-box {
+  width: 92px;
+  height: 92px;
+  border-radius: 16px;
+  background: #f8f8fa;
+  border: 1px solid #ededf1;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+html.dark .applebox-cart-img-box,
+html:not(.light) .applebox-cart-img-box {
+  background: #1a1a22;
+  border-color: #272731;
+}
+
+.applebox-cart-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.applebox-cart-info-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.applebox-cart-brand-tag {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #f59e0b;
+  margin-bottom: 3px;
+  text-transform: capitalize;
+}
+
+.applebox-cart-item-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #2563eb;
+  cursor: pointer;
+  margin: 0 0 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.15s ease;
+}
+
+.applebox-cart-item-title:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.applebox-cart-sku {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-family: var(--font-mono, monospace);
+}
+
+.applebox-cart-price-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.applebox-cart-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.applebox-cart-qty-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: var(--bg-card);
+  overflow: hidden;
+}
+
+html.dark .applebox-cart-qty-pill,
+html:not(.light) .applebox-cart-qty-pill {
+  border-color: #2e2e38;
+}
+
+.applebox-qty-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 1.15rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.applebox-qty-btn:hover {
+  background: var(--bg-card-hover);
+}
+
+.applebox-qty-num {
+  min-width: 30px;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.applebox-cart-del-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: var(--bg-card);
+  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.18s ease;
+}
+
+html.dark .applebox-cart-del-btn,
+html:not(.light) .applebox-cart-del-btn {
+  border-color: #2e2e38;
+}
+
+.applebox-cart-del-btn:hover {
+  color: #ef4444;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+
+.applebox-cart-item-subtotal {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+}
+
+.applebox-cart-subtotal-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.applebox-cart-subtotal-val {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* Summary Card (Image 1) */
+.applebox-summary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 22px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.applebox-summary-card-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 16px;
+}
+
+.applebox-summary-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.applebox-summary-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  gap: 8px;
+}
+
+.applebox-summary-item-name {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.applebox-summary-item-qty {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.applebox-summary-item-price {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.applebox-summary-count-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding: 8px 0;
+}
+
+.applebox-summary-divider {
+  height: 1px;
+  background: var(--border-subtle);
+  margin: 12px 0 16px;
+}
+
+.applebox-summary-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.summary-total-label {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.summary-total-val {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #f59e0b;
+}
+
+.applebox-checkout-main-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 16px;
+  background: #f59e0b;
+  color: #ffffff;
+  border: none;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+}
+
+.applebox-checkout-main-btn:hover {
+  background: #d97706;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(245, 158, 11, 0.45);
+}
+
+/* ==========================================================================
+   APPLEBOX PRODUCT DETAIL PAGE VIEW (Screenshot 2 Uslubi)
+   ========================================================================== */
+.product-detail-page-section {
+  padding: 14px 0 60px;
+  min-height: calc(100vh - 180px);
+  background: var(--bg-main);
+  animation: appleboxFadeIn 0.25s ease both;
+}
+
+.detail-page-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 4px 14px;
+  margin-bottom: 12px;
+}
+
+.detail-page-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.detail-page-back-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: #f59e0b;
+  color: #d97706;
+  transform: translateX(-3px);
+}
+
+.detail-page-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.applebox-detail-container {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+@media (min-width: 992px) {
+  .applebox-detail-container {
+    max-width: 860px;
+  }
+}
+
+/* Giant Image Card (Image 2) */
+.applebox-detail-img-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  max-height: 440px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.applebox-detail-hero-img {
+  max-width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  transition: transform 0.25s ease;
+}
+
+.applebox-detail-thumbs-strip {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.applebox-detail-thumb {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-card);
+  padding: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.applebox-detail-thumb.active,
+.applebox-detail-thumb:hover {
+  border-color: #f59e0b;
+}
+
+.applebox-detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Category/Brand link row */
+.applebox-detail-links-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.applebox-link-brand,
+.applebox-link-cat {
+  color: #2563eb;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.applebox-link-brand:hover,
+.applebox-link-cat:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.applebox-link-sep {
+  color: var(--text-muted);
+}
+
+/* Title */
+.applebox-detail-title {
+  font-family: var(--font-heading);
+  font-size: 1.45rem;
+  font-weight: 800;
+  line-height: 1.35;
+  color: var(--text-main);
+  letter-spacing: -0.3px;
+  margin: 0 0 18px;
+}
+
+/* Price & Stock Card */
+.applebox-detail-price-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 18px 22px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.applebox-detail-price-val {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.4px;
+}
+
+.applebox-detail-old-price {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.applebox-detail-stock-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #16a34a;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+/* Action Buttons Row (Savatga + Wishlist) */
+.applebox-detail-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.applebox-detail-add-btn {
+  flex: 1;
+  padding: 15px 22px;
+  border-radius: 16px;
+  background: #09090b;
+  color: #ffffff;
+  border: 1px solid #09090b;
+  font-size: 1.02rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.applebox-detail-add-btn:hover {
+  background: #27272a;
+  border-color: #3f3f46;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.applebox-detail-wish-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-subtle);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.applebox-detail-wish-btn:hover,
+.applebox-detail-wish-btn.active {
+  border-color: #ef4444;
+  color: #ef4444;
+  background: #fef2f2;
+}
+
+html.dark .applebox-detail-wish-btn.active,
+html:not(.light) .applebox-detail-wish-btn.active {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.applebox-detail-wish-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Tavsif (Description Card) */
+.applebox-detail-desc-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.applebox-detail-desc-heading {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0 0 12px;
+}
+
+.applebox-detail-desc-paragraph {
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  margin: 0 0 16px;
+}
+
+.applebox-detail-specs-wrap {
+  margin-top: 16px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 14px;
+}
+
+.applebox-specs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.applebox-specs-table td {
+  padding: 8px 4px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.applebox-specs-table .specs-key {
+  color: var(--text-muted);
+  font-weight: 500;
+  width: 40%;
+}
+
+.applebox-specs-table .specs-val {
+  color: var(--text-main);
+  font-weight: 600;
+  width: 60%;
+}
+
+/* ==========================================================================
+   CINEMATIC CURTAIN INTRO ANIMATION (Parda Ochilishi — Royal Black & Gold)
+   ========================================================================== */
+.site-curtain-intro {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  user-select: none;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Chap va o'ng pardalar (Two luxury theater wings) */
+.curtain-wing {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50.5%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 50%, #151520 0%, #0a0a0f 65%, #030305 100%);
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.95);
+  transition: transform 1.05s cubic-bezier(0.77, 0, 0.175, 1);
+  will-change: transform;
+}
+
+.curtain-wing-left {
+  left: 0;
+  border-right: 1.5px solid rgba(245, 158, 11, 0.3);
+  transform: translateX(0);
+}
+
+.curtain-wing-right {
+  right: 0;
+  border-left: 1.5px solid rgba(245, 158, 11, 0.3);
+  transform: translateX(0);
+}
+
+/* Parda burmalari va ipak/baxmal tovlanishi */
+.curtain-fold-shading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.015) 0px,
+    rgba(0, 0, 0, 0.25) 24px,
+    rgba(255, 255, 255, 0.02) 48px,
+    rgba(0, 0, 0, 0.4) 72px
+  );
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* Markazdagi logo va brend kartasi */
+.curtain-center-brand {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: opacity 0.5s ease, transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.curtain-logo-wrapper {
+  position: relative;
+  width: 86px;
+  height: 86px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, #1f1f2d, #0a0a0f);
+  border: 1.5px solid rgba(245, 158, 11, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 50px rgba(245, 158, 11, 0.35), 0 12px 36px rgba(0, 0, 0, 0.85);
+  animation: curtainLogoPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes curtainLogoPulse {
+  0% {
+    transform: scale(0.96);
+    box-shadow: 0 0 35px rgba(245, 158, 11, 0.25), 0 8px 25px rgba(0, 0, 0, 0.8);
+  }
+  100% {
+    transform: scale(1.05);
+    box-shadow: 0 0 65px rgba(245, 158, 11, 0.6), 0 16px 40px rgba(0, 0, 0, 0.95);
+  }
+}
+
+.curtain-brand-img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+.curtain-brand-text {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.curtain-title {
+  font-family: var(--font-heading, sans-serif);
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.curtain-title-dot {
+  color: var(--yellow-400, #f59e0b);
+}
+
+.curtain-subtitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Yupqa yuklanish chizig'i */
+.curtain-loader-bar {
+  width: 140px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  margin-top: 22px;
+  overflow: hidden;
+  position: relative;
+}
+
+.curtain-loader-progress {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.9);
+  border-radius: 999px;
+  transition: width 0.75s ease-out;
+}
+
+/* Parda ochilish holati (Opening sequence) */
+.site-curtain-intro.opening .curtain-center-brand {
+  opacity: 0;
+  transform: scale(1.2) translateY(-10px);
+}
+
+.site-curtain-intro.opening .curtain-wing-left {
+  transform: translateX(-101.5%);
+}
+
+.site-curtain-intro.opening .curtain-wing-right {
+  transform: translateX(101.5%);
+}
+
+.site-curtain-intro.completed {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none !important;
+  display: none !important;
 }
 

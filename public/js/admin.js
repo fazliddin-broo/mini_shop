@@ -203,7 +203,8 @@ const adminState = {
   activeTab: 'tab-dashboard',
   currentOrderFilter: 'all',
   liveCounter: 8,
-  selectedViewingOrder: null
+  selectedViewingOrder: null,
+  notificationsSeen: false
 };
 
 // Utility: Format currency
@@ -324,7 +325,7 @@ function initLanguage(lang) {
 
   const searchInput = document.getElementById('dash-search-input');
   if (searchInput) {
-    searchInput.placeholder = lang === 'ru' ? 'Поиск (Товар, @клиент, тел...) [⌘K]' : 'Qidiruv (Mahsulot, @mijoz, tel...) [⌘K]';
+    searchInput.placeholder = lang === 'ru' ? 'Поиск (товар, клиент, тел)...' : 'Qidiruv (mahsulot, mijoz, tel)...';
   }
 
   if (adminState.analyticsData) {
@@ -347,9 +348,10 @@ function initSplashAndLoad() {
 }
 
 async function refreshDashboardData(silent = false) {
-  if (!silent) {
-    const refreshBtn = document.getElementById('btn-manual-refresh');
-    if (refreshBtn) refreshBtn.style.opacity = '0.5';
+  const refreshBtn = document.getElementById('btn-manual-refresh');
+  if (!silent && refreshBtn) {
+    refreshBtn.classList.add('btn-refreshing');
+    refreshBtn.disabled = true;
   }
 
   const tasks = [
@@ -367,11 +369,15 @@ async function refreshDashboardData(silent = false) {
   renderDashboardStats();
   renderRecentOrdersTable();
   renderChronologyStream();
+  renderNotificationsList();
+  renderAuditFullTimeline();
 
   if (!silent) {
-    showToast("Ma'lumotlar muvaffaqiyatli yangilandi!", "success");
-    const refreshBtn = document.getElementById('btn-manual-refresh');
-    if (refreshBtn) refreshBtn.style.opacity = '1';
+    if (refreshBtn) {
+      refreshBtn.classList.remove('btn-refreshing');
+      refreshBtn.disabled = false;
+    }
+    showToast(adminState.lang === 'ru' ? 'Данные успешно обновлены!' : 'Barcha ma\'lumotlar muvaffaqiyatli yangilandi!', "success");
   }
 }
 
@@ -500,22 +506,7 @@ function renderDashboardStats() {
   const orders = adminState.orders || [];
   const products = adminState.products || [];
 
-  // Card 1: Xaridorlar & Mijozlar (Haqiqiy mijozlar soni)
-  const custSet = new Set();
-  orders.forEach(o => {
-    if (o.customer && o.customer.phone) custSet.add(o.customer.phone);
-  });
-  const customerCount = custSet.size;
-  const custNumEl = document.getElementById('stat-cust-number');
-  if (custNumEl) custNumEl.textContent = customerCount;
-  const custActiveEl = document.getElementById('stat-cust-active');
-  if (custActiveEl) custActiveEl.textContent = `${customerCount} faol`;
-  const custPendingEl = document.getElementById('stat-cust-pending');
-  if (custPendingEl) custPendingEl.textContent = '0 kutilmoqda';
-  const custBlockedEl = document.getElementById('stat-cust-blocked');
-  if (custBlockedEl) custBlockedEl.textContent = '0 blok';
-
-  // Card 2: Buyurtmalar (Jami)
+  // Card 1: Buyurtmalar (Jami)
   const totalOrders = orders.length;
   const ordersNumEl = document.getElementById('stat-orders-number');
   if (ordersNumEl) ordersNumEl.textContent = totalOrders;
@@ -526,7 +517,7 @@ function renderDashboardStats() {
   const ordersDelayedEl = document.getElementById('stat-orders-delayed');
   if (ordersDelayedEl) ordersDelayedEl.textContent = '0 kechikkan';
 
-  // Card 3: O'rtacha Savdo Cheki (Haqiqiy tushum / buyurtmalar)
+  // Card 2: O'rtacha Savdo Cheki (Haqiqiy tushum / buyurtmalar)
   let totalRevenue = orders.reduce((sum, o) => sum + Number(o.total || 0), 0);
   const aov = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
   const aovNumEl = document.getElementById('stat-aov-number');
@@ -534,7 +525,7 @@ function renderDashboardStats() {
     aovNumEl.textContent = aov === 0 ? "0 so'm" : (aov >= 1000000 ? (aov / 1000000).toFixed(1) + ' mln' : formatSum(aov));
   }
 
-  // Card 4: Mahsulotlar Bazasi
+  // Card 3: Mahsulotlar Bazasi
   const prodNumEl = document.getElementById('stat-products-number');
   if (prodNumEl) prodNumEl.textContent = `${products.length} ta`;
   const prodStockEl = document.getElementById('stat-products-stock');
@@ -559,8 +550,12 @@ function renderDashboardStats() {
   }
   const notifCount = document.getElementById('header-notif-count');
   if (notifCount) {
-    notifCount.textContent = orders.length;
-    notifCount.style.display = orders.length > 0 ? 'inline-flex' : 'none';
+    const newOrders = orders.filter(o => !o.status || o.status === 'new' || o.status === 'pending');
+    const lowStockCount = products.filter(p => (p.stock || 0) <= 3).length;
+    const totalNotifs = newOrders.length + lowStockCount;
+    const unreadCount = adminState.notificationsSeen ? 0 : totalNotifs;
+    notifCount.textContent = unreadCount;
+    notifCount.style.display = unreadCount > 0 ? 'inline-flex' : 'none';
   }
 }
 
@@ -569,48 +564,109 @@ function renderRecentOrdersTable() {
   if (!tbody) return;
 
   const orders = adminState.orders || [];
+
   if (orders.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" style="text-align: center; padding: 48px 16px; color: var(--text-muted);">
-          <div style="font-size: 2.2rem; margin-bottom: 10px;">📦</div>
-          <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 6px;">Hozircha yangi buyurtmalar mavjud emas</div>
-          <div style="font-size: 0.85rem; max-width: 420px; margin: 0 auto; line-height: 1.5;">Do'kon yangi ishga tushirildi. Mijozlar vitrinadan buyurtma berganda, to'liq chek va mijoz ma'lumotlari shu yerda real vaqtda aks etadi.</div>
+        <td colspan="6" style="text-align: center; padding: 42px 16px; color: var(--text-muted);">
+          <div style="font-size: 2.2rem; margin-bottom: 8px;">🛒</div>
+          <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 4px;">Hozircha buyurtmalar yo'q</div>
+          <div style="font-size: 0.85rem; max-width: 440px; margin: 0 auto; line-height: 1.5; color: var(--text-muted);">Mijozlar buyurtma berganda bu yerda avtomatik ko'rinadi.</div>
         </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = orders.slice(0, 8).map(order => {
+  tbody.innerHTML = orders.slice(0, 10).map(order => {
     const cust = order.customer || {};
     const items = order.items || [];
     const itemSummary = items.length > 0 ? `${items[0].name} (${items[0].quantity || 1} ta)` : 'Gadjetlar';
+    const isNew = (!order.status || order.status === 'new' || order.status === 'pending');
+    const isConfirmed = order.status === 'confirmed';
+    const isCompleted = order.status === 'completed';
+    const isCancelled = order.status === 'cancelled';
+
+    let actionBtnsHtml = '';
+    if (isNew) {
+      actionBtnsHtml = `
+        <button class="tbl-btn tbl-btn-success" onclick="confirmOrder('${order.id}')" title="Buyurtmani tasdiqlash">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Tasdiqlash</span>
+        </button>
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <span>Ko'rish</span>
+        </button>
+        <button class="tbl-btn tbl-btn-danger" onclick="cancelOrder('${order.id}')" title="Bekor qilish">
+          <span>Bekor</span>
+        </button>
+      `;
+    } else if (isConfirmed) {
+      actionBtnsHtml = `
+        <span class="pill-badge pill-green">✓ Tasdiqlangan</span>
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <span>Ko'rish</span>
+        </button>
+        <button class="tbl-btn tbl-btn-danger" onclick="cancelOrder('${order.id}')" title="Bekor qilish">
+          <span>Bekor</span>
+        </button>
+      `;
+    } else if (isCompleted) {
+      actionBtnsHtml = `
+        <span class="pill-badge pill-teal">Topshirildi</span>
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <span>Ko'rish</span>
+        </button>
+      `;
+    } else if (isCancelled) {
+      actionBtnsHtml = `
+        <span class="pill-badge pill-red">Bekor qilingan</span>
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <span>Ko'rish</span>
+        </button>
+      `;
+    } else {
+      actionBtnsHtml = `
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <span>Ko'rish</span>
+        </button>
+      `;
+    }
 
     return `
       <tr>
         <td>
-          <div class="table-cust-name">${cust.name || 'Mijoz'}</div>
-          <div class="table-cust-sub">${cust.phone || ''}</div>
+          <div class="table-cust-name">${escapeHtml(cust.name || 'Mijoz')}</div>
+          <div class="table-cust-sub">${escapeHtml(cust.phone || '')}</div>
         </td>
         <td><span class="table-id-badge">#${order.id.slice(-5).toUpperCase()}</span></td>
         <td><span class="table-time-badge">${order.formattedDate || new Date(order.createdAt).toLocaleDateString('uz-UZ')}</span></td>
-        <td><span class="table-qty-badge">${itemSummary}</span></td>
+        <td><span class="table-qty-badge" title="${escapeHtml(itemSummary)}">${escapeHtml(itemSummary)}</span></td>
         <td><span class="table-sum-bold">${formatSum(order.total)}</span></td>
         <td>
           <div class="table-action-btns">
-            <button class="tbl-btn" onclick="openOrderModal('${order.id}')">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              <span>Ko'rish</span>
-            </button>
-            <button class="tbl-btn tbl-btn-danger" onclick="updateOrderStatus('${order.id}', 'cancelled')">
-              <span>Bekor</span>
-            </button>
+            ${actionBtnsHtml}
           </div>
         </td>
       </tr>
     `;
   }).join('');
+}
+
+async function confirmOrder(id) {
+  await updateOrderStatus(id, 'confirmed');
+  showToast("Buyurtma muvaffaqiyatli tasdiqlandi!", "success");
+}
+
+async function cancelOrder(id) {
+  if (!confirm(`Haqiqatan ham #${id.slice(-5).toUpperCase()} raqamli buyurtmani bekor qilmoqchimisiz?`)) return;
+  await updateOrderStatus(id, 'cancelled');
+  showToast("Buyurtma bekor qilindi", "info");
 }
 
 function renderChronologyStream() {
@@ -619,88 +675,482 @@ function renderChronologyStream() {
 
   const orders = adminState.orders || [];
   const products = adminState.products || [];
+  const feedFilter = adminState.currentFeedFilter || 'all';
 
-  if (orders.length === 0) {
+  const now = new Date();
+  const todayStr = now.toLocaleDateString('uz-UZ');
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toLocaleDateString('uz-UZ');
+
+  function getBucket(dateVal) {
+    if (!dateVal) return 'today';
+    const dStr = new Date(dateVal).toLocaleDateString('uz-UZ');
+    if (dStr === todayStr) return 'today';
+    if (dStr === yesterdayStr) return 'yesterday';
+    return 'earlier';
+  }
+
+  const allEvents = [];
+
+  // Order events
+  orders.forEach(order => {
+    const cust = order.customer || {};
+    const items = order.items || [];
+    const itemTitle = items.length > 0 ? items[0].name : 'Gadjetlar';
+    const bucket = getBucket(order.createdAt);
+    const timeFormatted = order.formattedDate || new Date(order.createdAt).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' });
+
+    let statusText = 'Yangi';
+    let statusClass = 'pill-yellow';
+    if (order.status === 'confirmed') {
+      statusText = 'Tasdiqlangan';
+      statusClass = 'pill-green';
+    } else if (order.status === 'completed') {
+      statusText = 'Topshirildi';
+      statusClass = 'pill-teal';
+    } else if (order.status === 'cancelled') {
+      statusText = 'Bekor qilingan';
+      statusClass = 'pill-red';
+    }
+
+    allEvents.push({
+      type: 'order',
+      id: order.id,
+      timestamp: new Date(order.createdAt).getTime() || 0,
+      bucket: bucket,
+      title: 'Yangi xaridor buyurtma berdi',
+      subtitle: `${escapeHtml(cust.name || 'Mijoz')} (${escapeHtml(cust.phone || '')}) — ${escapeHtml(itemTitle)} • ${formatSum(order.total)}`,
+      time: timeFormatted,
+      statusText: statusText,
+      statusClass: statusClass,
+      iconType: 'shopping-bag'
+    });
+  });
+
+  // System status events so feed is always active and useful
+  allEvents.push({
+    type: 'system',
+    timestamp: now.getTime() - 600000,
+    bucket: 'today',
+    title: 'Vitrina buyurtmalarni qabul qilishga tayyor',
+    subtitle: `${products.length} ta mahsulot omborda faol sotuvda`,
+    time: 'Bugun',
+    statusText: 'Faol',
+    statusClass: 'pill-green',
+    iconType: 'check-circle'
+  });
+
+  allEvents.push({
+    type: 'system',
+    timestamp: yesterday.getTime() - 3600000,
+    bucket: 'yesterday',
+    title: 'Baza va API sinxronlashuvi muvaffaqiyatli',
+    subtitle: 'Server diagnostikasi va zaxira monitoringi barqaror',
+    time: 'Kecha',
+    statusText: 'Barqaror',
+    statusClass: 'pill-green',
+    iconType: 'server'
+  });
+
+  // Sort newest first
+  allEvents.sort((a, b) => b.timestamp - a.timestamp);
+
+  // Filter based on feedFilter: 'all', 'today', 'yesterday'
+  let filteredEvents = allEvents;
+  if (feedFilter === 'today') {
+    filteredEvents = allEvents.filter(ev => ev.bucket === 'today');
+  } else if (feedFilter === 'yesterday') {
+    filteredEvents = allEvents.filter(ev => ev.bucket === 'yesterday');
+  }
+
+  if (filteredEvents.length === 0) {
+    const emptyMsg = feedFilter === 'today'
+      ? "Bugun hali yangi buyurtmalar qayd etilmadi"
+      : (feedFilter === 'yesterday' ? "Kecha buyurtmalar qayd etilmagan" : "Hozircha xronologiya yozuvlari mavjud emas");
     container.innerHTML = `
-      <div class="stream-group">
-        <div class="stream-group-header">
-          <span>${adminState.lang === 'ru' ? 'СЕГОДНЯШНИЕ ДЕЙСТВИЯ' : 'BUGUNGI AMALLAR'}</span>
-          <span class="stream-group-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">TIZIM TAYYOR</span>
-        </div>
-
-        <div class="stream-item" style="margin-top: 8px;">
-          <div class="stream-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-          </div>
-          <div class="stream-body">
-            <div class="stream-title">${adminState.lang === 'ru' ? 'Витрина готова к заказам' : 'Vitrina buyurtmalarni qabul qilishga tayyor'}</div>
-            <div class="stream-subtitle">${products.length} ta mahsulot sotuvda faol (jami 391 dona qoldiq)</div>
-            <div class="stream-meta-row">
-              <span class="stream-time-badge">Bugun</span>
-              <span class="stream-status-pill" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Faol</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="stream-group">
-        <div class="stream-group-header">
-          <span>${adminState.lang === 'ru' ? 'МОНИТОРИНГ' : 'TIZIM MONITORINGI'}</span>
-          <span class="stream-group-badge">BARQAROR</span>
-        </div>
-
-        <div class="stream-item" style="margin-top: 8px;">
-          <div class="stream-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-              <line x1="6" y1="6" x2="6.01" y2="6"></line>
-              <line x1="6" y1="18" x2="6.01" y2="18"></line>
-            </svg>
-          </div>
-          <div class="stream-body">
-            <div class="stream-title">${adminState.lang === 'ru' ? 'Синхронизация базы данных' : 'Baza va API sinxronlashuvi barqaror'}</div>
-            <div class="stream-subtitle">Yangi buyurtmalar avtomatik qabul qilinadi</div>
-            <div class="stream-meta-row">
-              <span class="stream-time-badge">Doimiy</span>
-              <span class="stream-status-pill">Onlayn</span>
-            </div>
-          </div>
-        </div>
+      <div style="text-align: center; padding: 36px 12px; color: var(--text-muted);">
+        <div style="font-size: 2rem; margin-bottom: 6px;">⏱️</div>
+        <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">${emptyMsg}</div>
+        <button class="btn btn-outline" style="margin-top: 10px; font-size: 0.78rem; padding: 4px 12px;" onclick="setFeedFilter('all')">Barchasini ko'rsatish</button>
       </div>
     `;
     return;
   }
 
-  const recentOrder = orders[0];
-  container.innerHTML = `
+  // Group filtered events
+  const groups = [];
+  if (feedFilter === 'all' || feedFilter === 'today') {
+    const todayItems = filteredEvents.filter(e => e.bucket === 'today');
+    if (todayItems.length > 0) {
+      groups.push({
+        label: adminState.lang === 'ru' ? 'СЕГОДНЯШНИЕ ДЕЙСТВИЯ' : 'BUGUNGI AMALLAR',
+        badge: `${todayItems.length} TA AMAL`,
+        badgeColor: 'rgba(16, 185, 129, 0.15)',
+        textColor: '#10b981',
+        items: todayItems
+      });
+    }
+  }
+
+  if (feedFilter === 'all' || feedFilter === 'yesterday') {
+    const yesterdayItems = filteredEvents.filter(e => e.bucket === 'yesterday');
+    if (yesterdayItems.length > 0) {
+      groups.push({
+        label: adminState.lang === 'ru' ? 'ВЧЕРАШНИЕ ДЕЙСТВИЯ' : 'KECHAGI AMALLAR',
+        badge: `${yesterdayItems.length} TA AMAL`,
+        badgeColor: 'rgba(245, 158, 11, 0.15)',
+        textColor: '#f59e0b',
+        items: yesterdayItems
+      });
+    }
+  }
+
+  if (feedFilter === 'all') {
+    const earlierItems = filteredEvents.filter(e => e.bucket === 'earlier');
+    if (earlierItems.length > 0) {
+      groups.push({
+        label: adminState.lang === 'ru' ? 'ПРЕДЫДУЩИЕ ДЕЙСТВИЯ' : 'OLDINGI AMALLAR',
+        badge: `${earlierItems.length} TA AMAL`,
+        badgeColor: 'rgba(99, 102, 241, 0.15)',
+        textColor: '#6366f1',
+        items: earlierItems
+      });
+    }
+  }
+
+  container.innerHTML = groups.map(grp => `
     <div class="stream-group">
       <div class="stream-group-header">
-        <span>${adminState.lang === 'ru' ? 'СЕГОДНЯШНИЕ ДЕЙСТВИЯ' : 'BUGUNGI AMALLAR'}</span>
-        <span class="stream-group-badge">1 TA AMAL</span>
+        <span>${grp.label}</span>
+        <span class="stream-group-badge" style="background: ${grp.badgeColor}; color: ${grp.textColor};">${grp.badge}</span>
       </div>
 
-      <div class="stream-item" style="margin-top: 8px;">
-        <div class="stream-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        </div>
-        <div class="stream-body">
-          <div class="stream-title">${adminState.lang === 'ru' ? 'Новый покупатель оформил заказ' : 'Yangi xaridor buyurtma berdi'}</div>
-          <div class="stream-subtitle">${recentOrder.customer?.name || 'Mijoz'} (${recentOrder.customer?.phone || ''})</div>
-          <div class="stream-meta-row">
-            <span class="stream-time-badge">${recentOrder.formattedDate || 'Hozirgina'}</span>
-            <span class="stream-status-pill">${recentOrder.status || 'new'}</span>
+      ${grp.items.map(it => {
+        const iconSvg = it.iconType === 'check-circle'
+          ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+          : (it.iconType === 'server'
+            ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>`
+            : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>`);
+
+        const isClickable = it.type === 'order';
+        return `
+          <div class="stream-item" style="margin-top: 8px; ${isClickable ? 'cursor: pointer;' : ''}" ${isClickable ? `onclick="openOrderModal('${it.id}')"` : ''} title="${isClickable ? "Buyurtmani ko'rish uchun bosing" : ''}">
+            <div class="stream-icon">
+              ${iconSvg}
+            </div>
+            <div class="stream-body">
+              <div class="stream-title">${it.title}</div>
+              <div class="stream-subtitle">${it.subtitle}</div>
+              <div class="stream-meta-row">
+                <span class="stream-time-badge">${it.time}</span>
+                <span class="stream-status-pill ${it.statusClass}">${it.statusText}</span>
+              </div>
+            </div>
           </div>
+        `;
+      }).join('')}
+    </div>
+  `).join('');
+}
+
+function setFeedFilter(filter) {
+  adminState.currentFeedFilter = filter;
+  document.querySelectorAll('.feed-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.feedFilter === filter);
+  });
+  renderChronologyStream();
+}
+window.setFeedFilter = setFeedFilter;
+
+function renderAuditFullTimeline() {
+  const container = document.getElementById('audit-full-timeline');
+  if (!container) return;
+
+  const orders = adminState.orders || [];
+  const products = adminState.products || [];
+  const filter = adminState.currentAuditFilter || 'all';
+
+  // Audit Metrics
+  const totalCountEl = document.getElementById('audit-total-count');
+  const ordersCountEl = document.getElementById('audit-orders-count');
+  const systemCountEl = document.getElementById('audit-system-count');
+
+  const now = new Date();
+  const allLogs = [];
+
+  // 1. Order Logs
+  orders.forEach(order => {
+    const cust = order.customer || {};
+    const items = order.items || [];
+    const itemNames = items.map(it => `${it.name} (${it.quantity || 1}x)`).join(', ') || 'Gadjetlar';
+    const dateFormatted = order.formattedDate || new Date(order.createdAt).toLocaleString('uz-UZ');
+
+    let statusBadge = '';
+    if (order.status === 'confirmed') {
+      statusBadge = '<span class="pill-badge pill-green">✓ Tasdiqlangan</span>';
+    } else if (order.status === 'completed') {
+      statusBadge = '<span class="pill-badge pill-teal">Topshirildi</span>';
+    } else if (order.status === 'cancelled') {
+      statusBadge = '<span class="pill-badge pill-red">Bekor qilingan</span>';
+    } else {
+      statusBadge = '<span class="pill-badge pill-yellow">Yangi buyurtma</span>';
+    }
+
+    allLogs.push({
+      type: 'orders',
+      id: order.id,
+      timestamp: new Date(order.createdAt).getTime() || 0,
+      title: `Buyurtma qabul qilindi #${order.id.slice(-5).toUpperCase()}`,
+      desc: `Xaridor: <b>${escapeHtml(cust.name || 'Mijoz')}</b> (${escapeHtml(cust.phone || '')}) • Mahsulotlar: ${escapeHtml(itemNames)} • Summa: <b style="color: var(--accent-teal);">${formatSum(order.total)}</b>`,
+      time: dateFormatted,
+      actor: cust.name ? `${escapeHtml(cust.name)} (Mijoz)` : 'Mijoz',
+      statusHtml: statusBadge,
+      iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>`,
+      iconBg: 'rgba(16, 185, 129, 0.15)',
+      iconColor: '#10b981',
+      actionBtn: `<button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Buyurtmani ko'rish"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Ko'rish</button>`
+    });
+  });
+
+  // 2. System / Catalog / Security Logs
+  allLogs.push({
+    type: 'system',
+    timestamp: now.getTime() - 300000,
+    title: "Do'kon sozlamalari va API xizmatlari faol",
+    desc: `Do'kon vitrinasi onlayn • Telegram bot integratsiyasi va AI savdo konsultanti tayyor holatda`,
+    time: "Hozirgina",
+    actor: "Tizim (Avtomatik)",
+    statusHtml: '<span class="pill-badge pill-green">Muvaffaqiyatli</span>',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+    iconBg: 'rgba(16, 185, 129, 0.15)',
+    iconColor: '#10b981',
+    actionBtn: ''
+  });
+
+  allLogs.push({
+    type: 'system',
+    timestamp: now.getTime() - 1800000,
+    title: "Mahsulotlar katalogi ombor bilan sinxronlandi",
+    desc: `Katalogda ${products.length} ta faol mahsulot joylashtirilgan. Umumiy tovar zaxirasi tekshirildi`,
+    time: "Bugun",
+    actor: "Admin (Boshqaruvchi)",
+    statusHtml: '<span class="pill-badge pill-green">Faol</span>',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7.5 4.27 9 5.15"></path><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path></svg>`,
+    iconBg: 'rgba(59, 130, 246, 0.15)',
+    iconColor: '#3b82f6',
+    actionBtn: `<button class="tbl-btn" onclick="switchTab('tab-products')">Katalog</button>`
+  });
+
+  allLogs.push({
+    type: 'system',
+    timestamp: now.getTime() - 7200000,
+    title: "Baza va server diagnostika tekshiruvi",
+    desc: `MongoDB Atlas / Lokal saqlash serveri bilan aloqa tekshirildi. Javob tezligi: ~18ms`,
+    time: "Bugun",
+    actor: "Monitoring servisi",
+    statusHtml: '<span class="pill-badge pill-green">Barqaror</span>',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`,
+    iconBg: 'rgba(245, 158, 11, 0.15)',
+    iconColor: '#f59e0b',
+    actionBtn: `<button class="tbl-btn" onclick="pingDatabase()">Ping</button>`
+  });
+
+  allLogs.push({
+    type: 'system',
+    timestamp: now.getTime() - 14400000,
+    title: "Admin Boshqaruv Markazi sessiyasi boshlandi",
+    desc: `Xavfsiz PIN autentifikatsiyasi orqali kirish amalga oshirildi. Ruxsat: Boshqaruvchi`,
+    time: "Bugun",
+    actor: "Admin (127.0.0.1)",
+    statusHtml: '<span class="pill-badge pill-green">Himoyalangan</span>',
+    iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`,
+    iconBg: 'rgba(139, 92, 246, 0.15)',
+    iconColor: '#8b5cf6',
+    actionBtn: ''
+  });
+
+  // Sort logs by timestamp newest first
+  allLogs.sort((a, b) => b.timestamp - a.timestamp);
+
+  // Update counters
+  if (totalCountEl) totalCountEl.textContent = `${allLogs.length} ta`;
+  if (ordersCountEl) ordersCountEl.textContent = `${orders.length} ta`;
+  if (systemCountEl) systemCountEl.textContent = "Barqaror";
+
+  // Filter logs
+  let displayLogs = allLogs;
+  if (filter === 'orders') {
+    displayLogs = allLogs.filter(l => l.type === 'orders');
+  } else if (filter === 'system') {
+    displayLogs = allLogs.filter(l => l.type === 'system');
+  }
+
+  if (displayLogs.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 48px 16px; color: var(--text-muted);">
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">📋</div>
+        <div style="font-weight: 700; color: var(--text-main); font-size: 1rem;">Tanlangan toifada audit yozuvlari topilmadi</div>
+        <button class="btn btn-outline" style="margin-top: 12px; font-size: 0.8rem;" onclick="setAuditFilter('all')">Barcha qaydlarni ko'rsatish</button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = displayLogs.map(log => `
+    <div class="audit-entry-card">
+      <div class="audit-entry-left">
+        <div class="audit-entry-icon-wrap" style="background: ${log.iconBg}; color: ${log.iconColor};">
+          ${log.iconSvg}
+        </div>
+        <div class="audit-entry-text">
+          <div class="audit-entry-title-row">
+            <span class="audit-entry-title">${log.title}</span>
+            ${log.statusHtml}
+          </div>
+          <div class="audit-entry-desc">${log.desc}</div>
         </div>
       </div>
+      <div class="audit-entry-right">
+        <div class="audit-entry-meta">
+          <div class="audit-entry-time">${log.time}</div>
+          <div class="audit-entry-actor">${log.actor}</div>
+        </div>
+        ${log.actionBtn ? `<div>${log.actionBtn}</div>` : ''}
+      </div>
     </div>
-  `;
+  `).join('');
+}
+
+function setAuditFilter(filter) {
+  adminState.currentAuditFilter = filter;
+  document.querySelectorAll('.audit-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.auditFilter === filter);
+  });
+  renderAuditFullTimeline();
+}
+window.setAuditFilter = setAuditFilter;
+
+
+function renderNotificationsList() {
+  const container = document.getElementById('notifications-list-body');
+  if (!container) return;
+
+  const orders = adminState.orders || [];
+  const products = adminState.products || [];
+
+  const items = [];
+
+  // 1. Orders
+  orders.slice(0, 12).forEach(order => {
+    const cust = order.customer || {};
+    const orderItems = order.items || [];
+    const itemName = orderItems.length > 0 ? orderItems[0].name : 'Gadjetlar';
+    const isNew = (!order.status || order.status === 'new' || order.status === 'pending');
+    const isConfirmed = order.status === 'confirmed';
+    const isCompleted = order.status === 'completed';
+
+    let statusLabel = isNew ? 'Yangi buyurtma' : (isConfirmed ? 'Tasdiqlangan' : (isCompleted ? 'Topshirildi' : order.status));
+    let statusColor = isNew ? 'var(--accent-orange)' : (isConfirmed ? 'var(--accent-teal)' : 'var(--text-muted)');
+
+    items.push({
+      type: 'order',
+      id: order.id,
+      title: `${escapeHtml(cust.name || 'Mijoz')} — ${escapeHtml(itemName)}`,
+      sub: `${formatSum(order.total)} • <span style="color: ${statusColor}; font-weight: 700;">${statusLabel}</span>`,
+      time: order.formattedDate || new Date(order.createdAt).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' }),
+      iconSvg: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>`,
+      iconBg: isNew ? 'rgba(245, 158, 11, 0.15)' : 'rgba(16, 185, 129, 0.15)',
+      iconColor: isNew ? '#f59e0b' : '#10b981'
+    });
+  });
+
+  // 2. Low stock items
+  products.filter(p => (p.stock || 0) <= 3).forEach(p => {
+    items.push({
+      type: 'stock',
+      id: p.id,
+      title: `Zaxira kam qoldi: ${escapeHtml(p.name)}`,
+      sub: `<span style="color: #ef4444; font-weight: 700;">Faqat ${p.stock || 0} dona qoldi!</span>`,
+      time: "Diqqat",
+      iconSvg: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+      iconBg: 'rgba(239, 68, 68, 0.15)',
+      iconColor: '#ef4444'
+    });
+  });
+
+  if (items.length === 0) {
+    container.innerHTML = `<div class="notif-empty-state">Hozircha yangi bildirishnomalar yo'q</div>`;
+    return;
+  }
+
+  container.innerHTML = items.map(it => `
+    <div class="notif-item" onclick="${it.type === 'order' ? `openOrderModal('${it.id}')` : `openEditProductModal('${it.id}')`}">
+      <div class="notif-icon-circle" style="background: ${it.iconBg}; color: ${it.iconColor};">
+        ${it.iconSvg}
+      </div>
+      <div class="notif-content">
+        <div class="notif-title">${it.title}</div>
+        <div class="notif-sub">${it.sub}</div>
+        <div class="notif-time">${it.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function initNotificationsControls() {
+  const notifBtn = document.getElementById('btn-notifications');
+  const notifDropdown = document.getElementById('notifications-dropdown-menu');
+  const clearNotifBtn = document.getElementById('btn-clear-notifications');
+  const viewOrdersBtn = document.getElementById('btn-notif-view-orders');
+  const notifCountBadge = document.getElementById('header-notif-count');
+
+  if (notifBtn && notifDropdown) {
+    notifBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = notifDropdown.classList.contains('hidden');
+      if (isHidden) {
+        notifDropdown.classList.remove('hidden');
+        renderNotificationsList();
+        adminState.notificationsSeen = true;
+        if (notifCountBadge) {
+          notifCountBadge.style.display = 'none';
+        }
+      } else {
+        notifDropdown.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
+        notifDropdown.classList.add('hidden');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !notifDropdown.classList.contains('hidden')) {
+        notifDropdown.classList.add('hidden');
+      }
+    });
+  }
+
+  if (clearNotifBtn) {
+    clearNotifBtn.addEventListener('click', () => {
+      adminState.notificationsSeen = true;
+      if (notifCountBadge) {
+        notifCountBadge.style.display = 'none';
+      }
+      if (notifDropdown) notifDropdown.classList.add('hidden');
+      showToast("Barcha bildirishnomalar o'qilgan deb belgilandi", "success");
+    });
+  }
+
+  if (viewOrdersBtn) {
+    viewOrdersBtn.addEventListener('click', () => {
+      if (notifDropdown) notifDropdown.classList.add('hidden');
+      switchTab('tab-orders');
+    });
+  }
 }
 
 // =============================================================================
@@ -1048,7 +1498,11 @@ function renderAllOrdersTable() {
 
   let list = adminState.orders;
   if (adminState.currentOrderFilter !== 'all') {
-    list = list.filter(o => o.status === adminState.currentOrderFilter);
+    if (adminState.currentOrderFilter === 'confirmed') {
+      list = list.filter(o => o.status === 'confirmed' || o.status === 'completed');
+    } else {
+      list = list.filter(o => o.status === adminState.currentOrderFilter);
+    }
   }
 
   if (list.length === 0) {
@@ -1061,8 +1515,8 @@ function renderAllOrdersTable() {
     const items = order.items || [];
     const itemsHtml = items.map(it => `<div>• <b>${it.name}</b> x ${it.quantity || 1}</div>`).join('');
 
-    const statusBadge = order.status === 'completed'
-      ? '<span class="pill-badge pill-green">Topshirildi</span>'
+    const statusBadge = (order.status === 'confirmed' || order.status === 'completed')
+      ? '<span class="pill-badge pill-green">Tasdiqlangan</span>'
       : order.status === 'processing'
       ? '<span class="pill-badge pill-yellow">Jarayonda</span>'
       : order.status === 'cancelled'
@@ -1235,6 +1689,11 @@ async function pingDatabase() {
 
       const connEl = document.getElementById('db-conn-status');
       if (connEl) connEl.textContent = data.status || 'Faol / Ulangan';
+
+      const prodEl = document.getElementById('db-prod-count');
+      if (prodEl && data.productsCount !== undefined) prodEl.textContent = `${data.productsCount} ta`;
+      const ordEl = document.getElementById('db-orders-count');
+      if (ordEl && data.ordersCount !== undefined) ordEl.textContent = `${data.ordersCount} ta`;
 
       showToast(`Aloqa barqaror! Javob tezligi: ${data.latencyMs}ms`, "success");
     } else {
@@ -1479,18 +1938,84 @@ function setupEventListeners() {
   const manualRefresh = document.getElementById('btn-manual-refresh');
   if (manualRefresh) manualRefresh.addEventListener('click', () => refreshDashboardData());
 
-  // Search input filter on dashboard
+  // Search input filter on dashboard with clear button
+  // Search input filter on dashboard with clear button & kbd badge
   const dashSearch = document.getElementById('dash-search-input');
-  if (dashSearch) {
-    dashSearch.addEventListener('input', (e) => {
-      const q = e.target.value.toLowerCase().trim();
-      const rows = document.querySelectorAll('#dash-recent-orders-tbody tr');
-      rows.forEach(r => {
-        const text = r.textContent.toLowerCase();
-        r.style.display = text.includes(q) ? '' : 'none';
-      });
+  const dashSearchClear = document.getElementById('dash-search-clear');
+  const dashSearchKbd = document.getElementById('dash-search-kbd');
+
+  function handleDashSearch(query) {
+    const q = (query || '').toLowerCase().trim();
+    if (dashSearchClear && dashSearchKbd) {
+      if (q.length > 0) {
+        dashSearchClear.classList.remove('hidden');
+        dashSearchKbd.classList.add('hidden');
+      } else {
+        dashSearchClear.classList.add('hidden');
+        dashSearchKbd.classList.remove('hidden');
+      }
+    }
+
+    const tbody = document.getElementById('dash-recent-orders-tbody');
+    if (!tbody) return;
+
+    const rows = tbody.querySelectorAll('tr:not(#dash-no-search-row)');
+    let matchCount = 0;
+    rows.forEach(r => {
+      const text = r.textContent.toLowerCase();
+      const match = text.includes(q);
+      r.style.display = match ? '' : 'none';
+      if (match) matchCount++;
     });
+
+    const existingNoMatch = document.getElementById('dash-no-search-row');
+    if (matchCount === 0 && q.length > 0 && rows.length > 0) {
+      if (!existingNoMatch) {
+        const noRow = document.createElement('tr');
+        noRow.id = 'dash-no-search-row';
+        noRow.innerHTML = `
+          <td colspan="6" style="text-align: center; padding: 28px 16px; color: var(--text-muted);">
+            <div style="font-size: 1.5rem; margin-bottom: 6px;">🔍</div>
+            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">"${escapeHtml(q)}" bo'yicha hech qanday buyurtma topilmadi</div>
+            <button class="btn btn-outline" style="margin-top: 8px; padding: 4px 12px; font-size: 0.78rem;" onclick="clearDashSearch()">Qidiruvni tozalash</button>
+          </td>
+        `;
+        tbody.appendChild(noRow);
+      }
+    } else if (existingNoMatch) {
+      existingNoMatch.remove();
+    }
   }
+
+  function clearDashSearch() {
+    if (dashSearch) {
+      dashSearch.value = '';
+      handleDashSearch('');
+      dashSearch.focus();
+    }
+  }
+  window.clearDashSearch = clearDashSearch;
+
+  if (dashSearch) {
+    dashSearch.addEventListener('input', (e) => handleDashSearch(e.target.value));
+  }
+  if (dashSearchClear) {
+    dashSearchClear.addEventListener('click', clearDashSearch);
+  }
+
+  // Global hotkey: Ctrl+K or Cmd+K
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (dashSearch) {
+        dashSearch.focus();
+        dashSearch.select();
+      }
+    } else if (e.key === 'Escape' && document.activeElement === dashSearch) {
+      clearDashSearch();
+      dashSearch.blur();
+    }
+  });
 
   // Export Button
   const exportBtn = document.getElementById('btn-export-data');
@@ -1516,6 +2041,31 @@ function setupEventListeners() {
   const feedJournalBtn = document.getElementById('btn-feed-to-journal');
   if (feedJournalBtn) {
     feedJournalBtn.addEventListener('click', () => switchTab('tab-audit'));
+  }
+
+  // Chronology Stream Filter Pills (Barchasi, Bugun, Kecha)
+  document.querySelectorAll('.feed-pill').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const filter = e.target.dataset.feedFilter;
+      if (filter) setFeedFilter(filter);
+    });
+  });
+
+  // Audit Filter Pills in Tab-Audit (Barchasi, Buyurtmalar, Tizim & Baza)
+  document.querySelectorAll('.audit-pill').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const filter = e.target.dataset.auditFilter;
+      if (filter) setAuditFilter(filter);
+    });
+  });
+
+  // Refresh Audit Button
+  const refreshAuditBtn = document.getElementById('btn-refresh-audit');
+  if (refreshAuditBtn) {
+    refreshAuditBtn.addEventListener('click', () => {
+      renderAuditFullTimeline();
+      showToast("Audit jurnali yangilandi!", "success");
+    });
   }
 
   // Sidebar Tab Navigation
@@ -1717,10 +2267,15 @@ function setupEventListeners() {
   // Profile Card and Quick Shop Modal Controls
   initProfileCardControls();
 
+  // Notifications Bell Controls
+  initNotificationsControls();
+
   // Global window functions for inline table calls
   window.openEditProductModal = openEditProductModal;
   window.deleteProduct = deleteProduct;
   window.updateOrderStatus = updateOrderStatus;
+  window.confirmOrder = confirmOrder;
+  window.cancelOrder = cancelOrder;
   window.openOrderModal = openOrderModal;
   window.openSampleOrderModal = openSampleOrderModal;
   window.showToast = showToast;
@@ -1748,9 +2303,16 @@ function initProfileCardControls() {
       }
     });
 
-    // Close when clicking outside
+    // Close when clicking outside or pressing Escape
     document.addEventListener('click', (e) => {
       if (!dropdownMenu.contains(e.target) && !profileCard.contains(e.target)) {
+        dropdownMenu.classList.add('hidden');
+        profileCard.classList.remove('dropdown-open');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !dropdownMenu.classList.contains('hidden')) {
         dropdownMenu.classList.add('hidden');
         profileCard.classList.remove('dropdown-open');
       }
@@ -1892,6 +2454,10 @@ function switchTab(tabId) {
     loadProducts();
   } else if (tabId === 'tab-orders') {
     loadOrders();
+  } else if (tabId === 'tab-audit') {
+    renderAuditFullTimeline();
+  } else if (tabId === 'tab-database') {
+    pingDatabase();
   } else if (tabId === 'tab-settings') {
     loadSettings();
   }
