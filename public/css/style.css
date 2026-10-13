@@ -6093,6 +6093,61 @@ html:not(.light) .applebox-cart-del-btn {
   object-fit: contain;
 }
 
+/* Gallery Arrows and Counter */
+.detail-gallery-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(18, 18, 24, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.detail-gallery-nav-btn.prev {
+  left: 12px;
+}
+
+.detail-gallery-nav-btn.next {
+  right: 12px;
+}
+
+.detail-gallery-nav-btn:hover {
+  background: var(--yellow-400);
+  color: #000;
+  border-color: transparent;
+  transform: translateY(-50%) scale(1.08);
+}
+
+.detail-gallery-counter {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #f4f4f5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  user-select: none;
+}
+
 /* Category/Brand link row */
 .applebox-detail-links-row {
   display: flex;

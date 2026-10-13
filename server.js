@@ -50,7 +50,7 @@ const SettingsSchema = new mongoose.Schema({
 const ProductSchema = new mongoose.Schema({
   id: { type: String, unique: true, required: true },
   name: { type: String, required: true },
-  category: { type: String, default: 'Smartfonlar' },
+  category: { type: String, default: 'telefon-aksessuar' },
   brand: { type: String, default: 'Boshqa' },
   price: { type: Number, default: 0 },
   oldPrice: { type: Number, default: null },
@@ -202,6 +202,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Fayllar papkalari
 const DATA_DIR = path.join(__dirname, 'data');
+// DIQQAT: Render.com, Railway yoki boshqa ephemeral serverlarda yuklangan rasmlar
+// redeploy paytida o'chib ketmasligi uchun productionda Cloudinary / AWS S3 yoki Render Persistent Disk tavsiya etiladi.
+// Hozirgi holatda lokal uploads/ papkasi xizmat qiladi.
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
@@ -536,17 +539,38 @@ const upload = multer({
 });
 
 // ── Telegram Helper ───────────────────────────────────────
-async function sendTelegramMessage(botToken, chatId, text) {
+function escapeTelegramHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+async function sendTelegramMessage(botToken, chatId, text, parseMode = 'HTML') {
   if (!botToken || !chatId) return { success: false, reason: 'Bot token yoki Chat ID belgilanmagan' };
   try {
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const payload = {
+      chat_id: chatId,
+      text,
+      disable_web_page_preview: true
+    };
+    if (parseMode) payload.parse_mode = parseMode;
+
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true })
+      body: JSON.stringify(payload)
     });
     const result = await res.json();
-    if (!result.ok) return { success: false, reason: result.description };
+    if (!result.ok) {
+      // Agar Telegram HTML entity xatosini bersa, teglar tozalanib oddiy matn sifatida xavfsiz qayta yuboriladi
+      if (parseMode === 'HTML' && result.description && result.description.includes("can't parse entities")) {
+        const plainText = text.replace(/<[^>]+>/g, '');
+        return await sendTelegramMessage(botToken, chatId, plainText, null);
+      }
+      return { success: false, reason: result.description };
+    }
     return { success: true, result };
   } catch (error) {
     return { success: false, reason: error.message };
@@ -557,10 +581,42 @@ function formatSum(num) {
   return Number(num || 0).toLocaleString('uz-UZ') + " so'm";
 }
 
-// ── Admin auth middleware (Parolsiz ochiq kirish) ──────────
+// ── Admin auth middleware (Haqiqiy PIN token tekshiruvi) ──
 async function verifyAdmin(req, res, next) {
-  // Parol talab qilinmaydi, to'g'ridan-to'g'ri o'tkaziladi
-  next();
+  try {
+    const authHeader = req.headers['authorization'] || req.headers['x-admin-token'] || '';
+    let token = '';
+
+    if (typeof authHeader === 'string') {
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.slice(7).trim();
+      } else {
+        token = authHeader.trim();
+      }
+    }
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Avtorizatsiyadan o'tilmagan! Admin token talab qilinadi."
+      });
+    }
+
+    const settings = await getSettings();
+    const correctPin = String(settings?.shop?.adminPin || process.env.ADMIN_PIN || '1234').trim();
+    const expectedToken = 'auth_' + Buffer.from(correctPin).toString('base64');
+
+    if (token !== expectedToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Yaroqsiz yoki eskirgan admin token! Iltimos, qaytadan tizimga kiring."
+      });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Autentifikatsiyada server xatosi: " + err.message });
+  }
 }
 
 // ── Customer Storefront (Mijozlar vitrinasi) ───────────────
@@ -601,7 +657,7 @@ app.post('/api/admin/login', checkBruteForce, async (req, res) => {
       return res.json({ success: true, token: 'auth_' + Buffer.from(correctPin).toString('base64') });
     }
     recordFailedLogin(ip);
-    return res.status(401).json({ success: false, message: "PIN-kod noto'g'ri! (Standart PIN: 1234)" });
+    return res.status(401).json({ success: false, message: "PIN-kod noto'g'ri! Qaytadan urinib ko'ring." });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -684,7 +740,7 @@ app.post('/api/admin/products', verifyAdmin, upload.any(), async (req, res) => {
     const newProduct = {
       id: `prod-${Date.now()}`,
       name: name || 'Nomsiz Mahsulot',
-      category: category || 'Smartfonlar',
+      category: category || 'telefon-aksessuar',
       brand: brand || 'Boshqa',
       price: Number(price) || 0,
       oldPrice: oldPrice ? Number(oldPrice) : null,
@@ -879,9 +935,60 @@ app.get('/api/admin/analytics', verifyAdmin, async (req, res) => {
 // 6. Orders (Client checkout)
 app.post('/api/orders', async (req, res) => {
   try {
-    const { customer, items, total } = req.body;
-    if (!customer || !customer.phone || !items || !items.length) {
-      return res.status(400).json({ error: "Buyurtma ma'lumotlari to'liq emas!" });
+    const { customer, items } = req.body;
+    if (!customer || !customer.phone || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, error: "Buyurtma ma'lumotlari to'liq emas!" });
+    }
+
+    // Telefon raqami validatsiyasi (kamida 9 ta raqam)
+    const rawPhone = String(customer.phone || '').trim();
+    const phoneDigits = rawPhone.replace(/\D/g, '');
+    if (phoneDigits.length < 9) {
+      return res.status(400).json({
+        success: false,
+        error: "Telefon raqami noto'g'ri kiritildi! Kamida 9 ta raqam bo'lishi kerak."
+      });
+    }
+
+    // 1. Har bir mahsulotni bazadan tekshirish va zaxira (stock) nazorati
+    const validatedItems = [];
+    let serverTotal = 0;
+
+    for (const it of items) {
+      const prodId = String(it.id || '').trim();
+      if (!prodId) {
+        return res.status(400).json({ success: false, error: "Mahsulot identifikatori (ID) ko'rsatilmagan!" });
+      }
+
+      const product = await getProductById(prodId);
+      if (!product) {
+        return res.status(400).json({
+          success: false,
+          error: `Mahsulot topilmadi: ${it.name || prodId}`
+        });
+      }
+
+      const qty = Math.max(1, parseInt(it.quantity, 10) || 1);
+      const currentStock = typeof product.stock === 'number' ? product.stock : 10;
+
+      if (currentStock < qty) {
+        return res.status(400).json({
+          success: false,
+          error: `Zaxira yetarli emas: "${product.name}" dan omborda ${currentStock} ta qolgan, siz ${qty} ta so'radingiz.`
+        });
+      }
+
+      // Narx FAQAT bazadan olinadi (mijoz yuborgan narxga ishonilmaydi)
+      const unitPrice = Number(product.price || 0);
+      serverTotal += unitPrice * qty;
+
+      validatedItems.push({
+        id: product.id,
+        name: product.name,
+        price: unitPrice,
+        quantity: qty,
+        currentStock
+      });
     }
 
     const settings = await getSettings();
@@ -894,25 +1001,47 @@ app.post('/api/orders', async (req, res) => {
       createdAt: now.toISOString(),
       formattedDate,
       customer: {
-        name: customer.name || 'Mijoz',
-        phone: customer.phone,
-        address: customer.address || "Ko'rsatilmagan",
+        name: customer.name ? String(customer.name).trim() : 'Mijoz',
+        phone: rawPhone,
+        address: customer.address ? String(customer.address).trim() : "Ko'rsatilmagan",
         deliveryMethod: customer.deliveryMethod || 'yandex',
-        notes: customer.notes || ''
+        notes: customer.notes ? String(customer.notes).trim() : ''
       },
-      items: items.map(item => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity || 1 })),
-      total: Number(total) || 0,
+      items: validatedItems.map(vi => ({
+        id: vi.id,
+        name: vi.name,
+        price: vi.price,
+        quantity: vi.quantity
+      })),
+      total: serverTotal, // Faqat serverda hisoblangan haqiqiy summa!
       status: 'new',
       telegramSent: false
     };
 
-    await createOrder(newOrder);
+    // 2. Buyurtmani bazaga yozish (avval order create)
+    const created = await createOrder(newOrder);
+    if (!created) {
+      throw new Error("Buyurtmani saqlashda xatolik yuz berdi");
+    }
 
+    // 3. Ombor (stock) ni kamaytirish (ikki marta tekshir: stock 0 dan pastga tushmasin)
+    for (const vi of validatedItems) {
+      try {
+        const freshProd = await getProductById(vi.id);
+        const curStock = freshProd && typeof freshProd.stock === 'number' ? freshProd.stock : vi.currentStock;
+        const newStock = Math.max(0, curStock - vi.quantity);
+        await updateProduct(vi.id, { stock: newStock });
+      } catch (errStock) {
+        console.error(`Ombor kamaytirishda xatolik (${vi.id}):`, errStock.message);
+      }
+    }
+
+    // 4. Telegram xabarnoma (agar bot ulangan bo'lsa)
     let tgResult = { success: false };
     const tg = settings.telegram;
     if (tg && tg.botToken && tg.chatId) {
       const itemsText = newOrder.items
-        .map((it, idx) => `  ${idx + 1}. <b>${it.name}</b> x ${it.quantity} ta = ${formatSum(it.price * it.quantity)}`)
+        .map((it, idx) => `  ${idx + 1}. <b>${escapeTelegramHtml(it.name)}</b> x ${it.quantity} ta = ${formatSum(it.price * it.quantity)}`)
         .join('\n');
       const isPickup = String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('borib') ||
                        String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('pickup') ||
@@ -920,21 +1049,27 @@ app.post('/api/orders', async (req, res) => {
       const deliveryName = isPickup
         ? "Do'kondan borib olish"
         : "Yandex kuryer orqali yetkazish";
-      const message = `YANGI BUYURTMA #${newOrder.id}\n` +
-        `Mijoz: ${newOrder.customer.name}\n` +
-        `Telefon: ${newOrder.customer.phone}\n` +
-        `Manzil: ${newOrder.customer.address}\n` +
-        `Yetkazish: ${deliveryName}\n` +
-        (newOrder.customer.notes ? `Izoh: ${newOrder.customer.notes}\n` : '') +
-        `\nTanlangan tovarlar:\n${itemsText}\n` +
-        `\nJAMI: ${formatSum(newOrder.total)}\n` +
-        `Vaqt: ${formattedDate}`;
+      const message = `<b>YANGI BUYURTMA #${escapeTelegramHtml(newOrder.id)}</b>\n` +
+        `<b>Mijoz:</b> ${escapeTelegramHtml(newOrder.customer.name)}\n` +
+        `<b>Telefon:</b> ${escapeTelegramHtml(newOrder.customer.phone)}\n` +
+        `<b>Manzil:</b> ${escapeTelegramHtml(newOrder.customer.address)}\n` +
+        `<b>Yetkazish:</b> ${escapeTelegramHtml(deliveryName)}\n` +
+        (newOrder.customer.notes ? `<b>Izoh:</b> ${escapeTelegramHtml(newOrder.customer.notes)}\n` : '') +
+        `\n<b>Tanlangan tovarlar:</b>\n${itemsText}\n` +
+        `\n<b>JAMI:</b> <b>${formatSum(newOrder.total)}</b>\n` +
+        `<i>Vaqt: ${escapeTelegramHtml(formattedDate)}</i>`;
       tgResult = await sendTelegramMessage(tg.botToken, tg.chatId, message);
     }
 
-    res.status(201).json({ success: true, orderId: newOrder.id, telegramSent: tgResult.success });
+    res.status(201).json({
+      success: true,
+      orderId: newOrder.id,
+      total: serverTotal,
+      telegramSent: tgResult.success
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Order checkout error:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -999,7 +1134,7 @@ app.post('/api/admin/broadcast', verifyAdmin, async (req, res) => {
     if (!botToken || !chatId) {
       return res.status(400).json({ error: "Telegram Bot Token yoki Chat ID sozlanmagan! Avval 'Sozlamalar' bo'limida botni ulang." });
     }
-    const broadcastText = `<b>[BLACK STORE BILDIRISHNOMA]</b>\n\n<b>${title || "E'lon"}</b>\n\n${textContent}\n\n<i>Yuborilgan vaqt: ${new Date().toLocaleTimeString('uz-UZ')}, ${new Date().toLocaleDateString('uz-UZ')}</i>`;
+    const broadcastText = `<b>[BLACK STORE BILDIRISHNOMA]</b>\n\n<b>${escapeTelegramHtml(title || "E'lon")}</b>\n\n${escapeTelegramHtml(textContent)}\n\n<i>Yuborilgan vaqt: ${new Date().toLocaleTimeString('uz-UZ')}, ${new Date().toLocaleDateString('uz-UZ')}</i>`;
     const result = await sendTelegramMessage(botToken, chatId, broadcastText);
     if (result.success) {
       res.json({ success: true, message: "Xabar Telegram botga muvaffaqiyatli yuborildi!" });

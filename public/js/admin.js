@@ -220,7 +220,18 @@ function escapeHtml(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Utility: Escape JS string for onclick handlers
+function escapeJsString(str) {
+  return String(str || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
 }
 
 // Floating Toast Notification System
@@ -244,6 +255,136 @@ function showToast(message, type = 'success') {
     setTimeout(() => item.remove(), 250);
   }, 3500);
 }
+
+// =============================================================================
+// ADMIN AUTHENTICATION & FETCH WRAPPER (Xavfsiz Token Boshqaruvi)
+// =============================================================================
+function showLoginModal(show = true) {
+  const modal = document.getElementById('admin-login-modal');
+  if (!modal) return;
+  if (show) {
+    modal.classList.remove('hidden');
+    const input = document.getElementById('admin-login-pin');
+    if (input) {
+      input.value = '';
+      setTimeout(() => input.focus(), 120);
+    }
+    const errBox = document.getElementById('admin-login-error');
+    if (errBox) {
+      errBox.textContent = '';
+      errBox.classList.add('hidden');
+    }
+  } else {
+    modal.classList.add('hidden');
+  }
+}
+
+function adminLogout() {
+  adminState.token = '';
+  localStorage.removeItem('mini_shop_admin_token');
+  showLoginModal(true);
+  showToast(adminState.lang === 'ru' ? 'Вы вышли из системы' : "Tizimdan chiqildi", 'info');
+}
+
+async function handleAdminLoginSubmit(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const pinInput = document.getElementById('admin-login-pin');
+  const errBox = document.getElementById('admin-login-error');
+  const spinner = document.getElementById('btn-login-spinner');
+  const btnText = document.getElementById('btn-login-text');
+  const submitBtn = document.getElementById('btn-admin-login-submit');
+
+  const pin = (pinInput?.value || '').trim();
+  if (!pin) {
+    if (errBox) {
+      errBox.textContent = adminState.lang === 'ru' ? "Введите PIN-код!" : "PIN-kodni kiriting!";
+      errBox.classList.remove('hidden');
+    }
+    return;
+  }
+
+  if (errBox) errBox.classList.add('hidden');
+  if (spinner) spinner.classList.remove('hidden');
+  if (btnText) btnText.textContent = adminState.lang === 'ru' ? "Проверка..." : "Tekshirilmoqda...";
+  if (submitBtn) submitBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin })
+    });
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      const errMsg = data.message || (adminState.lang === 'ru' ? "Неверный PIN-код!" : "Noto'g'ri PIN-kod!");
+      if (errBox) {
+        errBox.textContent = errMsg;
+        errBox.classList.remove('hidden');
+      }
+      showToast(errMsg, 'error');
+      if (pinInput) {
+        pinInput.value = '';
+        pinInput.focus();
+      }
+      return;
+    }
+
+    // Login successful
+    adminState.token = data.token;
+    localStorage.setItem('mini_shop_admin_token', data.token);
+    showLoginModal(false);
+    showToast(adminState.lang === 'ru' ? "Добро пожаловать в админ-панель!" : "Xush kelibsiz! Tizimga muvaffaqiyatli kirildi.", 'success');
+
+    // Load fresh dashboard data
+    refreshDashboardData();
+  } catch (err) {
+    console.error('Login error:', err);
+    if (errBox) {
+      errBox.textContent = "Server xatosi: " + err.message;
+      errBox.classList.remove('hidden');
+    }
+  } finally {
+    if (spinner) spinner.classList.add('hidden');
+    if (btnText) btnText.textContent = adminState.lang === 'ru' ? "Войти в систему" : "Tizimga Kirish";
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+// Wrapper for all admin endpoints with Authorization Bearer header & 401 interceptor
+async function adminFetch(url, options = {}) {
+  const opts = { ...options };
+  opts.headers = { ...(opts.headers || {}) };
+
+  // Set Authorization header if token exists
+  if (adminState.token) {
+    opts.headers['Authorization'] = 'Bearer ' + adminState.token;
+  }
+
+  // Only auto-set Content-Type: application/json if body is not FormData and not already specified
+  if (opts.body && !(opts.body instanceof FormData) && !opts.headers['Content-Type']) {
+    opts.headers['Content-Type'] = 'application/json';
+  }
+
+  try {
+    const res = await fetch(url, opts);
+    if (res.status === 401) {
+      console.warn('Admin token unauthorized or expired (401):', url);
+      adminState.token = '';
+      localStorage.removeItem('mini_shop_admin_token');
+      showLoginModal(true);
+    }
+    return res;
+  } catch (err) {
+    console.error('adminFetch network error:', err);
+    throw err;
+  }
+}
+
+window.handleAdminLoginSubmit = handleAdminLoginSubmit;
+window.showLoginModal = showLoginModal;
+window.adminLogout = adminLogout;
+window.adminFetch = adminFetch;
 
 // =============================================================================
 // 1. INITIALIZATION & THEME / LANGUAGE
@@ -297,7 +438,9 @@ function initAutoRefresh() {
     adminState.liveCounter -= 1;
     if (adminState.liveCounter <= 0) {
       adminState.liveCounter = 8;
-      refreshDashboardData(true);
+      if (adminState.token) {
+        refreshDashboardData(true);
+      }
     }
     if (pulseText) {
       const prefix = adminState.lang === 'ru' ? 'В сети' : 'Jonli';
@@ -343,11 +486,20 @@ function initSplashAndLoad() {
 
   setTimeout(() => {
     if (splash) splash.classList.add('fade-out');
-    refreshDashboardData();
+    if (!adminState.token) {
+      showLoginModal(true);
+    } else {
+      refreshDashboardData();
+    }
   }, 950);
 }
 
 async function refreshDashboardData(silent = false) {
+  if (!adminState.token) {
+    showLoginModal(true);
+    return;
+  }
+
   const refreshBtn = document.getElementById('btn-manual-refresh');
   if (!silent && refreshBtn) {
     refreshBtn.classList.add('btn-refreshing');
@@ -586,37 +738,38 @@ function renderRecentOrdersTable() {
     const isConfirmed = order.status === 'confirmed';
     const isCompleted = order.status === 'completed';
     const isCancelled = order.status === 'cancelled';
+    const safeJsOrderId = escapeJsString(String(order.id || ''));
 
     let actionBtnsHtml = '';
     if (isNew) {
       actionBtnsHtml = `
-        <button class="tbl-btn tbl-btn-success" onclick="confirmOrder('${order.id}')" title="Buyurtmani tasdiqlash">
+        <button class="tbl-btn tbl-btn-success" onclick="confirmOrder('${safeJsOrderId}')" title="Buyurtmani tasdiqlash">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
           <span>Tasdiqlash</span>
         </button>
-        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${safeJsOrderId}')" title="Batafsil ko'rish">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           <span>Ko'rish</span>
         </button>
-        <button class="tbl-btn tbl-btn-danger" onclick="cancelOrder('${order.id}')" title="Bekor qilish">
+        <button class="tbl-btn tbl-btn-danger" onclick="cancelOrder('${safeJsOrderId}')" title="Bekor qilish">
           <span>Bekor</span>
         </button>
       `;
     } else if (isConfirmed) {
       actionBtnsHtml = `
         <span class="pill-badge pill-green">✓ Tasdiqlangan</span>
-        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${safeJsOrderId}')" title="Batafsil ko'rish">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           <span>Ko'rish</span>
         </button>
-        <button class="tbl-btn tbl-btn-danger" onclick="cancelOrder('${order.id}')" title="Bekor qilish">
+        <button class="tbl-btn tbl-btn-danger" onclick="cancelOrder('${safeJsOrderId}')" title="Bekor qilish">
           <span>Bekor</span>
         </button>
       `;
     } else if (isCompleted) {
       actionBtnsHtml = `
         <span class="pill-badge pill-teal">Topshirildi</span>
-        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${safeJsOrderId}')" title="Batafsil ko'rish">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           <span>Ko'rish</span>
         </button>
@@ -624,14 +777,14 @@ function renderRecentOrdersTable() {
     } else if (isCancelled) {
       actionBtnsHtml = `
         <span class="pill-badge pill-red">Bekor qilingan</span>
-        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${safeJsOrderId}')" title="Batafsil ko'rish">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           <span>Ko'rish</span>
         </button>
       `;
     } else {
       actionBtnsHtml = `
-        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Batafsil ko'rish">
+        <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${safeJsOrderId}')" title="Batafsil ko'rish">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           <span>Ko'rish</span>
         </button>
@@ -909,7 +1062,7 @@ function renderAuditFullTimeline() {
       iconSvg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>`,
       iconBg: 'rgba(16, 185, 129, 0.15)',
       iconColor: '#10b981',
-      actionBtn: `<button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${order.id}')" title="Buyurtmani ko'rish"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Ko'rish</button>`
+      actionBtn: `<button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${escapeJsString(String(order.id || ''))}')" title="Buyurtmani ko'rish"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> Ko'rish</button>`
     });
   });
 
@@ -1084,8 +1237,10 @@ function renderNotificationsList() {
     return;
   }
 
-  container.innerHTML = items.map(it => `
-    <div class="notif-item" onclick="${it.type === 'order' ? `openOrderModal('${it.id}')` : `openEditProductModal('${it.id}')`}">
+  container.innerHTML = items.map(it => {
+    const safeJsId = escapeJsString(String(it.id || ''));
+    return `
+    <div class="notif-item" onclick="${it.type === 'order' ? `openOrderModal('${safeJsId}')` : `openEditProductModal('${safeJsId}')`}">
       <div class="notif-icon-circle" style="background: ${it.iconBg}; color: ${it.iconColor};">
         ${it.iconSvg}
       </div>
@@ -1095,7 +1250,8 @@ function renderNotificationsList() {
         <div class="notif-time">${it.time}</div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function initNotificationsControls() {
@@ -1158,7 +1314,7 @@ function initNotificationsControls() {
 // =============================================================================
 async function loadAnalytics(period = 'weekly') {
   try {
-    const res = await fetch(`/api/admin/analytics?period=${period}`);
+    const res = await adminFetch(`/api/admin/analytics?period=${period}`);
     if (!res.ok) return;
     const data = await res.json();
     adminState.analyticsData = data;
@@ -1276,20 +1432,29 @@ function renderTopProducts(topProds) {
   const tbody = document.getElementById('top-products-tbody');
   if (!tbody) return;
 
-  tbody.innerHTML = topProds.map(p => `
-    <tr>
-      <td>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <img src="${p.image}" alt="${p.name}" style="width: 38px; height: 38px; border-radius: 8px; object-fit: cover;">
-          <span style="font-weight: 700;">${p.name}</span>
-        </div>
-      </td>
-      <td><span class="pill-badge pill-muted">${p.category}</span></td>
-      <td>${formatSum(p.price)}</td>
-      <td><strong>${p.soldCount} ta</strong></td>
-      <td style="text-align: right; color: var(--accent-teal); font-weight: 800;">${formatSum(p.totalSales)}</td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = topProds.map(p => {
+    const rawImg = String(p.image || '');
+    const safeImage = (rawImg.startsWith('http://') || rawImg.startsWith('https://') || rawImg.startsWith('/uploads/') || rawImg.startsWith('/images/'))
+      ? escapeHtml(rawImg)
+      : 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80';
+    const safeName = escapeHtml(p.name || 'Mahsulot');
+    const safeCat = escapeHtml(p.category || 'Boshqa');
+
+    return `
+      <tr>
+        <td>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="${safeImage}" alt="${safeName}" style="width: 38px; height: 38px; border-radius: 8px; object-fit: cover;" onerror="this.onerror=null;this.src='/images/placeholder.svg';">
+            <span style="font-weight: 700;">${safeName}</span>
+          </div>
+        </td>
+        <td><span class="pill-badge pill-muted">${safeCat}</span></td>
+        <td>${formatSum(p.price)}</td>
+        <td><strong>${Number(p.soldCount || 0)} ta</strong></td>
+        <td style="text-align: right; color: var(--accent-teal); font-weight: 800;">${formatSum(p.totalSales)}</td>
+      </tr>
+    `;
+  }).join('');
 }
 
 // =============================================================================
@@ -1297,7 +1462,8 @@ function renderTopProducts(topProds) {
 // =============================================================================
 async function loadProducts() {
   try {
-    const res = await fetch('/api/products');
+    const res = await adminFetch('/api/products');
+    if (res.status === 401) return;
     const data = await res.json();
     adminState.products = Array.isArray(data) ? data : [];
     renderProductsTable();
@@ -1329,8 +1495,18 @@ function renderProductsTable() {
 
   tbody.innerHTML = list.map(prod => {
     const images = Array.isArray(prod.images) && prod.images.length > 0 ? prod.images : (prod.image ? [prod.image] : []);
-    const imgBadge = images.slice(0, 3).map(img => `<img src="${img}" class="table-thumb-mini" alt="${prod.name}">`).join('');
+    const imgBadge = images.slice(0, 3).map(img => {
+      const safeImg = (img && (img.startsWith('http://') || img.startsWith('https://') || img.startsWith('/uploads/') || img.startsWith('/images/')))
+        ? escapeHtml(img)
+        : '/images/placeholder.svg';
+      return `<img src="${safeImg}" class="table-thumb-mini" alt="${escapeHtml(prod.name)}" onerror="this.onerror=null;this.src='/images/placeholder.svg';">`;
+    }).join('');
     const moreCount = images.length > 3 ? `<span class="more-photos-pill">+${images.length - 3}</span>` : '';
+    const safeJsId = escapeJsString(prod.id);
+    const safeName = escapeHtml(prod.name);
+    const safeBrand = escapeHtml(prod.brand || '');
+    const safeCategory = escapeHtml(prod.category || '');
+    const safeBadge = prod.badge ? escapeHtml(prod.badge) : '';
 
     return `
       <tr>
@@ -1341,16 +1517,16 @@ function renderProductsTable() {
           </div>
         </td>
         <td>
-          <div style="font-weight: 700;">${prod.name}</div>
-          <small style="color: var(--text-muted);">${prod.brand || ''} • ${prod.category}</small>
+          <div style="font-weight: 700;">${safeName}</div>
+          <small style="color: var(--text-muted);">${safeBrand} • ${safeCategory}</small>
         </td>
         <td style="font-weight: 700; color: var(--accent-teal);">${formatSum(prod.price)}</td>
-        <td><span class="pill-badge ${prod.stock > 0 ? 'pill-green' : 'pill-red'}">${prod.stock || 0} ta</span></td>
-        <td>${prod.badge ? `<span class="pill-badge pill-yellow">${prod.badge}</span>` : '—'}</td>
+        <td><span class="pill-badge ${prod.stock > 0 ? 'pill-green' : 'pill-red'}">${Number(prod.stock || 0)} ta</span></td>
+        <td>${safeBadge ? `<span class="pill-badge pill-yellow">${safeBadge}</span>` : '—'}</td>
         <td style="text-align: right;">
           <div class="table-action-btns" style="justify-content: flex-end;">
-            <button class="tbl-btn" onclick="openEditProductModal('${prod.id}')">Tahrirlash</button>
-            <button class="tbl-btn tbl-btn-danger" onclick="deleteProduct('${prod.id}')">O'chirish</button>
+            <button class="tbl-btn" onclick="openEditProductModal('${safeJsId}')">Tahrirlash</button>
+            <button class="tbl-btn tbl-btn-danger" onclick="deleteProduct('${safeJsId}')">O'chirish</button>
           </div>
         </td>
       </tr>
@@ -1435,7 +1611,7 @@ async function handleProductFormSubmit(e) {
     const url = isEdit ? `/api/admin/products/${id}` : '/api/admin/products';
     const method = isEdit ? 'PUT' : 'POST';
 
-    const res = await fetch(url, {
+    const res = await adminFetch(url, {
       method,
       body: formData
     });
@@ -1461,7 +1637,7 @@ async function handleProductFormSubmit(e) {
 async function deleteProduct(id) {
   if (!confirm("Ushbu mahsulotni o'chirishni tasdiqlaysizmi?")) return;
   try {
-    const res = await fetch(`/api/admin/products/${id}`, {
+    const res = await adminFetch(`/api/admin/products/${id}`, {
       method: 'DELETE'
     });
     if (res.ok) {
@@ -1482,7 +1658,8 @@ async function deleteProduct(id) {
 // =============================================================================
 async function loadOrders() {
   try {
-    const res = await fetch('/api/admin/orders');
+    const res = await adminFetch('/api/admin/orders');
+    if (res.status === 401) return;
     const data = await res.json();
     adminState.orders = Array.isArray(data) ? data : [];
     renderAllOrdersTable();
@@ -1513,7 +1690,12 @@ function renderAllOrdersTable() {
   tbody.innerHTML = list.map(order => {
     const cust = order.customer || {};
     const items = order.items || [];
-    const itemsHtml = items.map(it => `<div>• <b>${it.name}</b> x ${it.quantity || 1}</div>`).join('');
+    const itemsHtml = items.map(it => `<div>• <b>${escapeHtml(it.name || '')}</b> x ${escapeHtml(String(it.quantity || 1))}</div>`).join('');
+    const safeCustName = escapeHtml(cust.name || 'Mijoz');
+    const safeCustPhone = escapeHtml(cust.phone || '');
+    const safeShortId = escapeHtml(String(order.id || '').slice(-5).toUpperCase());
+    const safeDate = escapeHtml(String(order.formattedDate || new Date(order.createdAt).toLocaleDateString('uz-UZ')));
+    const safeJsOrderId = escapeJsString(String(order.id || ''));
 
     const statusBadge = (order.status === 'confirmed' || order.status === 'completed')
       ? '<span class="pill-badge pill-green">Tasdiqlangan</span>'
@@ -1525,20 +1707,20 @@ function renderAllOrdersTable() {
 
     return `
       <tr>
-        <td><span class="table-id-badge">#${order.id.slice(-5).toUpperCase()}</span></td>
+        <td><span class="table-id-badge">#${safeShortId}</span></td>
         <td>
-          <div style="font-weight: 700;">${cust.name || 'Mijoz'}</div>
-          <small style="color: var(--accent-teal);">${cust.phone || ''}</small>
+          <div style="font-weight: 700;">${safeCustName}</div>
+          <small style="color: var(--accent-teal);">${safeCustPhone}</small>
         </td>
-        <td><span class="table-time-badge">${order.formattedDate || new Date(order.createdAt).toLocaleDateString('uz-UZ')}</span></td>
+        <td><span class="table-time-badge">${safeDate}</span></td>
         <td><div style="font-size: 0.82rem; line-height: 1.4;">${itemsHtml || 'Gadjetlar'}</div></td>
         <td style="font-weight: 700; color: var(--accent-teal);">${formatSum(order.total)}</td>
         <td>${statusBadge}</td>
         <td>
           <div class="table-action-btns">
-            <button class="tbl-btn" onclick="openOrderModal('${order.id}')">Ko'rish</button>
-            <button class="tbl-btn tbl-btn-success" onclick="updateOrderStatus('${order.id}', 'completed')" title="Yetkazildi">✓</button>
-            <button class="tbl-btn tbl-btn-danger" onclick="updateOrderStatus('${order.id}', 'cancelled')" title="Bekor qilish">✕</button>
+            <button class="tbl-btn" onclick="openOrderModal('${safeJsOrderId}')">Ko'rish</button>
+            <button class="tbl-btn tbl-btn-success" onclick="updateOrderStatus('${safeJsOrderId}', 'completed')" title="Yetkazildi">✓</button>
+            <button class="tbl-btn tbl-btn-danger" onclick="updateOrderStatus('${safeJsOrderId}', 'cancelled')" title="Bekor qilish">✕</button>
           </div>
         </td>
       </tr>
@@ -1548,7 +1730,7 @@ function renderAllOrdersTable() {
 
 async function updateOrderStatus(id, status) {
   try {
-    const res = await fetch(`/api/admin/orders/${id}/status`, {
+    const res = await adminFetch(`/api/admin/orders/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
@@ -1587,8 +1769,8 @@ function openOrderModal(id) {
   const tbody = document.getElementById('ord-view-items-tbody');
   tbody.innerHTML = (order.items || []).map(it => `
     <tr>
-      <td><b>${it.name}</b></td>
-      <td>${it.quantity || 1} ta</td>
+      <td><b>${escapeHtml(it.name || '')}</b></td>
+      <td>${escapeHtml(String(it.quantity || 1))} ta</td>
       <td>${formatSum(it.price)}</td>
       <td style="text-align: right; font-weight: 700; color: var(--accent-teal);">${formatSum((it.price || 0) * (it.quantity || 1))}</td>
     </tr>
@@ -1612,7 +1794,7 @@ function openSampleOrderModal(name, phone, item, total) {
   const tbody = document.getElementById('ord-view-items-tbody');
   tbody.innerHTML = `
     <tr>
-      <td><b>${item}</b></td>
+      <td><b>${escapeHtml(item || '')}</b></td>
       <td>1 ta</td>
       <td>${formatSum(total)}</td>
       <td style="text-align: right; font-weight: 700; color: var(--accent-teal);">${formatSum(total)}</td>
@@ -1641,7 +1823,7 @@ async function handleBroadcastSubmit(e) {
   sendBtn.textContent = "Yuborilmoqda...";
 
   try {
-    const res = await fetch('/api/admin/broadcast', {
+    const res = await adminFetch('/api/admin/broadcast', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, body: message, imageUrl })
@@ -1681,7 +1863,7 @@ async function pingDatabase() {
   if (pingBtn) pingBtn.style.opacity = '0.5';
 
   try {
-    const res = await fetch('/api/admin/ping');
+    const res = await adminFetch('/api/admin/ping');
     const data = await res.json();
     if (res.ok && data.success) {
       const latencyEl = document.getElementById('db-latency');
@@ -1711,7 +1893,8 @@ async function pingDatabase() {
 // =============================================================================
 async function loadSettings() {
   try {
-    const res = await fetch('/api/admin/settings');
+    const res = await adminFetch('/api/admin/settings');
+    if (res.status === 401) return;
     const data = await res.json();
     if (!data) return;
 
@@ -1825,13 +2008,17 @@ async function saveSettingsPayload(payload, alertBox, successMsg) {
   if (alertBox) alertBox.className = 'alert-box hidden';
 
   try {
-    const res = await fetch('/api/admin/settings', {
+    const res = await adminFetch('/api/admin/settings', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const data = await res.json();
     if (res.ok) {
+      if (data.token) {
+        adminState.token = data.token;
+        localStorage.setItem('mini_shop_admin_token', data.token);
+      }
       if (alertBox) {
         alertBox.className = 'alert-box success';
         alertBox.textContent = successMsg;
@@ -1870,7 +2057,7 @@ async function testTelegramBot() {
   }
 
   try {
-    const res = await fetch('/api/admin/test-telegram', {
+    const res = await adminFetch('/api/admin/test-telegram', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ botToken, chatId })
@@ -2395,13 +2582,18 @@ function initProfileCardControls() {
       };
 
       try {
-        const res = await fetch('/api/admin/settings', {
+        const res = await adminFetch('/api/admin/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        const data = await res.json();
 
         if (res.ok) {
+          if (data.token) {
+            adminState.token = data.token;
+            localStorage.setItem('mini_shop_admin_token', data.token);
+          }
           const sidebarShopName = document.getElementById('sidebar-shop-name');
           if (sidebarShopName) sidebarShopName.textContent = newName;
           
@@ -2412,7 +2604,7 @@ function initProfileCardControls() {
           closeQuickModal();
           loadSettings();
         } else {
-          showToast("Saqlashda xatolik yuz berdi", "error");
+          showToast(`Saqlashda xatolik: ${data.error || 'Noma\'lum xato'}`, "error");
         }
       } catch (err) {
         showToast("Server bilan aloqa xatosi", "error");

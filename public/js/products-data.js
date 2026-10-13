@@ -496,12 +496,12 @@ const PRODUCTS = [
     id: 100,
     name_uz: 'Apple iPhone 15 Pro 128GB Natural Titanium | 100% Original',
     name_ru: 'Apple iPhone 15 Pro 128GB Натуральный титан | 100% Оригинал',
-    category: 'telefon-aksessuar',
+    category: 'telefon-planshetlar',
     brand: 'Apple',
-    price: 1099,
-    old_price: 1199,
+    price: 13990000,
+    old_price: 15200000,
     discount_percent: 8,
-    currency: '$',
+    priceUsd: 1099,
     rating: 5.0,
     reviews_count: 142,
     badge_uz: 'Top Flagman',
@@ -1562,16 +1562,18 @@ const PRODUCTS = [
   }
 ];
 
-function formatPrice(amount) {
-  if (typeof amount === 'string') return amount;
+function formatPrice(amount, explicitCurrency = null) {
+  if (typeof amount === 'string' && isNaN(Number(amount))) return amount;
   if (!amount && amount !== 0) return '';
-  const num = Math.round(amount);
-  // Dollar ($) narxlari: agar narx 5000 dan kam bo'lsa (masalan, 1099$), dollarda ko'rsatamiz
-  if (num > 0 && num <= 5000) {
+  const num = Math.round(Number(amount) || 0);
+
+  // Faqat explicit currency === '$' bo'lsa dollarda ko'rsatiladi
+  if (explicitCurrency === '$') {
     return new Intl.NumberFormat('en-US').format(num).replace(/,/g, ' ') + ' $';
   }
+
   const currentLang = (typeof APP_STATE !== 'undefined' && APP_STATE.lang) ? APP_STATE.lang : 'uz';
   const currency = currentLang === 'ru' ? 'сум' : "so'm";
   const locale = currentLang === 'ru' ? 'ru-RU' : 'uz-UZ';
-  return new Intl.NumberFormat(locale).format(num) + ' ' + currency;
+  return new Intl.NumberFormat(locale).format(num).replace(/,/g, ' ') + ' ' + currency;
 }

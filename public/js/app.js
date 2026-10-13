@@ -45,6 +45,29 @@ function t(key) {
   return (I18N[currentLang] && I18N[currentLang][key]) || (I18N.uz && I18N.uz[key]) || key;
 }
 
+// HTML xavfsiz qochirish yordamchisi (XSS himoyasi)
+function escapeHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeJsString(str) {
+  return String(str || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+}
+
+function sanitizeId(id) {
+  return String(id || '').replace(/[^a-zA-Z0-9_-]/g, '');
+}
+
 // ==========================================================================
 // INITIALIZATION
 // ==========================================================================
@@ -110,6 +133,8 @@ async function loadLiveProducts() {
         brand: p.brand || 'Boshqa',
         price: rawPrice,
         old_price: rawOldPrice,
+        priceUsd: p.priceUsd ? Number(p.priceUsd) : null,
+        currency: p.currency || null,
         discount_percent: discPercent,
         rating: p.rating || 4.9,
         reviews_count: p.reviews_count || 15,
@@ -581,6 +606,9 @@ function renderHeroSlider() {
         bannerImg = banner.image_ru;
       }
     }
+    if (bannerImg && !bannerImg.startsWith('http') && !bannerImg.startsWith('/')) {
+      bannerImg = '/' + bannerImg;
+    }
 
     if (banner.is_graphic) {
       return `
@@ -942,7 +970,7 @@ function renderBrandsDrawer() {
   grid.innerHTML = BRANDS.map(brand => {
     const isActive = APP_STATE.activeBrand && APP_STATE.activeBrand.toLowerCase() === brand.id.toLowerCase();
     const logoHtml = brand.logo 
-      ? `<img src="${brand.logo}" alt="${brand.name}" class="brand-drawer-img" loading="eager" />`
+      ? `<img src="${brand.logo}" alt="${brand.name}" class="brand-drawer-img" loading="eager" onerror="this.onerror=null;this.src='/images/placeholder.svg';" />`
       : getIcon(brand.icon);
 
     return `
@@ -1149,40 +1177,45 @@ function renderProducts() {
 
   container.innerHTML = products.map(prod => {
     const isWished = APP_STATE.wishlist.some(w => String(w) === String(prod.id));
-    const prodName = prod['name_' + lang] || prod.name_uz;
-    const prodBadge = prod['badge_' + lang] || prod.badge_uz || prod.badge;
+    const prodName = prod['name_' + lang] || prod.name_uz || prod.name || '';
+    const safeId = sanitizeId(prod.id);
+    const safeJsId = escapeJsString(prod.id);
+    const safeName = escapeHtml(prodName);
+    const safeBrand = escapeHtml(prod.brand || '');
+    const safeImage = escapeHtml(prod.main_image || prod.image || '');
+    const safeRating = escapeHtml(String(prod.rating || '5.0'));
 
     return `
-      <div class="product-card" data-id="${prod.id}" onclick="openProductDetail('${prod.id}')" style="cursor: pointer;">
+      <div class="product-card" data-id="${safeId}" onclick="openProductDetail('${safeJsId}')" style="cursor: pointer;">
         <div class="product-image-box">
-          <button class="btn-wishlist ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist('${prod.id}')" title="${isWished ? t('wishlistRemove') : t('wishlistAdd')}">
+          <button class="btn-wishlist ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist('${safeJsId}')" title="${isWished ? t('wishlistRemove') : t('wishlistAdd')}">
             ${isWished ? getIcon('heartFilled') : getIcon('heart')}
           </button>
-          <img src="${prod.main_image}" alt="${prodName}" loading="lazy" />
+          <img src="${safeImage}" alt="${safeName}" title="${safeName}" loading="lazy" onerror="this.onerror=null;this.src='/images/placeholder.svg';" />
         </div>
 
         <div class="product-content">
           <div class="product-meta-row">
-            <span class="product-brand">${prod.brand}</span>
+            <span class="product-brand">${safeBrand}</span>
             <div class="product-rating">
               ${getIcon('star')}
-              <span>${prod.rating}</span>
+              <span>${safeRating}</span>
             </div>
           </div>
 
-          <h3 class="product-title" onclick="openProductDetail('${prod.id}')">${prodName}</h3>
+          <h3 class="product-title" onclick="openProductDetail('${safeJsId}')" title="${safeName}">${safeName}</h3>
 
           <div class="product-price-row">
-            <div class="current-price">${formatPrice(prod.price)}</div>
+            <div class="current-price">${formatPrice(prod.price, prod.currency)}</div>
             ${prod.old_price ? `
               <div class="old-price-wrap">
-                <span class="old-price">${formatPrice(prod.old_price)}</span>
-                ${prod.discount_percent ? `<span class="discount-badge">-${prod.discount_percent}%</span>` : ''}
+                <span class="old-price">${formatPrice(prod.old_price, prod.currency)}</span>
+                ${prod.discount_percent ? `<span class="discount-badge">-${Number(prod.discount_percent)}%</span>` : ''}
               </div>
             ` : ''}
           </div>
 
-          <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart('${prod.id}', null, 1, this)">
+          <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart('${safeJsId}', null, 1, this)">
             ${getIcon('shoppingBag')}
             <span>${t('addToCart')}</span>
           </button>
@@ -1313,26 +1346,27 @@ function renderHomeDeals() {
     const prodName = prod['name_' + lang] || prod.name_uz;
     const discountDrop = prod.discount_percent || Math.round(((prod.old_price - prod.price) / prod.old_price) * 100);
 
+    const safeDealJsId = escapeJsString(prod.id);
     return `
-      <div class="deal-card" onclick="openProductDetail('${prod.id}')" data-id="${prod.id}">
+      <div class="deal-card" onclick="openProductDetail('${safeDealJsId}')" data-id="${escapeHtml(prod.id)}">
         <div class="deal-image-box">
           <span class="deal-discount-badge">↓ -${discountDrop}%</span>
-          <button class="deal-wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist('${prod.id}')" title="${isWished ? t('wishlistRemove') : t('wishlistAdd')}" aria-label="Sevimlilar">
+          <button class="deal-wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation(); toggleWishlist('${safeDealJsId}')" title="${isWished ? t('wishlistRemove') : t('wishlistAdd')}" aria-label="Sevimlilar">
             ${isWished ? getIcon('heartFilled') : getIcon('heart')}
           </button>
-          <img src="${prod.main_image}" alt="${escapeHtml(prodName)}" loading="lazy" />
+          <img src="${prod.main_image}" alt="${escapeHtml(prodName)}" loading="lazy" onerror="this.onerror=null;this.src='/images/placeholder.svg';" />
         </div>
         <div class="deal-content">
           <div class="deal-price-block">
-            <div class="deal-current-price">${formatPrice(prod.price)}</div>
+            <div class="deal-current-price">${formatPrice(prod.price, prod.currency)}</div>
             <div class="deal-old-price-row">
-              <span class="deal-old-price">${formatPrice(prod.old_price)}</span>
+              <span class="deal-old-price">${formatPrice(prod.old_price, prod.currency)}</span>
               <span class="deal-drop-tag">-${discountDrop}%</span>
             </div>
           </div>
           <h3 class="deal-title" title="${escapeHtml(prodName)}">${escapeHtml(prodName)}</h3>
           <div class="deal-footer-action">
-            <button class="deal-cart-btn" onclick="event.stopPropagation(); addToCart('${prod.id}', null, 1, this)">
+            <button class="deal-cart-btn" onclick="event.stopPropagation(); addToCart('${safeDealJsId}', null, 1, this)">
               <span class="deal-cart-icon">${getIcon('shoppingBag')}</span>
               <span>${t('addToCart')}</span>
             </button>
@@ -1846,13 +1880,13 @@ function renderCartDrawer() {
 
     return `
       <div class="cart-item">
-        <img src="${item.image}" alt="${itemName}" class="cart-item-img" />
+        <img src="${item.image}" alt="${escapeHtml(itemName)}" class="cart-item-img" onerror="this.onerror=null;this.src='/images/placeholder.svg';" />
         <div class="cart-item-details">
           <div>
-            <h4 class="cart-item-title">${itemName}</h4>
-            <div style="font-size: 0.75rem; color: var(--text-muted);">${t('color')} ${item.color}</div>
+            <h4 class="cart-item-title">${escapeHtml(itemName)}</h4>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">${t('color')} ${escapeHtml(item.color || 'Standart')}</div>
           </div>
-          <div class="cart-item-price">${formatPrice(item.price)}</div>
+          <div class="cart-item-price">${formatPrice(item.price, item.currency)}</div>
           <div class="cart-item-qty">
             <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)">${getIcon('minus')}</button>
             <span class="qty-num">${item.quantity}</span>
@@ -2174,17 +2208,26 @@ function renderProductDetailPage(prod) {
   if (!container) return;
 
   const imagesList = (prod.images && prod.images.length > 0) ? prod.images : [prod.main_image];
+  window._currentDetailImages = imagesList;
+  window._currentDetailImageIdx = 0;
 
   container.innerHTML = `
     <div class="applebox-detail-container">
       <!-- Giant Rounded Hero Image Card (Screenshot 2) -->
-      <div class="applebox-detail-img-card">
-        <img id="detailHeroImg" src="${prod.main_image}" alt="${escapeHtml(prodName)}" class="applebox-detail-hero-img" />
+      <div class="applebox-detail-img-card" id="detailHeroCard">
+        <img id="detailHeroImg" src="${prod.main_image}" alt="${escapeHtml(prodName)}" class="applebox-detail-hero-img" onerror="this.onerror=null;this.src='/images/placeholder.svg';" />
         ${imagesList.length > 1 ? `
+          <button class="detail-gallery-nav-btn prev" type="button" onclick="navigateDetailGallery(-1)" aria-label="Oldingi rasm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <button class="detail-gallery-nav-btn next" type="button" onclick="navigateDetailGallery(1)" aria-label="Keyingi rasm">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+          <div class="detail-gallery-counter"><span id="detailGalleryIdx">1</span> / ${imagesList.length}</div>
           <div class="applebox-detail-thumbs-strip">
             ${imagesList.map((img, idx) => `
-              <div class="applebox-detail-thumb ${idx === 0 ? 'active' : ''}" onclick="changeDetailHeroImg('${img}', this)">
-                <img src="${img}" alt="${escapeHtml(prodName)}" />
+              <div class="applebox-detail-thumb ${idx === 0 ? 'active' : ''}" data-idx="${idx}" onclick="selectDetailGalleryIdx(${idx})">
+                <img src="${escapeHtml(img)}" alt="${escapeHtml(prodName)}" onerror="this.onerror=null;this.src='/images/placeholder.svg';" />
               </div>
             `).join('')}
           </div>
@@ -2203,8 +2246,8 @@ function renderProductDetailPage(prod) {
 
       <!-- Price & Stock Card (Screenshot 2) -->
       <div class="applebox-detail-price-card">
-        <div class="applebox-detail-price-val">${formatPrice(prod.price)}</div>
-        ${prod.old_price ? `<div class="applebox-detail-old-price">${formatPrice(prod.old_price)}</div>` : ''}
+        <div class="applebox-detail-price-val">${formatPrice(prod.price, prod.currency)}</div>
+        ${prod.old_price ? `<div class="applebox-detail-old-price">${formatPrice(prod.old_price, prod.currency)}</div>` : ''}
         <div class="applebox-detail-stock-row">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -2264,13 +2307,71 @@ function renderProductDetailPage(prod) {
       </div>
     </div>
   `;
+
+  // Mobil qurilmalarda swipe orqali surish
+  setTimeout(() => {
+    const heroCard = document.getElementById('detailHeroCard');
+    if (heroCard && imagesList.length > 1) {
+      let touchStartX = 0;
+      heroCard.addEventListener('touchstart', (e) => {
+        if (e.changedTouches && e.changedTouches[0]) touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+      heroCard.addEventListener('touchend', (e) => {
+        if (e.changedTouches && e.changedTouches[0]) {
+          const touchEndX = e.changedTouches[0].screenX;
+          const diff = touchEndX - touchStartX;
+          if (Math.abs(diff) > 40) {
+            if (diff < 0) navigateDetailGallery(1);
+            else navigateDetailGallery(-1);
+          }
+        }
+      }, { passive: true });
+    }
+  }, 50);
+}
+
+function selectDetailGalleryIdx(idx) {
+  const images = window._currentDetailImages || [];
+  if (!images.length || idx < 0 || idx >= images.length) return;
+  window._currentDetailImageIdx = idx;
+
+  const heroImg = document.getElementById('detailHeroImg');
+  if (heroImg) heroImg.src = images[idx];
+
+  const counterEl = document.getElementById('detailGalleryIdx');
+  if (counterEl) counterEl.textContent = idx + 1;
+
+  document.querySelectorAll('.applebox-detail-thumb').forEach(el => {
+    const elIdx = parseInt(el.getAttribute('data-idx'), 10);
+    if (elIdx === idx) {
+      el.classList.add('active');
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    } else {
+      el.classList.remove('active');
+    }
+  });
+}
+
+function navigateDetailGallery(direction) {
+  const images = window._currentDetailImages || [];
+  if (!images.length || images.length <= 1) return;
+  let nextIdx = (window._currentDetailImageIdx || 0) + direction;
+  if (nextIdx < 0) nextIdx = images.length - 1;
+  else if (nextIdx >= images.length) nextIdx = 0;
+  selectDetailGalleryIdx(nextIdx);
 }
 
 function changeDetailHeroImg(imgSrc, element) {
-  const heroImg = document.getElementById('detailHeroImg');
-  if (heroImg) heroImg.src = imgSrc;
-  document.querySelectorAll('.applebox-detail-thumb').forEach(el => el.classList.remove('active'));
-  if (element) element.classList.add('active');
+  const images = window._currentDetailImages || [];
+  const idx = images.indexOf(imgSrc);
+  if (idx !== -1) {
+    selectDetailGalleryIdx(idx);
+  } else {
+    const heroImg = document.getElementById('detailHeroImg');
+    if (heroImg) heroImg.src = imgSrc;
+    document.querySelectorAll('.applebox-detail-thumb').forEach(el => el.classList.remove('active'));
+    if (element) element.classList.add('active');
+  }
 }
 
 function toggleDetailWishlist(prodId) {
@@ -2378,13 +2479,13 @@ function renderCartPage() {
       <div class="applebox-cart-card" data-cart-id="${item.id}">
         <div class="applebox-cart-card-top">
           <div class="applebox-cart-img-box" onclick="openProductDetail('${item.id}')">
-            <img src="${item.image}" alt="${escapeHtml(itemName)}" />
+            <img src="${item.image}" alt="${escapeHtml(itemName)}" onerror="this.onerror=null;this.src='/images/placeholder.svg';" />
           </div>
           <div class="applebox-cart-info-col">
             <div class="applebox-cart-brand-tag">${escapeHtml(brand)}</div>
             <h3 class="applebox-cart-item-title" onclick="openProductDetail('${item.id}')">${escapeHtml(itemName)}</h3>
             <div class="applebox-cart-sku">${escapeHtml(sku)}</div>
-            <div class="applebox-cart-price-val">${formatPrice(item.price)}</div>
+            <div class="applebox-cart-price-val">${formatPrice(item.price, item.currency)}</div>
           </div>
         </div>
 
@@ -2606,35 +2707,54 @@ async function handleCheckoutSubmit(event) {
   const phone = document.getElementById('checkoutPhone').value.trim();
   const address = document.getElementById('checkoutAddress').value.trim();
   const submitBtn = document.getElementById('checkoutSubmitBtn');
+  const lang = APP_STATE.lang || 'uz';
 
+  // 1. Telefon raqami validatsiyasi (kamida 9 ta raqam)
+  const phoneDigits = phone.replace(/\D/g, '');
+  if (phoneDigits.length < 9) {
+    showToast(
+      lang === 'ru' ? 'Пожалуйста, введите корректный номер телефона (минимум 9 цифр)!' : "Iltimos, to'g'ri telefon raqam kiriting (kamida 9 ta raqam)!",
+      'alertTriangle'
+    );
+    const phoneInput = document.getElementById('checkoutPhone');
+    if (phoneInput) phoneInput.focus();
+    return;
+  }
+
+  // 2. Savatcha bo'sh emasligini tekshirish
+  if (!APP_STATE.cart || APP_STATE.cart.length === 0) {
+    showToast(
+      lang === 'ru' ? 'Ваша корзина пуста!' : "Savatingiz bo'sh!",
+      'alertTriangle'
+    );
+    return;
+  }
+
+  const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
   if (submitBtn) {
     submitBtn.disabled = true;
-    submitBtn.innerHTML = `<span>${APP_STATE.lang === 'ru' ? 'Оформление заказа...' : 'Buyurtma rasmiylashtirilmoqda...'}</span>`;
+    submitBtn.innerHTML = `<span>${lang === 'ru' ? 'Оформление заказа...' : 'Buyurtma rasmiylashtirilmoqda...'}</span>`;
   }
 
   const total = APP_STATE.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const finalTotal = APP_STATE.discountRate > 0 ? total * (1 - APP_STATE.discountRate) : total;
-  const lang = APP_STATE.lang || 'uz';
 
   const orderPayload = {
     customer: {
-      name: name || 'Mijoz',
+      name: name || (lang === 'ru' ? 'Клиент' : 'Mijoz'),
       phone: phone,
-      address: address || "Ko'rsatilmagan",
+      address: address || (lang === 'ru' ? 'Не указан' : "Ko'rsatilmagan"),
       deliveryMethod: currentDeliveryMethod || 'yandex',
       notes: `To'lov turi: ${currentPaymentMethod}`
     },
     items: APP_STATE.cart.map(item => ({
       id: String(item.id),
       name: item['name_' + lang] || item.name_uz || item.name || 'Mahsulot',
-      price: Number(item.price) || 0,
-      quantity: Number(item.quantity) || 1
-    })),
-    total: Number(finalTotal) || 0
+      quantity: Math.max(1, Number(item.quantity) || 1)
+    }))
   };
 
-  let assignedOrderId = 'BS-' + Math.floor(100000 + Math.random() * 900000);
-  let liveOrderSaved = false;
+  let orderResult = null;
 
   try {
     const res = await fetch('/api/orders', {
@@ -2642,23 +2762,54 @@ async function handleCheckoutSubmit(event) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderPayload)
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.orderId) {
-        assignedOrderId = data.orderId;
-        liveOrderSaved = true;
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok || !data || !data.success || !data.orderId) {
+      const errorMsg = (data && (data.error || data.message))
+        ? (data.error || data.message)
+        : (lang === 'ru' ? 'Не удалось оформить заказ. Попробуйте снова!' : "Buyurtma saqlanmadi, qayta urinib ko'ring!");
+
+      showToast(errorMsg, 'alertTriangle');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHtml || `${getIcon('check')} <span>${t('confirmOrder')}</span>`;
       }
+      // Savatchani tozalash EMAS! Xatolik yuz berganda savat to'liq saqlanadi.
+      return;
     }
+
+    orderResult = data;
   } catch (err) {
-    console.warn("Backendga buyurtma yuborishda ulanish xatosi (lokal fallback):", err);
+    console.error("Order submit network error:", err);
+    showToast(
+      lang === 'ru' ? 'Ошибка сети! Проверьте подключение и повторите попытку.' : "Tarmoq xatosi! Ulanishni tekshirib, qayta urinib ko'ring.",
+      'alertTriangle'
+    );
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnHtml || `${getIcon('check')} <span>${t('confirmOrder')}</span>`;
+    }
+    // Savatchani tozalash EMAS!
+    return;
   }
+
+  // FAQAT muvaffaqiyatli saqlangandagina buyurtma kodi va chek ko'rsatiladi
+  const assignedOrderId = orderResult.orderId;
+  const confirmedTotal = typeof orderResult.total === 'number' ? orderResult.total : finalTotal;
 
   const body = document.getElementById('checkoutModalBody');
   if (!body) return;
 
+  const safeOrderId = escapeHtml(String(assignedOrderId || ''));
+  const safeCustomerName = escapeHtml(name || (lang === 'ru' ? 'Клиент' : 'Mijoz'));
+  const safeCustomerPhone = escapeHtml(phone || '');
+  const safeCustomerAddress = escapeHtml(address || (lang === 'ru' ? 'Не указан' : "Ko'rsatilmagan"));
+  const safePaymentMethod = escapeHtml(String(currentPaymentMethod || ''));
+
   const greeting = lang === 'ru' 
-    ? `Спасибо, <strong>${name}</strong>! ${t('orderCode')} <strong>#${assignedOrderId}</strong>. Наш менеджер скоро свяжется с вами по номеру <strong>${phone}</strong>.`
-    : `Rahmat, <strong>${name}</strong>! Buyurtma kodi: <strong>#${assignedOrderId}</strong>. Menejerimiz tez orada <strong>${phone}</strong> raqamiga aloqaga chiqadi.`;
+    ? `Спасибо, <strong>${safeCustomerName}</strong>! ${t('orderCode')} <strong>#${safeOrderId}</strong>. Наш менеджер скоро свяжется с вами по номеру <strong>${safeCustomerPhone}</strong>.`
+    : `Rahmat, <strong>${safeCustomerName}</strong>! Buyurtma kodi: <strong>#${safeOrderId}</strong>. Menejerimiz tez orada <strong>${safeCustomerPhone}</strong> raqamiga aloqaga chiqadi.`;
 
   const deliveryNameText = currentDeliveryMethod === 'pickup'
     ? (lang === 'ru' ? 'Самовывоз (Малика savdo markazi, B-1)' : "Do'kondan borib olish (Malika, B-blok 1-do'kon)")
@@ -2679,11 +2830,11 @@ async function handleCheckoutSubmit(event) {
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
           <span style="color: var(--text-muted);">${t('orderPaymentMethod')}</span>
-          <strong>${currentPaymentMethod}</strong>
+          <strong>${safePaymentMethod}</strong>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
           <span style="color: var(--text-muted);">${t('orderAddress')}</span>
-          <strong style="text-align: right; max-width: 60%;">${address}</strong>
+          <strong style="text-align: right; max-width: 60%;">${safeCustomerAddress}</strong>
         </div>
         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
           <span style="color: var(--text-muted);">${t('orderItemsCount')}</span>
@@ -2691,7 +2842,7 @@ async function handleCheckoutSubmit(event) {
         </div>
         <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border-subtle);">
           <span style="font-weight: 700;">${t('totalPayment')}</span>
-          <span style="font-weight: 800; color: var(--yellow-400);">${formatPrice(finalTotal)}</span>
+          <span style="font-weight: 800; color: var(--yellow-400);">${formatPrice(confirmedTotal)}</span>
         </div>
       </div>
 
@@ -2701,7 +2852,7 @@ async function handleCheckoutSubmit(event) {
     </div>
   `;
 
-  // Savatchani tozalash
+  // Savatchani tozalash FAQAT muvaffaqiyatdan keyin!
   APP_STATE.cart = [];
   APP_STATE.discountRate = 0;
   saveCart();
@@ -2898,24 +3049,6 @@ function matchProductSearch(p, query) {
   });
 }
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function escapeJsString(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'")
-    .replace(/"/g, '\\"')
-    .replace(/\n/g, ' ');
-}
 
 function highlightSearchQuery(text, query) {
   if (!text) return '';
@@ -3003,14 +3136,14 @@ function renderLiveSearchDropdown(dropdownEl, query) {
       <div class="search-item-row" data-id="${escapeHtml(product.id)}" onclick="handleSearchItemClick('${escapeJsString(product.id)}')">
         <div class="search-item-left">
           <div class="search-item-thumb-box">
-            <img src="${product.main_image}" alt="${escapeHtml(name)}" class="search-item-thumb" loading="lazy" />
+            <img src="${product.main_image}" alt="${escapeHtml(name)}" class="search-item-thumb" loading="lazy" onerror="this.onerror=null;this.src='/images/placeholder.svg';" />
           </div>
           <div class="search-item-info">
             <div class="search-item-title">${highlightedTitle}</div>
             <div class="search-item-variant">${escapeHtml(variant)}</div>
           </div>
         </div>
-        <div class="search-item-price">${priceFormatted}</div>
+        <div class="search-item-price">${formatPrice(product.price, product.currency)}</div>
       </div>
     `;
   }).join('');

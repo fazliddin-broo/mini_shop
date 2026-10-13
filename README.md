@@ -73,3 +73,19 @@ Brauzerda quyidagi manzillarni oching:
 > *Qarang, menda Malikadagi do'konlar uchun maxsus Mini Shop veb-ilovasi bor. Siz buni bio-ga qo'yasiz. Klientlar kirib, narxlarni ko'rib, 1 klikda buyurtma beradi. Tunda ham bizning AI robotimiz ularga javob beradi. Buyurtma berilishi bilan to'g'ridan-to'g'ri sizning Telegramingizga mijozning nomeri va tanlagan telefoni chek bo'lib tushadi.*
 > 
 > *Keling, hozir 1 daqiqada sizga ko'rsataman: mana o'z telefonimdan bitta test zakaz beraman, qarang..."*
+
+---
+
+## 🚀 Production Deployment (Render.com, Railway, VPS)
+
+### 1. MongoDB Atlas Ulanishi
+- `MONGO_URI` o'zgaruvchisini Render / Railway Environment Variables bo'limiga qo'shing.
+- Network Access bo'limida `0.0.0.0/0` (Anywhere) ruxsati yoqilganiga ishonch hosil qiling.
+
+### 2. Media Fayllar va Uploads (Rasmlar)
+- **Render.com bepul/standart konteynerlari:** Server disk xotirasi *ephemeral* (har bir git push yoki redeploy paytida `uploads/` papkasi yangilanadi).
+- **Tavsiya etiladigan yechimlar:**
+  1. **Tashqi rasm havolalari (Unsplash / CDN):** Mahsulot rasmi sifatida to'g'ridan-to'g'ri `https://...` URL kiritish (eng oson va ishonchli).
+  2. **Render Persistent Disk:** Render boshqaruv panelida `/uploads` yo'liga doimiy disk (Disk Mount) ulash.
+  3. **Cloudinary / AWS S3:** Katta hajmdagi rasmlar uchun bepul Cloudinary yoki S3 bucket integratsiyasi.
+  4. **Zaxira (Fallback):** Agar rasm yuklanmasa yoki tarmoq xatosi yuz bersa, tizim avtomatik ravishda `/images/placeholder.svg` zaxira rasmini ko'rsatadi.
