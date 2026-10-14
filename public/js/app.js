@@ -30,6 +30,7 @@ const APP_STATE = {
   activeDetailProduct: null,
   selectedDetailColor: null,
   discountRate: 0,
+  promoCode: null,
   isWishlistView: false,
   isCategoryView: false,
   isCartView: false,
@@ -1924,12 +1925,24 @@ function applyPromoCode() {
   if (!input) return;
 
   const code = input.value.trim().toUpperCase();
+  const lang = APP_STATE.lang || 'uz';
+  if (!code) {
+    showToast(lang === 'ru' ? 'Введите промокод!' : 'Promokodni kiriting!', 'alertTriangle');
+    return;
+  }
+
   if (code === 'BLACK10' || code === 'APPLEBOX') {
+    APP_STATE.promoCode = code;
     APP_STATE.discountRate = 0.10;
     renderCartDrawer();
+    showToast(lang === 'ru' ? `Промокод ${code} активирован (-10%)!` : `${code} promokodi qo'llandi (-10%)!`, 'check');
   } else if (code === 'BLACK20') {
+    APP_STATE.promoCode = code;
     APP_STATE.discountRate = 0.20;
     renderCartDrawer();
+    showToast(lang === 'ru' ? 'Промокод BLACK20 активирован (-20%)!' : 'BLACK20 promokodi qo\'llandi (-20%)!', 'check');
+  } else {
+    showToast(lang === 'ru' ? 'Неверный или недействительный промокод!' : "Noto'g'ri yoki muddati o'tgan promokod!", 'alertTriangle');
   }
 }
 
@@ -2725,6 +2738,7 @@ async function handleCheckoutSubmit(event) {
       deliveryMethod: currentDeliveryMethod || 'yandex',
       notes: `To'lov turi: ${currentPaymentMethod}`
     },
+    promoCode: APP_STATE.promoCode || null,
     items: APP_STATE.cart.map(item => ({
       id: String(item.id),
       name: item['name_' + lang] || item.name_uz || item.name || 'Mahsulot',
@@ -2833,6 +2847,7 @@ async function handleCheckoutSubmit(event) {
   // Savatchani tozalash FAQAT muvaffaqiyatdan keyin!
   APP_STATE.cart = [];
   APP_STATE.discountRate = 0;
+  APP_STATE.promoCode = null;
   saveCart();
   updateCounters();
   renderProducts();
@@ -3373,3 +3388,77 @@ function closeReviewsModal() {
   const modal = document.getElementById('reviewsModal');
   if (modal) modal.classList.remove('active');
 }
+
+// ==========================================================================
+// CUSTOMER AI CONSULTANT CHAT LOGIC (VIRTUAL SELLER)
+// ==========================================================================
+function toggleCustomerAiChat(open) {
+  const modal = document.getElementById('customerAiModal');
+  if (!modal) return;
+  if (open) {
+    modal.classList.add('active');
+    setTimeout(() => {
+      const input = document.getElementById('customerAiInput');
+      if (input) input.focus();
+    }, 150);
+  } else {
+    modal.classList.remove('active');
+  }
+}
+
+function sendQuickAiPrompt(text) {
+  const input = document.getElementById('customerAiInput');
+  if (input) {
+    input.value = text;
+    handleCustomerAiSend(new Event('submit'));
+  }
+}
+
+async function handleCustomerAiSend(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const input = document.getElementById('customerAiInput');
+  const messagesBox = document.getElementById('customerAiMessages');
+  const sendBtn = document.getElementById('customerAiSendBtn');
+  if (!input || !messagesBox) return;
+
+  const text = (input.value || '').trim();
+  if (!text) return;
+  input.value = '';
+
+  // Append User message
+  const userBubble = document.createElement('div');
+  userBubble.className = 'ai-chat-bubble ai-bubble-user';
+  userBubble.innerHTML = `<div class="ai-bubble-content">${escapeHtml(text)}</div>`;
+  messagesBox.appendChild(userBubble);
+  messagesBox.scrollTop = messagesBox.scrollHeight;
+
+  // Append Bot loading bubble
+  const botBubble = document.createElement('div');
+  botBubble.className = 'ai-chat-bubble ai-bubble-bot';
+  botBubble.innerHTML = `<div class="ai-bubble-content" style="display:flex;align-items:center;gap:6px;"><span class="ai-sparkle-dot"></span> <em>Javob tayyorlanmoqda...</em></div>`;
+  messagesBox.appendChild(botBubble);
+  messagesBox.scrollTop = messagesBox.scrollHeight;
+
+  if (sendBtn) sendBtn.disabled = true;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    const replyText = (data && data.reply) ? data.reply : "Kechirasiz, javob olishda muammo yuz berdi. Iltimos qaytadan urinib ko'ring.";
+    botBubble.innerHTML = `<div class="ai-bubble-content">${escapeHtml(replyText)}</div>`;
+  } catch (err) {
+    botBubble.innerHTML = `<div class="ai-bubble-content" style="color:#ef4444;">Tarmoq xatosi. Iltimos ulanishingizni tekshiring.</div>`;
+  } finally {
+    if (sendBtn) sendBtn.disabled = false;
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+  }
+}
+
+window.toggleCustomerAiChat = toggleCustomerAiChat;
+window.sendQuickAiPrompt = sendQuickAiPrompt;
+window.handleCustomerAiSend = handleCustomerAiSend;
+

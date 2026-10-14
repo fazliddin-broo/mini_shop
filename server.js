@@ -150,12 +150,10 @@ mongoose.connection.on('disconnected', () => {
 });
 
 // ── Middleware: MongoDB ulanishini tekshirish (fallback bilan) ──
+// BUGFIX: avval MongoDB xatosi bo'lsa BARCHA /api so'rovlar 503 qaytarardi va do'kon
+// butunlay ishlamay qolardi. Endi MongoDB ulanmagan bo'lsa, tizim data/*.json fayllari
+// bilan ishlashda davom etadi (helper funksiyalar readyState ni o'zi tekshiradi).
 async function ensureDbConnected(req, res, next) {
-  // If MongoDB connection has an error, respond with Service Unavailable
-  if (dbError) {
-    return res.status(503).json({ success: false, error: 'Database not connected', details: dbError?.message || 'Unavailable' });
-  }
-  // Otherwise continue to route handlers (fallback JSON works if DB not connected)
   next();
 }
 
@@ -201,6 +199,12 @@ function clearLoginRecord(ip) {
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ success: false, error: "Noto'g'ri JSON format yuborildi!" });
+  }
+  next(err);
+});
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -318,6 +322,16 @@ async function seedDatabaseIfEmpty() {
 }
 
 // ── Database Access Helpers (MongoDB + JSON Fallback) ───────
+// BUGFIX: oldingi regex `/[.*+?^${}()|[\\]\\]/g` noto'g'ri edi va maxsus belgilarni
+// escape qilmasdi -> qidiruvda "(" yoki "[" yozilsa server 500 xato berardi.
+function escapeRegex(str) {
+  return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// Promo-kodlar (mijoz panelidagi kodlar bilan bir xil). Chegirma FAQAT serverda hisoblanadi.
+const PROMO_CODES = { BLACK10: 0.10, APPLEBOX: 0.10, BLACK20: 0.20 };
+const ORDER_STATUSES = ['new', 'processing', 'confirmed', 'completed', 'cancelled'];
+
 async function getSettings() {
   if (mongoose.connection.readyState === 1) {
     let s = await Settings.findOne({ key: 'main' }).lean();
@@ -372,11 +386,11 @@ async function getProducts(filter = {}) {
   if (mongoose.connection.readyState === 1) {
     const query = {};
     if (filter.category && filter.category !== 'Barchasi') {
-      const escCat = filter.category.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+      const escCat = escapeRegex(filter.category);
       query.category = { $regex: new RegExp(`^${escCat}$`, 'i') };
     }
     if (filter.search) {
-      const esc = filter.search.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+      const esc = escapeRegex(filter.search);
       query.$or = [
         { name: { $regex: esc, $options: 'i' } },
         { brand: { $regex: esc, $options: 'i' } },
@@ -503,7 +517,46 @@ async function createOrder(data) {
   return newOrder;
 }
 
+async function getOrderById(id) {
+  if (mongoose.connection.readyState === 1) {
+    return await Order.findOne({ id }).lean();
+  }
+  const list = readJsonSafe(ORDERS_FILE, []);
+  return list.find(o => o.id === id) || null;
+}
+
+// Buyurtma bekor qilinsa ombor qaytariladi, bekor holatdan qaytarilsa yana kamaytiriladi
+async function adjustStockForOrder(order, direction) {
+  for (const it of (order.items || [])) {
+    try {
+      const prod = await getProductById(String(it.id));
+      if (!prod) continue;
+      const cur = typeof prod.stock === 'number' ? prod.stock : 0;
+      const qty = Number(it.quantity) || 1;
+      const newStock = Math.max(0, cur + direction * qty);
+      await updateProduct(prod.id, { stock: newStock });
+    } catch (e) {
+      console.error('Ombor tuzatishda xatolik:', e.message);
+    }
+  }
+}
+
 async function updateOrderStatus(id, status) {
+  if (!ORDER_STATUSES.includes(status)) {
+    throw new Error(`Yaroqsiz holat: ${status}`);
+  }
+  const current = await getOrderById(id);
+  if (!current) return null;
+  const oldStatus = current.status;
+
+  if (oldStatus !== status) {
+    if (status === 'cancelled' && oldStatus !== 'cancelled') {
+      await adjustStockForOrder(current, +1);
+    } else if (oldStatus === 'cancelled' && status !== 'cancelled') {
+      await adjustStockForOrder(current, -1);
+    }
+  }
+
   if (mongoose.connection.readyState === 1) {
     const updated = await Order.findOneAndUpdate({ id }, { $set: { status } }, { new: true, lean: true });
     const list = readJsonSafe(ORDERS_FILE, []);
@@ -632,6 +685,11 @@ app.get(['/', '/shop', '/store', '/index.html'], (req, res) => {
 // ── Black Store Admin Dashboard URL ────────────────────────
 app.get(['/admin', '/admin.html', '/dashboard', '/blackstore-6666'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// ── Taplink / Bio Links (Instagram bio uchun) ──────────────
+app.get(['/taplink', '/taplink.html', '/links', '/bio'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'taplink.html'));
 });
 
 // ── API ROUTES (MongoDB ulanishini tekshirish bilan) ───────
@@ -874,50 +932,58 @@ app.get('/api/admin/analytics', verifyAdmin, async (req, res) => {
     const orders = await getOrders();
     const products = await getAllProducts();
 
-    const totalOrdersCount = orders.length;
-    let actualRevenue = 0;
     const ordersByStatus = { new: 0, processing: 0, completed: 0, cancelled: 0 };
     orders.forEach(o => {
-      actualRevenue += Number(o.total || 0);
       const st = o.status || 'new';
       ordersByStatus[st] = (ordersByStatus[st] || 0) + 1;
     });
 
-    // Haqiqiy buyurtmalar tahlili (hech qanday soxta sonlarsiz)
-    const effectiveRevenue = actualRevenue;
-    const effectiveOrders = totalOrdersCount;
+    // BUGFIX: bekor qilingan buyurtmalar daromadga qo'shilmaydi
+    const validOrders = orders.filter(o => o.status !== 'cancelled');
+    const effectiveRevenue = validOrders.reduce((acc, o) => acc + Number(o.total || 0), 0);
+    const effectiveOrders = validOrders.length;
     const averageOrderValue = effectiveOrders > 0 ? Math.round(effectiveRevenue / effectiveOrders) : 0;
 
+    // BUGFIX: oldin grafik soxta edi (jami summa 7 ga / 4 ga teng bo'lingan).
+    // Endi buyurtmalar haqiqiy sanasi bo'yicha guruhlanadi.
     let timeline = [];
+    const now = new Date();
     if (period === 'weekly') {
       const daysUz = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'];
       const daysRu = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
-      timeline = daysUz.map((d, i) => ({
-        labelUz: d,
-        labelRu: daysRu[i],
-        revenue: effectiveOrders > 0 ? Math.round(effectiveRevenue / 7) : 0,
-        orders: effectiveOrders > 0 ? Math.round(effectiveOrders / 7) : 0
-      }));
+      const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+      timeline = daysUz.map((d, i) => ({ labelUz: d, labelRu: daysRu[i], revenue: 0, orders: 0 }));
+      validOrders.forEach(o => {
+        const dt = new Date(o.createdAt);
+        if (isNaN(dt) || dt < monday) return;
+        const idx = (dt.getDay() + 6) % 7;
+        timeline[idx].revenue += Number(o.total || 0);
+        timeline[idx].orders += 1;
+      });
     } else {
-      const weeksUz = ['1-hafta (1-7)', '2-hafta (8-14)', '3-hafta (15-21)', '4-hafta (22-30)'];
-      const weeksRu = ['1-я неделя (1-7)', '2-я неделя (8-14)', '3-я неделя (15-21)', '4-я неделя (22-30)'];
-      timeline = weeksUz.map((w, i) => ({
-        labelUz: w,
-        labelRu: weeksRu[i],
-        revenue: effectiveOrders > 0 ? Math.round(effectiveRevenue / 4) : 0,
-        orders: effectiveOrders > 0 ? Math.round(effectiveOrders / 4) : 0
-      }));
+      const weeksUz = ['1-hafta (1-7)', '2-hafta (8-14)', '3-hafta (15-21)', '4-hafta (22-31)'];
+      const weeksRu = ['1-я неделя (1-7)', '2-я неделя (8-14)', '3-я неделя (15-21)', '4-я неделя (22-31)'];
+      timeline = weeksUz.map((w, i) => ({ labelUz: w, labelRu: weeksRu[i], revenue: 0, orders: 0 }));
+      validOrders.forEach(o => {
+        const dt = new Date(o.createdAt);
+        if (isNaN(dt) || dt.getFullYear() !== now.getFullYear() || dt.getMonth() !== now.getMonth()) return;
+        const idx = Math.min(3, Math.floor((dt.getDate() - 1) / 7));
+        timeline[idx].revenue += Number(o.total || 0);
+        timeline[idx].orders += 1;
+      });
     }
 
     // Top mahsulotlar (Haqiqiy buyurtmalar asosida)
     const soldMap = {};
-    orders.forEach(o => {
+    validOrders.forEach(o => {
       (o.items || []).forEach(it => {
         soldMap[it.id] = (soldMap[it.id] || 0) + (it.quantity || 1);
       });
     });
 
-    const topProducts = products.slice(0, 5).map(p => {
+    // BUGFIX: oldin shunchaki birinchi 5 ta mahsulot olinardi; endi eng ko'p sotilganlar
+    const topProducts = [...products].sort((a, b) => (soldMap[b.id] || 0) - (soldMap[a.id] || 0)).slice(0, 5).map(p => {
       const soldUnits = soldMap[p.id] || 0;
       const prodImages = Array.isArray(p.images) && p.images.length > 0 ? p.images : (p.image ? [p.image] : []);
       return {
@@ -977,6 +1043,7 @@ app.post('/api/orders', async (req, res) => {
 
     // 1. Har bir mahsulotni bazadan tekshirish va zaxira (stock) nazorati
     const validatedItems = [];
+    const requestedQty = {};
     let serverTotal = 0;
 
     for (const it of items) {
@@ -995,8 +1062,11 @@ app.post('/api/orders', async (req, res) => {
 
       const qty = Math.max(1, parseInt(it.quantity, 10) || 1);
       const currentStock = typeof product.stock === 'number' ? product.stock : 10;
+      // BUGFIX: bir xil mahsulot savatda bir necha qatorda (masalan, turli rang) bo'lsa,
+      // umumiy miqdor ombordan oshib ketmasligi tekshiriladi
+      requestedQty[product.id] = (requestedQty[product.id] || 0) + qty;
 
-      if (currentStock < qty) {
+      if (currentStock < requestedQty[product.id]) {
         return res.status(400).json({
           success: false,
           error: `Zaxira yetarli emas: "${product.name}" dan omborda ${currentStock} ta qolgan, siz ${qty} ta so'radingiz.`
@@ -1017,9 +1087,22 @@ app.post('/api/orders', async (req, res) => {
     }
 
     const settings = await getSettings();
-    const orderId = `ORD-${Date.now().toString().slice(-5)}`;
+    // BUGFIX: oldin ID faqat vaqtning oxirgi 5 raqamidan iborat edi -> takrorlanib,
+    // MongoDB unique xatosi bilan buyurtma yo'qolishi mumkin edi
+    const orderId = `ORD-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 90 + 10)}`;
     const now = new Date();
-    const formattedDate = `${now.toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit' })}, ${now.toLocaleDateString('uz-UZ')}`;
+    // BUGFIX: serverda (Render, UTC) vaqt 5 soat farq qilardi -> Toshkent vaqti majburiy
+    const tz = { timeZone: 'Asia/Tashkent' };
+    const formattedDate = `${now.toLocaleTimeString('uz-UZ', { ...tz, hour: '2-digit', minute: '2-digit' })}, ${now.toLocaleDateString('uz-UZ', tz)}`;
+
+    // BUGFIX: promo-kod chegirmasi oldin faqat mijoz ekranida ko'rinardi, sotuvchiga esa
+    // to'liq narx borardi. Endi chegirma serverda tekshiriladi va hisoblanadi.
+    const promoCode = String(req.body.promoCode || '').trim().toUpperCase();
+    const discountRate = PROMO_CODES[promoCode] || 0;
+    const subtotal = serverTotal;
+    if (discountRate > 0) {
+      serverTotal = Math.round(subtotal * (1 - discountRate));
+    }
 
     const newOrder = {
       id: orderId,
@@ -1038,6 +1121,9 @@ app.post('/api/orders', async (req, res) => {
         price: vi.price,
         quantity: vi.quantity
       })),
+      subtotal,
+      discount: discountRate > 0 ? (subtotal - serverTotal) : 0,
+      promoCode: discountRate > 0 ? promoCode : null,
       total: serverTotal, // Faqat serverda hisoblangan haqiqiy summa!
       status: 'new',
       telegramSent: false
@@ -1061,10 +1147,10 @@ app.post('/api/orders', async (req, res) => {
       }
     }
 
-    // 4. Telegram xabarnoma (agar bot ulangan bo'lsa)
+    // 4. Telegram xabarnoma (agar bot ulangan va yoqilgan bo'lsa)
     let tgResult = { success: false };
     const tg = settings.telegram;
-    if (tg && tg.botToken && tg.chatId) {
+    if (tg && tg.botToken && tg.chatId && tg.enabled !== false) {
       const itemsText = newOrder.items
         .map((it, idx) => `  ${idx + 1}. <b>${escapeTelegramHtml(it.name)}</b> x ${it.quantity} ta = ${formatSum(it.price * it.quantity)}`)
         .join('\n');
@@ -1072,18 +1158,37 @@ app.post('/api/orders', async (req, res) => {
                        String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('pickup') ||
                        String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('olib');
       const deliveryName = isPickup
-        ? "Do'kondan borib olish"
+        ? "Do'kondan borib olish (Malika)"
         : "Yandex kuryer orqali yetkazish";
-      const message = `<b>YANGI BUYURTMA #${escapeTelegramHtml(newOrder.id)}</b>\n` +
-        `<b>Mijoz:</b> ${escapeTelegramHtml(newOrder.customer.name)}\n` +
-        `<b>Telefon:</b> ${escapeTelegramHtml(newOrder.customer.phone)}\n` +
-        `<b>Manzil:</b> ${escapeTelegramHtml(newOrder.customer.address)}\n` +
-        `<b>Yetkazish:</b> ${escapeTelegramHtml(deliveryName)}\n` +
-        (newOrder.customer.notes ? `<b>Izoh:</b> ${escapeTelegramHtml(newOrder.customer.notes)}\n` : '') +
-        `\n<b>Tanlangan tovarlar:</b>\n${itemsText}\n` +
-        `\n<b>JAMI:</b> <b>${formatSum(newOrder.total)}</b>\n` +
-        `<i>Vaqt: ${escapeTelegramHtml(formattedDate)}</i>`;
+
+      const discountText = discountRate > 0
+        ? `\n<b>Promokod (${escapeTelegramHtml(promoCode)}):</b> -${formatSum(subtotal - serverTotal)}\n<b>Asl summa:</b> <s>${formatSum(subtotal)}</s>\n`
+        : '';
+
+      const message = `<b>🛍 YANGI BUYURTMA #${escapeTelegramHtml(newOrder.id)}</b>\n\n` +
+        `<b>👤 Mijoz:</b> ${escapeTelegramHtml(newOrder.customer.name)}\n` +
+        `<b>📞 Telefon:</b> <code>${escapeTelegramHtml(newOrder.customer.phone)}</code>\n` +
+        `<b>📍 Manzil:</b> ${escapeTelegramHtml(newOrder.customer.address)}\n` +
+        `<b>🚚 Yetkazish:</b> ${escapeTelegramHtml(deliveryName)}\n` +
+        (newOrder.customer.notes ? `<b>📝 Izoh:</b> ${escapeTelegramHtml(newOrder.customer.notes)}\n` : '') +
+        `\n<b>📦 Tovarlar:</b>\n${itemsText}\n` +
+        discountText +
+        `\n💰 <b>JAMI TO'LOV:</b> <b>${formatSum(newOrder.total)}</b>\n` +
+        `<i>🕒 Vaqt: ${escapeTelegramHtml(formattedDate)}</i>`;
+
       tgResult = await sendTelegramMessage(tg.botToken, tg.chatId, message);
+      if (tgResult.success) {
+        newOrder.telegramSent = true;
+        if (mongoose.connection.readyState === 1) {
+          await Order.updateOne({ id: newOrder.id }, { $set: { telegramSent: true } });
+        }
+        const oList = readJsonSafe(ORDERS_FILE, []);
+        const oIdx = oList.findIndex(o => o.id === newOrder.id);
+        if (oIdx !== -1) {
+          oList[oIdx].telegramSent = true;
+          writeJsonSafe(ORDERS_FILE, oList);
+        }
+      }
     }
 
     res.status(201).json({

@@ -1776,7 +1776,15 @@ function openOrderModal(id) {
     </tr>
   `).join('');
 
-  document.getElementById('ord-view-total').textContent = formatSum(order.total);
+  if (order.promoCode && order.discount) {
+    document.getElementById('ord-view-total').innerHTML = `
+      <span style="font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through; margin-right: 8px;">${formatSum(order.subtotal || (order.total + order.discount))}</span>
+      <span>${formatSum(order.total)}</span>
+      <span class="pill-badge pill-yellow" style="margin-left: 8px; font-size: 0.75rem;">${escapeHtml(order.promoCode)} (-${formatSum(order.discount)})</span>
+    `;
+  } else {
+    document.getElementById('ord-view-total').textContent = formatSum(order.total);
+  }
   document.getElementById('ord-view-status-select').value = order.status || 'new';
 
   document.getElementById('order-details-modal').classList.remove('hidden');
