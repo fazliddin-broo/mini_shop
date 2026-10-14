@@ -390,12 +390,9 @@ async function getProducts(filter = {}) {
   if (filter.category && filter.category !== 'Barchasi') {
     list = list.filter(p => (p.category || '').toLowerCase() === filter.category.toLowerCase());
   }
-  // Note: local JSON filter also uses exact match; escaping not needed for JSON.
-  return list;
-}
   if (filter.search) {
     const q = filter.search.toLowerCase();
-    list = list.filter(p => 
+    list = list.filter(p =>
       (p.name || '').toLowerCase().includes(q) ||
       (p.brand || '').toLowerCase().includes(q) ||
       (p.description || '').toLowerCase().includes(q)
