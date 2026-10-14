@@ -2004,6 +2004,42 @@ async function handleAiSettingsSubmit(e) {
   await saveSettingsPayload(payload, alertBox, "AI sozlamalari muvaffaqiyatli saqlandi!");
 }
 
+async function handleChangePasswordSubmit(e) {
+  e.preventDefault();
+  const alertBox = document.getElementById('pw-save-alert');
+  const currentPin = document.getElementById('pw-current').value.trim();
+  const newPin = document.getElementById('pw-new').value.trim();
+  const confirmPin = document.getElementById('pw-confirm').value.trim();
+
+  const fail = (msg) => {
+    if (alertBox) { alertBox.className = 'alert-box error'; alertBox.textContent = msg; }
+    showToast(msg, 'error');
+  };
+
+  if (newPin.length < 4) return fail("Yangi parol kamida 4 ta belgidan iborat bo'lishi kerak!");
+  if (newPin !== confirmPin) return fail("Yangi parollar bir-biriga mos kelmadi!");
+
+  try {
+    const res = await adminFetch('/api/admin/change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentPin, newPin })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) return fail(data.message || 'Parolni o\'zgartirib bo\'lmadi');
+
+    if (data.token) {
+      adminState.token = data.token;
+      localStorage.setItem('mini_shop_admin_token', data.token);
+    }
+    e.target.reset();
+    if (alertBox) { alertBox.className = 'alert-box success'; alertBox.textContent = "Parol muvaffaqiyatli o'zgartirildi!"; }
+    showToast("Parol muvaffaqiyatli o'zgartirildi!", 'success');
+  } catch (err) {
+    fail('Tarmoq xatosi!');
+  }
+}
+
 async function saveSettingsPayload(payload, alertBox, successMsg) {
   if (alertBox) alertBox.className = 'alert-box hidden';
 
@@ -2376,6 +2412,9 @@ function setupEventListeners() {
 
   const aiForm = document.getElementById('form-ai-settings');
   if (aiForm) aiForm.addEventListener('submit', handleAiSettingsSubmit);
+
+  const pwForm = document.getElementById('form-change-password');
+  if (pwForm) pwForm.addEventListener('submit', handleChangePasswordSubmit);
 
   const testTgBtn = document.getElementById('btn-test-telegram');
   if (testTgBtn) testTgBtn.addEventListener('click', testTelegramBot);

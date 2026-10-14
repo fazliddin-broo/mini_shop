@@ -2623,7 +2623,7 @@ function openCheckoutModal() {
   if (!modal || !body) return;
 
   currentDeliveryMethod = 'yandex';
-  currentPaymentMethod = 'Click';
+  currentPaymentMethod = t('cashDelivery');
 
   const total = APP_STATE.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const finalTotal = APP_STATE.discountRate > 0 ? total * (1 - APP_STATE.discountRate) : total;
@@ -2635,21 +2635,6 @@ function openCheckoutModal() {
     </div>
 
     <form class="checkout-form" id="checkoutForm" onsubmit="handleCheckoutSubmit(event)">
-      <!-- Yetkazib berish usuli -->
-      <div class="form-group">
-        <label class="form-label">${APP_STATE.lang === 'ru' ? 'Способ доставки' : 'Yetkazib berish usuli'}</label>
-        <div class="delivery-methods-grid">
-          <div class="delivery-option active" onclick="selectDeliveryMethod('yandex', this)">
-            ${getIcon('truck')}
-            <span style="font-size: 0.85rem;">${APP_STATE.lang === 'ru' ? 'Яндекс доставка' : 'Yandex kuryer'}</span>
-          </div>
-          <div class="delivery-option" onclick="selectDeliveryMethod('pickup', this)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            <span style="font-size: 0.85rem;">${APP_STATE.lang === 'ru' ? 'Самовывоз (Малика)' : 'Borib olish (Malika)'}</span>
-          </div>
-        </div>
-      </div>
-
       <div class="form-group">
         <label class="form-label">${t('fullName')}</label>
         <input type="text" class="form-input" id="checkoutName" placeholder="${t('namePlaceholder')}" required />
@@ -2665,24 +2650,17 @@ function openCheckoutModal() {
         <input type="text" class="form-input" id="checkoutAddress" placeholder="${t('addressPlaceholder')}" required />
       </div>
 
+      <!-- Yetkazib berish usuli -->
       <div class="form-group">
-        <label class="form-label">${t('paymentMethod')}</label>
-        <div class="payment-methods-grid">
-          <div class="payment-option active" onclick="selectPaymentMethod('Click', this)">
-            ${getIcon('creditCard')}
-            <span class="payment-name">Click</span>
-          </div>
-          <div class="payment-option" onclick="selectPaymentMethod('Payme', this)">
-            ${getIcon('creditCard')}
-            <span class="payment-name">Payme</span>
-          </div>
-          <div class="payment-option" onclick="selectPaymentMethod('Uzum Bank', this)">
-            ${getIcon('creditCard')}
-            <span class="payment-name">Uzum</span>
-          </div>
-          <div class="payment-option" onclick="selectPaymentMethod('${t('cashDelivery')}', this)">
+        <label class="form-label">${APP_STATE.lang === 'ru' ? 'Способ доставки' : 'Yetkazib berish usuli'}</label>
+        <div class="delivery-methods-grid">
+          <div class="delivery-option active" onclick="selectDeliveryMethod('yandex', this)">
             ${getIcon('truck')}
-            <span class="payment-name">${t('cashDelivery')}</span>
+            <span style="font-size: 0.85rem;">${APP_STATE.lang === 'ru' ? 'Яндекс доставка' : 'Yandex kuryer'}</span>
+          </div>
+          <div class="delivery-option" onclick="selectDeliveryMethod('pickup', this)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span style="font-size: 0.85rem;">${APP_STATE.lang === 'ru' ? 'Самовывоз (Малика)' : 'Borib olish (Malika)'}</span>
           </div>
         </div>
       </div>

@@ -9,7 +9,14 @@ const CATEGORIES = [
   { id: 'naushniki-quloqchinlar', name_uz: 'Quloqchinlar va naushniklar', name_ru: 'Наушники и гарнитуры', name_en: 'Headphones & Audio', icon: 'headphones', count: 8 },
   { id: 'smart-watch-fitnes', name_uz: 'Aqlli soatlar va fitnes', name_ru: 'Умные часы и фитнес', name_en: 'Smart Watches & Fitness', icon: 'watch', count: 6 },
   { id: 'zaryadka-kabel', name_uz: 'Zaryadlovchi va kabellar', name_ru: 'Зарядные устройства и кабели', name_en: 'Chargers & Cables', icon: 'plug', count: 7 },
-  { id: 'powerbanklar', name_uz: 'Powerbanklar', name_ru: 'Повербанки', name_en: 'Power Banks', icon: 'battery', count: 6 }
+  { id: 'powerbanklar', name_uz: 'Powerbanklar', name_ru: 'Повербанки', name_en: 'Power Banks', icon: 'battery', count: 6 },
+  { id: 'kolonki-audio', name_uz: 'Karnaylar va audio', name_ru: 'Колонки и аудио', name_en: 'Speakers & Audio', icon: 'headphones', count: 0 },
+  { id: 'blogger-jihozlar', name_uz: 'Blogerlar jihozlari', name_ru: 'Оборудование для блогеров', name_en: 'Creator Gear', icon: 'grid', count: 0 },
+  { id: 'kompyuter-aksessuar', name_uz: 'Playstation va Kompyuter aksessuarlari', name_ru: 'PlayStation и компьютерные аксессуары', name_en: 'PC & PlayStation Accessories', icon: 'grid', count: 0 },
+  { id: 'smart-texnika', name_uz: 'Smart qurilmalar va uy texnikasi', name_ru: 'Умные устройства и бытовая техника', name_en: 'Smart Home', icon: 'plug', count: 0 },
+  { id: 'gozellik-avto', name_uz: "Go'zallik, avto va boshqalar", name_ru: 'Красота, авто и другое', name_en: 'Beauty, Auto & More', icon: 'grid', count: 0 },
+  { id: 'holderlar-va-smart-parfyumlar', name_uz: 'Holderlar va Smart Parfyumlar', name_ru: 'Держатели и смарт-парфюмы', name_en: 'Holders & Smart Perfumes', icon: 'casePhone', count: 0 },
+  { id: 'sumkalar', name_uz: 'Sumkalar va chexollar', name_ru: 'Сумки и чехлы', name_en: 'Bags & Cases', icon: 'casePhone', count: 0 }
 ];
 
 const BRANDS = [
@@ -490,7 +497,7 @@ const I18N = {
 };
 
 // 6 ta rasmiy brend bo'yicha mahsulotlar to'plami (Apple, Samsung, WHOOP, Ray-Ban, Google, Canon)
-const PRODUCTS = [
+let PRODUCTS = [
   // --- APPLE ---
   {
     id: 100,

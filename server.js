@@ -689,6 +689,26 @@ app.put('/api/admin/settings', verifyAdmin, async (req, res) => {
   }
 });
 
+app.post('/api/admin/change-password', verifyAdmin, async (req, res) => {
+  try {
+    const currentPin = String(req.body.currentPin || '').trim();
+    const newPin = String(req.body.newPin || '').trim();
+    const settings = await getSettings();
+    const correctPin = String(settings?.shop?.adminPin || process.env.ADMIN_PIN || '1234').trim();
+
+    if (currentPin !== correctPin) {
+      return res.status(400).json({ success: false, message: "Joriy parol noto'g'ri!" });
+    }
+    if (newPin.length < 4) {
+      return res.status(400).json({ success: false, message: "Yangi parol kamida 4 ta belgidan iborat bo'lishi kerak!" });
+    }
+    await saveSettings({ shop: { adminPin: newPin } });
+    res.json({ success: true, token: 'auth_' + Buffer.from(newPin).toString('base64') });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // 4. Products (Public)
 app.get('/api/products', async (req, res) => {
   try {

@@ -962,6 +962,35 @@
               </form>
             </div>
 
+            <!-- 1.5. Admin parolini (PIN) o'zgartirish -->
+            <div class="section-card">
+              <div class="section-card-header">
+                <div>
+                  <h3 class="section-title">Parolni o'zgartirish</h3>
+                  <p class="section-subtitle">Admin panelga kirish PIN-kodini yangilang</p>
+                </div>
+              </div>
+
+              <form id="form-change-password" class="admin-form" autocomplete="off">
+                <div class="form-group">
+                  <label>Joriy parol</label>
+                  <input type="password" id="pw-current" autocomplete="off" required>
+                </div>
+                <div class="form-row-2">
+                  <div class="form-group">
+                    <label>Yangi parol</label>
+                    <input type="password" id="pw-new" autocomplete="new-password" minlength="4" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Yangi parolni takrorlang</label>
+                    <input type="password" id="pw-confirm" autocomplete="new-password" minlength="4" required>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary" id="btn-change-password">Parolni yangilash</button>
+                <div id="pw-save-alert" class="alert-box hidden"></div>
+              </form>
+            </div>
+
             <!-- 2. Telegram Bot Bildirishnomalari -->
             <div class="section-card">
               <div class="section-card-header">
@@ -1351,7 +1380,6 @@
               type="password" 
               id="admin-login-pin" 
               class="form-control" 
-              placeholder="••••" 
               autocomplete="off"
               inputmode="numeric"
               data-lpignore="true"
