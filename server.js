@@ -151,7 +151,11 @@ mongoose.connection.on('disconnected', () => {
 
 // ── Middleware: MongoDB ulanishini tekshirish (fallback bilan) ──
 async function ensureDbConnected(req, res, next) {
-  // Agar MongoDB ulangan bo'lsa MongoDB orqali, aks holda lokal JSON fayllardan uzluksiz ishlaydi
+  // If MongoDB connection has an error, respond with Service Unavailable
+  if (dbError) {
+    return res.status(503).json({ success: false, error: 'Database not connected', details: dbError?.message || 'Unavailable' });
+  }
+  // Otherwise continue to route handlers (fallback JSON works if DB not connected)
   next();
 }
 
@@ -368,14 +372,15 @@ async function getProducts(filter = {}) {
   if (mongoose.connection.readyState === 1) {
     const query = {};
     if (filter.category && filter.category !== 'Barchasi') {
-      query.category = { $regex: new RegExp(`^${filter.category}$`, 'i') };
+      const escCat = filter.category.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+      query.category = { $regex: new RegExp(`^${escCat}$`, 'i') };
     }
     if (filter.search) {
-      const q = filter.search;
+      const esc = filter.search.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
       query.$or = [
-        { name: { $regex: q, $options: 'i' } },
-        { brand: { $regex: q, $options: 'i' } },
-        { description: { $regex: q, $options: 'i' } }
+        { name: { $regex: esc, $options: 'i' } },
+        { brand: { $regex: esc, $options: 'i' } },
+        { description: { $regex: esc, $options: 'i' } }
       ];
     }
     return await Product.find(query).sort({ createdAt: -1 }).lean();
@@ -385,6 +390,9 @@ async function getProducts(filter = {}) {
   if (filter.category && filter.category !== 'Barchasi') {
     list = list.filter(p => (p.category || '').toLowerCase() === filter.category.toLowerCase());
   }
+  // Note: local JSON filter also uses exact match; escaping not needed for JSON.
+  return list;
+}
   if (filter.search) {
     const q = filter.search.toLowerCase();
     list = list.filter(p => 
