@@ -213,7 +213,7 @@ const I18N = {
     checkoutTitle: "Buyurtmani rasmiylashtirish",
     checkoutSubtitle: "Ma'lumotlaringizni to'ldiring, kuryerimiz tez orada siz bilan bog'lanadi.",
     fullName: "To'liq ismingiz",
-    namePlaceholder: "Masalan: Shaxriyor Eshmbetov",
+    namePlaceholder: "Masalan: Fazliddin Tursunov",
     phoneNumber: "Telefon raqamingiz",
     deliveryAddress: "Yetkazib berish manzili",
     addressPlaceholder: "Shahar, tuman, ko'cha, uy raqami",

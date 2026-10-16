@@ -1920,29 +1920,42 @@ function renderCartDrawer() {
   }
 }
 
-function applyPromoCode() {
+function applyPromoCode(customCode) {
   const input = document.getElementById('promoInput');
-  if (!input) return;
-
-  const code = input.value.trim().toUpperCase();
+  const code = (customCode !== undefined ? customCode : (input ? input.value : '')).trim().toUpperCase();
   const lang = APP_STATE.lang || 'uz';
   if (!code) {
     showToast(lang === 'ru' ? 'Введите промокод!' : 'Promokodni kiriting!', 'alertTriangle');
-    return;
+    return false;
   }
 
   if (code === 'BLACK10' || code === 'APPLEBOX') {
     APP_STATE.promoCode = code;
     APP_STATE.discountRate = 0.10;
     renderCartDrawer();
+    if (APP_STATE.isCartView) renderCartPage();
     showToast(lang === 'ru' ? `Промокод ${code} активирован (-10%)!` : `${code} promokodi qo'llandi (-10%)!`, 'check');
+    return true;
   } else if (code === 'BLACK20') {
     APP_STATE.promoCode = code;
     APP_STATE.discountRate = 0.20;
     renderCartDrawer();
+    if (APP_STATE.isCartView) renderCartPage();
     showToast(lang === 'ru' ? 'Промокод BLACK20 активирован (-20%)!' : 'BLACK20 promokodi qo\'llandi (-20%)!', 'check');
+    return true;
   } else {
     showToast(lang === 'ru' ? 'Неверный или недействительный промокод!' : "Noto'g'ri yoki muddati o'tgan promokod!", 'alertTriangle');
+    return false;
+  }
+}
+
+function handleCheckoutPromoApply() {
+  const input = document.getElementById('promoInput');
+  if (input) {
+    const success = applyPromoCode(input.value);
+    if (success) {
+      openCheckoutModal();
+    }
   }
 }
 
@@ -2678,9 +2691,24 @@ function openCheckoutModal() {
         </div>
       </div>
 
+      <!-- Promokod qo'llash maydoni -->
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label class="form-label">${APP_STATE.lang === 'ru' ? 'Промокод (при наличии)' : 'Promo-kod (chegirma uchun)'}</label>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" class="form-input" id="promoInput" placeholder="${t('promoPlaceholder') || 'BLACK10'}" value="${APP_STATE.promoCode || ''}" style="flex: 1;" />
+          <button type="button" class="btn-promo btn-primary" onclick="handleCheckoutPromoApply()" style="padding: 0 16px; border-radius: var(--radius-md); font-size: 0.85rem; cursor: pointer; white-space: nowrap; font-weight: 600;">${t('apply')}</button>
+        </div>
+      </div>
+
       <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
-        <span style="font-size: 0.95rem; font-weight: 600;">${t('totalPayment')}</span>
-        <span style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--yellow-400);">${formatPrice(finalTotal)}</span>
+        <div>
+          <span style="font-size: 0.95rem; font-weight: 600;">${t('totalPayment')}</span>
+          ${APP_STATE.discountRate > 0 ? `<div style="font-size: 0.78rem; color: var(--text-muted); text-decoration: line-through;">${formatPrice(total)}</div>` : ''}
+        </div>
+        <div style="text-align: right;">
+          <span style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--yellow-400);">${formatPrice(finalTotal)}</span>
+          ${APP_STATE.discountRate > 0 ? `<div style="font-size: 0.78rem; color: #22c55e; font-weight: 600;">-${APP_STATE.discountRate * 100}% (${APP_STATE.promoCode})</div>` : ''}
+        </div>
       </div>
 
       <button type="submit" class="btn-checkout" id="checkoutSubmitBtn" style="margin-top: 10px;">
@@ -2694,6 +2722,11 @@ function openCheckoutModal() {
 
 async function handleCheckoutSubmit(event) {
   event.preventDefault();
+  const promoEl = document.getElementById('promoInput');
+  if (promoEl && promoEl.value.trim() && !APP_STATE.promoCode) {
+    applyPromoCode(promoEl.value.trim());
+  }
+
   const name = document.getElementById('checkoutName').value.trim();
   const phone = document.getElementById('checkoutPhone').value.trim();
   const address = document.getElementById('checkoutAddress').value.trim();

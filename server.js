@@ -23,15 +23,15 @@ const MONGO_URI = (process.env.MONGO_URI || '').trim();
 const SettingsSchema = new mongoose.Schema({
   key: { type: String, default: 'main', unique: true },
   shop: {
-    name: { type: String, default: "Malika iStore" },
-    tagline: { type: String, default: "Yunusobod Malika bozori • B-blok 24-do'kon" },
-    description: { type: String, default: "Original Apple & Samsung gadjetlari, noutbuklar va eng so'nggi aksessuarlar. Toshkent bo'ylab 2 soatda tezkor yetkazib berish!" },
-    phone: { type: String, default: "+998 90 123 45 67" },
-    address: { type: String, default: "Toshkent sh., Yunusobod t., Malika savdo majmuasi, B-blok 24-do'kon" },
-    instagram: { type: String, default: "https://instagram.com/malika_istore" },
-    telegramChannel: { type: String, default: "https://t.me/malika_istore" },
+    name: { type: String, default: "Black Store" },
+    tagline: { type: String, default: "Malika savdo markazi • B-blok 1-do'kon" },
+    description: { type: String, default: "BlackStore.uz — Apple mahsulotlari eng arzon narxlarda! 1 yilgacha rasmiy kafolat, tezkor yetkazib berish va sifatli xizmat ko'rsatish." },
+    phone: { type: String, default: "+998 (95) 196-44-44" },
+    address: { type: String, default: "Toshkent sh., Malika savdo markazi, B-blok 1-do'kon" },
+    instagram: { type: String, default: "https://instagram.com/blackstore.uz" },
+    telegramChannel: { type: String, default: "https://t.me/blackstore_uz" },
     currency: { type: String, default: "UZS" },
-    workingHours: { type: String, default: "10:00 - 20:00 (Dam olish kunisiz)" },
+    workingHours: { type: String, default: "09:00 - 22:00 (dam olish kunlarisiz)" },
     adminPin: { type: String, default: "1234" }
   },
   telegram: {
@@ -42,8 +42,8 @@ const SettingsSchema = new mongoose.Schema({
   ai: {
     provider: { type: String, default: "gemini" },
     apiKey: { type: String, default: "" },
-    systemPrompt: { type: String, default: "Siz 'Malika iStore' do'konining professional, samimiy va xushmuomala virtual sotuvchi-maslahatchisisiz. Sizning vazifangiz - xaridorlarga do'kondagi tovarlar haqida to'liq ma'lumot berish, ularning ehtiyojiga mos gadjet tanlashda yordam berish va ularni xarid qilishga (savatchaga qo'shish yoki buyurtma berishga) yo'naltirish. Faqat do'konda bor tovarlar va ularning haqiqiy narxlarini ayting. O'zbek va Rus tillarida xushmuomala javob bering." },
-    welcomeMessage: { type: String, default: "Assalomu alaykum! Men Malika iStore virtual maslahatchisiman. Qanday gadjet yoki telefon qidiryapsiz? Sizga qaysi narx oralig'ida tanlashda yordam beray?" }
+    systemPrompt: { type: String, default: "Siz 'Black Store' (Apple, Samsung va zamonaviy gadjetlar do'koni)ning aqlli AI savdo maslahatchisisiz. Sizning vazifangiz — xaridorlarga do'kondagi tovarlar, kafolat (1 yil), yetkazib berish va narxlar bo'yicha professional maslahat berish. Manzil: Malika B-blok 1-do'kon. Tel: +998 (95) 196-44-44." },
+    welcomeMessage: { type: String, default: "Assalomu alaykum! Black Store do'koniga xush kelibsiz! Qanday gadjet yoki Apple mahsuloti qidiryapsiz?" }
   }
 }, { timestamps: true, strict: false });
 
@@ -243,23 +243,23 @@ app.use('/uploads', express.static(UPLOADS_DIR));
 
 const DEFAULT_SETTINGS = {
   shop: {
-    name: "Malika iStore",
-    tagline: "Yunusobod Malika bozori • B-blok 24-do'kon",
-    description: "Original Apple & Samsung gadjetlari, noutbuklar va eng so'nggi aksessuarlar. Toshkent bo'ylab 2 soatda tezkor yetkazib berish!",
-    phone: "+998 90 123 45 67",
-    address: "Toshkent sh., Yunusobod t., Malika savdo majmuasi, B-blok 24-do'kon",
-    instagram: "https://instagram.com/malika_istore",
-    telegramChannel: "https://t.me/malika_istore",
+    name: "Black Store",
+    tagline: "Malika savdo markazi • B-blok 1-do'kon",
+    description: "BlackStore.uz — Apple mahsulotlari eng arzon narxlarda! 1 yilgacha rasmiy kafolat, tezkor yetkazib berish va sifatli xizmat ko'rsatish.",
+    phone: "+998 (95) 196-44-44",
+    address: "Toshkent sh., Malika savdo markazi, B-blok 1-do'kon",
+    instagram: "https://instagram.com/blackstore.uz",
+    telegramChannel: "https://t.me/blackstore_uz",
     currency: "UZS",
-    workingHours: "10:00 - 20:00 (Dam olish kunisiz)",
+    workingHours: "09:00 - 22:00 (dam olish kunlarisiz)",
     adminPin: process.env.ADMIN_PIN || "1234"
   },
   telegram: { botToken: "", chatId: "", enabled: false },
   ai: {
     provider: "gemini",
     apiKey: process.env.GEMINI_API_KEY || "",
-    systemPrompt: "Siz 'Malika iStore' do'konining professional, samimiy va xushmuomala virtual sotuvchi-maslahatchisisiz. Sizning vazifangiz - xaridorlarga do'kondagi tovarlar haqida to'liq ma'lumot berish, ularning ehtiyojiga mos gadjet tanlashda yordam berish va ularni xarid qilishga (savatchaga qo'shish yoki buyurtma berishga) yo'naltirish. Faqat do'konda bor tovarlar va ularning haqiqiy narxlarini ayting. O'zbek va Rus tillarida xushmuomala javob bering.",
-    welcomeMessage: "Assalomu alaykum! Men Malika iStore virtual maslahatchisiman. Qanday gadjet yoki telefon qidiryapsiz? Sizga qaysi narx oralig'ida tanlashda yordam beray?"
+    systemPrompt: "Siz 'Black Store' (Apple, Samsung va zamonaviy gadjetlar do'koni)ning aqlli AI savdo maslahatchisisiz. Sizning vazifangiz — xaridorlarga do'kondagi tovarlar, kafolat (1 yil), yetkazib berish va narxlar bo'yicha professional maslahat berish. Manzil: Malika B-blok 1-do'kon. Tel: +998 (95) 196-44-44.",
+    welcomeMessage: "Assalomu alaykum! Black Store do'koniga xush kelibsiz! Qanday gadjet yoki Apple mahsuloti qidiryapsiz?"
   }
 };
 
@@ -423,17 +423,18 @@ async function getAllProducts() {
 }
 
 async function getProductById(id) {
+  const targetId = String(id);
   if (mongoose.connection.readyState === 1) {
-    return await Product.findOne({ id }).lean();
+    return await Product.findOne({ id: targetId }).lean();
   }
   const list = readJsonSafe(PRODUCTS_FILE, []);
-  return list.find(p => p.id === id) || null;
+  return list.find(p => String(p.id) === targetId) || null;
 }
 
 async function createProduct(data) {
   const newProd = {
     ...data,
-    id: data.id || `prod-${Date.now()}`
+    id: data.id ? String(data.id) : `prod-${Date.now()}`
   };
 
   if (mongoose.connection.readyState === 1) {
@@ -452,10 +453,11 @@ async function createProduct(data) {
 }
 
 async function updateProduct(id, data) {
+  const targetId = String(id);
   if (mongoose.connection.readyState === 1) {
-    const updated = await Product.findOneAndUpdate({ id }, { $set: data }, { new: true, lean: true });
+    const updated = await Product.findOneAndUpdate({ id: targetId }, { $set: data }, { new: true, lean: true });
     const list = readJsonSafe(PRODUCTS_FILE, []);
-    const idx = list.findIndex(p => p.id === id);
+    const idx = list.findIndex(p => String(p.id) === targetId);
     if (idx !== -1 && updated) {
       list[idx] = updated;
       writeJsonSafe(PRODUCTS_FILE, list);
@@ -464,7 +466,7 @@ async function updateProduct(id, data) {
   }
 
   const list = readJsonSafe(PRODUCTS_FILE, []);
-  const idx = list.findIndex(p => p.id === id);
+  const idx = list.findIndex(p => String(p.id) === targetId);
   if (idx !== -1) {
     list[idx] = { ...list[idx], ...data };
     writeJsonSafe(PRODUCTS_FILE, list);
@@ -474,17 +476,18 @@ async function updateProduct(id, data) {
 }
 
 async function deleteProduct(id) {
+  const targetId = String(id);
   if (mongoose.connection.readyState === 1) {
-    const result = await Product.deleteOne({ id });
+    const result = await Product.deleteOne({ id: targetId });
     const list = readJsonSafe(PRODUCTS_FILE, []);
-    const filtered = list.filter(p => p.id !== id);
+    const filtered = list.filter(p => String(p.id) !== targetId);
     writeJsonSafe(PRODUCTS_FILE, filtered);
     return result.deletedCount > 0;
   }
 
   const list = readJsonSafe(PRODUCTS_FILE, []);
   const initialLen = list.length;
-  const filtered = list.filter(p => p.id !== id);
+  const filtered = list.filter(p => String(p.id) !== targetId);
   writeJsonSafe(PRODUCTS_FILE, filtered);
   return filtered.length < initialLen;
 }
@@ -518,11 +521,12 @@ async function createOrder(data) {
 }
 
 async function getOrderById(id) {
+  const targetId = String(id);
   if (mongoose.connection.readyState === 1) {
-    return await Order.findOne({ id }).lean();
+    return await Order.findOne({ $or: [{ id: targetId }, { _id: targetId }] }).lean();
   }
   const list = readJsonSafe(ORDERS_FILE, []);
-  return list.find(o => o.id === id) || null;
+  return list.find(o => String(o.id) === targetId || String(o._id) === targetId) || null;
 }
 
 // Buyurtma bekor qilinsa ombor qaytariladi, bekor holatdan qaytarilsa yana kamaytiriladi
@@ -545,7 +549,8 @@ async function updateOrderStatus(id, status) {
   if (!ORDER_STATUSES.includes(status)) {
     throw new Error(`Yaroqsiz holat: ${status}`);
   }
-  const current = await getOrderById(id);
+  const targetId = String(id);
+  const current = await getOrderById(targetId);
   if (!current) return null;
   const oldStatus = current.status;
 
@@ -558,9 +563,9 @@ async function updateOrderStatus(id, status) {
   }
 
   if (mongoose.connection.readyState === 1) {
-    const updated = await Order.findOneAndUpdate({ id }, { $set: { status } }, { new: true, lean: true });
+    const updated = await Order.findOneAndUpdate({ $or: [{ id: targetId }, { _id: targetId }] }, { $set: { status } }, { new: true, lean: true });
     const list = readJsonSafe(ORDERS_FILE, []);
-    const idx = list.findIndex(o => (o.id === id || o._id === id));
+    const idx = list.findIndex(o => (String(o.id) === targetId || String(o._id) === targetId));
     if (idx !== -1 && updated) {
       list[idx] = updated;
       writeJsonSafe(ORDERS_FILE, list);
@@ -569,7 +574,7 @@ async function updateOrderStatus(id, status) {
   }
 
   const list = readJsonSafe(ORDERS_FILE, []);
-  const idx = list.findIndex(o => (o.id === id || o._id === id));
+  const idx = list.findIndex(o => (String(o.id) === targetId || String(o._id) === targetId));
   if (idx !== -1) {
     list[idx].status = status;
     writeJsonSafe(ORDERS_FILE, list);
@@ -1290,7 +1295,7 @@ app.post(['/api/chat', '/api/ai/chat'], async (req, res) => {
       `- ${p.name} (${p.category}) narxi: ${formatSum(p.price)}, $${p.priceUsd}. ${p.description}. Xususiyatlar: ${(p.specs || []).join(', ')}. Holati: ${p.stock > 0 ? 'Mavjud (' + p.stock + ' ta)' : 'Tugagan'}`
     ).join('\n');
 
-    const storeInfo = `Do'kon: ${settings.shop?.name || 'Malika iStore'}, Manzil: ${settings.shop?.address || ''}, Ish vaqti: ${settings.shop?.workingHours || '10:00-20:00'}, Tel: ${settings.shop?.phone || ''}. 2 soat ichida Yandex orqali yetkazib berish. 1 yil rasmiy kafolat.`;
+    const storeInfo = `Do'kon: ${settings.shop?.name || 'Black Store'}, Manzil: ${settings.shop?.address || "Malika savdo markazi, B-blok 1-do'kon"}, Ish vaqti: ${settings.shop?.workingHours || '09:00 - 22:00'}, Tel: ${settings.shop?.phone || '+998 (95) 196-44-44'}. 2 soat ichida Yandex orqali yetkazib berish. 1 yil rasmiy kafolat.`;
 
     const activeApiKey = (aiConfig.apiKey && aiConfig.apiKey.trim().length > 10)
       ? aiConfig.apiKey.trim()
@@ -1331,16 +1336,16 @@ app.post(['/api/chat', '/api/ai/chat'], async (req, res) => {
 function generateSmartFallbackReply(msg, products, shop) {
   const text = msg.toLowerCase();
   if (text.includes('salom') || text.includes('assalom') || text.includes('privet')) {
-    return `Assalomu alaykum! Xush kelibsiz! Men ${shop?.name || 'Malika iStore'} AI yordamchisiman. Qaysi gadjet sizni qiziqtiryapti?`;
+    return `Assalomu alaykum! Xush kelibsiz! Men ${shop?.name || 'Black Store'} AI maslahatchisiman. Qanday gadjet yoki Apple mahsuloti sizni qiziqtiryapti?`;
   }
   if (text.includes('dostavka') || text.includes('yetkaz') || text.includes('yetkazib')) {
-    return `Ha! Toshkent shahri bo'ylab 1-2 soat ichida yetkazib beramiz. Shuningdek do'kondan o'zingiz ham olib ketishingiz mumkin!`;
+    return `Ha! Toshkent shahri bo'ylab 1-2 soat ichida yetkazib beramiz. Shuningdek do'kondan (Malika, B-blok 1-do'kon) o'zingiz ham olib ketishingiz mumkin!`;
   }
   if (text.includes('kafolat') || text.includes('garantiya') || text.includes('original')) {
     return `Barcha qurilmalar 100% original, zavod qutisida. Har biriga 1 yil rasmiy kafolat beramiz!`;
   }
   if (text.includes('qayerda') || text.includes('adres') || text.includes('manzil')) {
-    return `Manzil: ${shop?.address || 'Malika savdo majmuasi'}. Ish vaqti: ${shop?.workingHours || '10:00-20:00'}. Tel: ${shop?.phone || ''}`;
+    return `Manzil: ${shop?.address || "Toshkent sh., Malika savdo markazi, B-blok 1-do'kon"}. Ish vaqti: ${shop?.workingHours || '09:00 - 22:00'}. Tel: ${shop?.phone || '+998 (95) 196-44-44'}`;
   }
   const matched = products.filter(p => {
     const words = text.split(/\s+/);
