@@ -162,9 +162,8 @@ async function loadLiveProducts() {
       APP_STATE._lastProductsHash = liveHash;
       APP_STATE._hasLoadedLiveOnce = true;
 
-      const serverIds = new Set(liveProducts.map(p => String(p.id)));
-      const remainingStatic = (typeof PRODUCTS !== 'undefined' ? PRODUCTS : []).filter(p => !serverIds.has(String(p.id)) && !p.is_live);
-      PRODUCTS = [...liveProducts, ...remainingStatic];
+      // Serverdan kelgan jonli mahsulotlar asosiy ro'yxat bo'ladi (o'chirilgan demo tovarlar qayta chiqib qolmaydi)
+      PRODUCTS = liveProducts;
 
       renderProducts();
       renderCategoriesBar();
@@ -1668,21 +1667,27 @@ function toggleWishlist(productId) {
 // ==========================================================================
 // CART LOGIC
 // ==========================================================================
-function addToCart(productId, selectedColor = null, quantity = 1, btnElement = null) {
+function addToCart(productId, selectedColor = null, quantity = 1, btnElement = null, customPrice = null) {
   const pId = String(productId);
   const prod = PRODUCTS.find(p => String(p.id) === pId);
   if (!prod) return;
 
   const existingIndex = APP_STATE.cart.findIndex(item => String(item.id) === pId);
+  const finalPrice = customPrice ? Number(customPrice) : prod.price;
 
   if (existingIndex > -1) {
     APP_STATE.cart[existingIndex].quantity += quantity;
+    if (customPrice) {
+      APP_STATE.cart[existingIndex].price = finalPrice;
+      APP_STATE.cart[existingIndex].dealPrice = finalPrice;
+    }
   } else {
     APP_STATE.cart.push({
       id: pId,
       name_uz: prod.name_uz,
       name_ru: prod.name_ru,
-      price: prod.price,
+      price: finalPrice,
+      dealPrice: customPrice ? finalPrice : undefined,
       image: prod.main_image,
       color: selectedColor || (prod.colors && prod.colors[0]) || 'Standart',
       quantity: quantity
@@ -2775,6 +2780,8 @@ async function handleCheckoutSubmit(event) {
     items: APP_STATE.cart.map(item => ({
       id: String(item.id),
       name: item['name_' + lang] || item.name_uz || item.name || 'Mahsulot',
+      price: item.price ? Number(item.price) : undefined,
+      dealPrice: item.dealPrice ? Number(item.dealPrice) : undefined,
       quantity: Math.max(1, Number(item.quantity) || 1)
     }))
   };
@@ -3458,6 +3465,8 @@ async function handleCustomerAiSend(e) {
   if (!text) return;
   input.value = '';
 
+  APP_STATE.aiChatHistory = APP_STATE.aiChatHistory || [];
+
   // Append User message
   const userBubble = document.createElement('div');
   userBubble.className = 'ai-chat-bubble ai-bubble-user';
@@ -3468,7 +3477,7 @@ async function handleCustomerAiSend(e) {
   // Append Bot loading bubble
   const botBubble = document.createElement('div');
   botBubble.className = 'ai-chat-bubble ai-bubble-bot';
-  botBubble.innerHTML = `<div class="ai-bubble-content" style="display:flex;align-items:center;gap:6px;"><span class="ai-sparkle-dot"></span> <em>Javob tayyorlanmoqda...</em></div>`;
+  botBubble.innerHTML = `<div class="ai-bubble-content" style="display:flex;align-items:center;gap:6px;"><span class="ai-sparkle-dot"></span> <em>Sotuvchi o'ylab javob yozmoqda...</em></div>`;
   messagesBox.appendChild(botBubble);
   messagesBox.scrollTop = messagesBox.scrollHeight;
 
@@ -3478,11 +3487,45 @@ async function handleCustomerAiSend(e) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text })
+      body: JSON.stringify({
+        message: text,
+        history: APP_STATE.aiChatHistory.slice(-8)
+      })
     });
     const data = await res.json();
     const replyText = (data && data.reply) ? data.reply : "Kechirasiz, javob olishda muammo yuz berdi. Iltimos qaytadan urinib ko'ring.";
-    botBubble.innerHTML = `<div class="ai-bubble-content">${escapeHtml(replyText)}</div>`;
+
+    // Save to history
+    APP_STATE.aiChatHistory.push({ role: 'user', content: text });
+    APP_STATE.aiChatHistory.push({ role: 'assistant', content: replyText });
+
+    let bubbleHtml = `<div class="ai-bubble-content">${escapeHtml(replyText).replace(/\n/g, '<br>')}`;
+
+    // Agar savdolashuvda kelishuvga erishilgan bo'lsa (deal)
+    if (data && data.deal) {
+      const deal = data.deal;
+      const safeId = escapeJsString(deal.productId);
+      const safeName = escapeHtml(deal.productName || 'Mahsulot');
+      const safePrice = formatSum(deal.price);
+      const safeOld = deal.regularPrice ? formatSum(deal.regularPrice) : '';
+
+      bubbleHtml += `
+        <div class="ai-deal-agreement-card" style="margin-top: 10px; padding: 12px; background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 12px; animation: pulse 2s infinite;">
+          <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; color: #10b981; font-size: 0.88rem; margin-bottom: 4px;">
+            <span>🤝</span> <span>Kelishilgan Maxsus Narx!</span>
+          </div>
+          <div style="font-size: 0.8rem; color: #e2e8f0; margin-bottom: 8px;">
+            <b>${safeName}</b>: ${safeOld ? `<span style="text-decoration: line-through; color: #94a3b8; font-size: 0.78rem;">${safeOld}</span> ➔ ` : ''}<b style="color: #34d399; font-size: 1.05rem;">${safePrice}</b>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="acceptAiDeal('${safeId}', ${deal.price})" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; background: #10b981; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: #fff;">
+            <span>🛍️ Kelishilgan narxda savatga olish</span>
+          </button>
+        </div>
+      `;
+    }
+
+    bubbleHtml += `</div>`;
+    botBubble.innerHTML = bubbleHtml;
   } catch (err) {
     botBubble.innerHTML = `<div class="ai-bubble-content" style="color:#ef4444;">Tarmoq xatosi. Iltimos ulanishingizni tekshiring.</div>`;
   } finally {
@@ -3491,7 +3534,15 @@ async function handleCustomerAiSend(e) {
   }
 }
 
+function acceptAiDeal(productId, agreedPrice) {
+  addToCart(productId, null, 1, null, agreedPrice);
+  toggleCustomerAiChat(false);
+  toggleCartDrawer(true);
+  showToast("🤝 Kelishilgan maxsus narx savatga kiritildi!", "shoppingBag");
+}
+
 window.toggleCustomerAiChat = toggleCustomerAiChat;
 window.sendQuickAiPrompt = sendQuickAiPrompt;
 window.handleCustomerAiSend = handleCustomerAiSend;
+window.acceptAiDeal = acceptAiDeal;
 

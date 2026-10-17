@@ -332,7 +332,7 @@ const I18N = {
     checkoutTitle: "Оформление заказа",
     checkoutSubtitle: "Заполните контактные данные, наш менеджер свяжется с вами в ближайшее время.",
     fullName: "Ваше полное имя",
-    namePlaceholder: "Например: Шахриёр Эшмбетов",
+    namePlaceholder: "Например: Фазлиддин Турсунов",
     phoneNumber: "Номер телефона",
     deliveryAddress: "Адрес доставки",
     addressPlaceholder: "Город, район, улица, дом, квартира",

@@ -87,7 +87,10 @@ const adminI18n = {
     lblProdName: "Mahsulot Nomi *",
     lblCategory: "Toifa",
     lblBrand: "Brend",
-    lblPrice: "Narxi (so'mda) *",
+    lblPrice: "Sotuv Narxi (so'mda) *",
+    lblPriceHint: "Do'konda xaridorga ko'rinadigan rasmiy narx",
+    lblMinPrice: "Minimal Narx (AI tushib berishi mumkin bo'lgan chegara)",
+    lblMinPriceHint: "AI savdolashganda shu narxdan pastga tushmaydi. Mijozga ko'rinmaydi!",
     lblOldPrice: "Eski Narxi (so'mda)",
     lblDesc: "Qisqa Tavsif",
     lblSpecs: "Xususiyatlar (har bir qatorda 1 tadan)",
@@ -178,7 +181,10 @@ const adminI18n = {
     lblProdName: "Название Товара *",
     lblCategory: "Категория",
     lblBrand: "Бренд",
-    lblPrice: "Цена (в сумах) *",
+    lblPrice: "Цена продажи (в сумах) *",
+    lblPriceHint: "Официальная цена, отображаемая покупателю",
+    lblMinPrice: "Минимальная цена (порог торга для AI)",
+    lblMinPriceHint: "AI при торге не опустится ниже этой цены. Покупателю не видна!",
     lblOldPrice: "Старая цена (в сумах)",
     lblDesc: "Описание (Кратко)",
     lblSpecs: "Характеристики (по 1 в строке)",
@@ -1462,7 +1468,7 @@ function renderTopProducts(topProds) {
 // =============================================================================
 async function loadProducts() {
   try {
-    const res = await adminFetch('/api/products');
+    const res = await adminFetch('/api/admin/products');
     if (res.status === 401) return;
     const data = await res.json();
     adminState.products = Array.isArray(data) ? data : [];
@@ -1520,7 +1526,10 @@ function renderProductsTable() {
           <div style="font-weight: 700;">${safeName}</div>
           <small style="color: var(--text-muted);">${safeBrand} • ${safeCategory}</small>
         </td>
-        <td style="font-weight: 700; color: var(--accent-teal);">${formatSum(prod.price)}</td>
+        <td style="font-weight: 700; color: var(--accent-teal);">
+          <div>${formatSum(prod.price)}</div>
+          ${prod.minPrice ? `<small style="display:inline-flex; align-items:center; gap:3px; color: #f59e0b; font-weight: 600; font-size: 0.76rem; margin-top: 3px;" title="AI savdolashishining eng quyi chegarasi">🛡️ Min: ${formatSum(prod.minPrice)}</small>` : '<small style="color: var(--text-muted); font-size: 0.72rem;">Min narx belgilanmagan</small>'}
+        </td>
         <td><span class="pill-badge ${prod.stock > 0 ? 'pill-green' : 'pill-red'}">${Number(prod.stock || 0)} ta</span></td>
         <td>${safeBadge ? `<span class="pill-badge pill-yellow">${safeBadge}</span>` : '—'}</td>
         <td style="text-align: right;">
@@ -1538,6 +1547,8 @@ function openAddProductModal() {
   document.getElementById('crud-modal-title').textContent = adminI18n[adminState.lang]?.btnAddProduct || "Yangi Mahsulot Qo'shish";
   document.getElementById('crud-prod-id').value = '';
   document.getElementById('product-crud-form').reset();
+  const minPriceEl = document.getElementById('crud-prod-min-price');
+  if (minPriceEl) minPriceEl.value = '';
   resetPhotoSlots([]);
   document.getElementById('product-crud-modal').classList.remove('hidden');
 }
@@ -1552,6 +1563,8 @@ function openEditProductModal(id) {
   document.getElementById('crud-prod-category').value = prod.category;
   document.getElementById('crud-prod-brand').value = prod.brand || 'Apple';
   document.getElementById('crud-prod-price').value = prod.price;
+  const minPriceEl = document.getElementById('crud-prod-min-price');
+  if (minPriceEl) minPriceEl.value = (prod.minPrice !== undefined && prod.minPrice !== null && prod.minPrice !== 0) ? prod.minPrice : '';
   document.getElementById('crud-prod-old-price').value = prod.oldPrice || '';
   document.getElementById('crud-prod-desc').value = prod.description || '';
   document.getElementById('crud-prod-specs').value = (prod.specs || []).join('\n');
@@ -1570,6 +1583,8 @@ async function handleProductFormSubmit(e) {
   const isEdit = !!id;
 
   const priceVal = Number(document.getElementById('crud-prod-price').value);
+  const minPriceEl = document.getElementById('crud-prod-min-price');
+  const minPriceVal = minPriceEl && minPriceEl.value ? Number(minPriceEl.value) : 0;
   const oldPriceVal = document.getElementById('crud-prod-old-price').value;
   const priceUsd = Math.round(priceVal / 12800);
 
@@ -1578,6 +1593,7 @@ async function handleProductFormSubmit(e) {
   formData.append('category', document.getElementById('crud-prod-category').value);
   formData.append('brand', document.getElementById('crud-prod-brand').value.trim());
   formData.append('price', priceVal);
+  formData.append('minPrice', minPriceVal);
   if (oldPriceVal) formData.append('oldPrice', Number(oldPriceVal));
   formData.append('priceUsd', priceUsd);
   formData.append('description', document.getElementById('crud-prod-desc').value.trim());

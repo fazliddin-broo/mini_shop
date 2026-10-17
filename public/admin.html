@@ -1156,7 +1156,7 @@
           </div>
         </div>
 
-        <div class="form-row-3">
+        <div class="form-row-2">
           <div class="form-group">
             <label data-i18n="lblBrand">Brend</label>
             <select id="crud-prod-brand">
@@ -1170,12 +1170,33 @@
             </select>
           </div>
           <div class="form-group">
-            <label data-i18n="lblPrice">Narxi (so'mda) *</label>
-            <input type="number" id="crud-prod-price" placeholder="18500000" required>
-          </div>
-          <div class="form-group">
             <label data-i18n="lblOldPrice">Eski Narxi (so'mda)</label>
             <input type="number" id="crud-prod-old-price" placeholder="19900000">
+            <span class="field-hint" style="font-size: 0.72rem; color: var(--text-muted);">Chegirma ko'rsatish uchun (ixtiyoriy, usti chiziladi)</span>
+          </div>
+        </div>
+
+        <!-- Narxlar va AI Savdo chegarasi qatori (Bozorona qulay ko'rinish) -->
+        <div class="price-negotiation-card">
+          <div class="price-card-header">
+            <span class="price-card-badge">💰 Savdo & Narx Sozlamalari</span>
+            <small class="price-card-sub">AI virtual sotuvchi aynan shu narxlar asosida xaridor bilan savdolashadi</small>
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="crud-prod-price" style="font-weight: 700; color: #10b981;">
+                <span data-i18n="lblPrice">Sotuv Narxi (so'mda) *</span>
+              </label>
+              <input type="number" id="crud-prod-price" placeholder="18500000" required>
+              <span class="field-hint" data-i18n="lblPriceHint">Do'konda xaridorga ko'rinadigan rasmiy narx</span>
+            </div>
+            <div class="form-group">
+              <label for="crud-prod-min-price" style="font-weight: 700; color: #f59e0b;">
+                🛡️ <span data-i18n="lblMinPrice">Minimal Narx (AI tushib berishi mumkin bo'lgan chegara)</span>
+              </label>
+              <input type="number" id="crud-prod-min-price" placeholder="17000000">
+              <span class="field-hint" style="color: #f59e0b;" data-i18n="lblMinPriceHint">AI savdolashganda shu narxdan pastga tushmaydi. Mijozga ko'rinmaydi!</span>
+            </div>
           </div>
         </div>
 
