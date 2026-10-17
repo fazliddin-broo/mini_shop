@@ -1678,19 +1678,22 @@ function toggleWishlist(productId) {
 // ==========================================================================
 // CART LOGIC
 // ==========================================================================
-function addToCart(productId, selectedColor = null, quantity = 1, btnElement = null, customPrice = null) {
+function addToCart(productId, selectedColor = null, quantity = 1, btnElement = null, customPrice = null, explicitCurrency = null) {
   const pId = String(productId);
   const prod = PRODUCTS.find(p => String(p.id) === pId);
   if (!prod) return;
 
   const existingIndex = APP_STATE.cart.findIndex(item => String(item.id) === pId);
   const finalPrice = customPrice ? Number(customPrice) : prod.price;
+  const isUsd = explicitCurrency === 'USD' || explicitCurrency === '$' || (customPrice && Number(customPrice) <= 5000 && prod.priceUsd);
+  const finalCurrency = isUsd ? 'USD' : (explicitCurrency || prod.currency || 'UZS');
 
   if (existingIndex > -1) {
     APP_STATE.cart[existingIndex].quantity += quantity;
     if (customPrice) {
       APP_STATE.cart[existingIndex].price = finalPrice;
       APP_STATE.cart[existingIndex].dealPrice = finalPrice;
+      APP_STATE.cart[existingIndex].currency = finalCurrency;
     }
   } else {
     APP_STATE.cart.push({
@@ -1699,6 +1702,7 @@ function addToCart(productId, selectedColor = null, quantity = 1, btnElement = n
       name_ru: prod.name_ru,
       price: finalPrice,
       dealPrice: customPrice ? finalPrice : undefined,
+      currency: finalCurrency,
       image: prod.main_image,
       color: selectedColor || (prod.colors && prod.colors[0]) || 'Standart',
       quantity: quantity
@@ -1888,7 +1892,9 @@ function renderCartDrawer() {
 
   itemsContainer.innerHTML = APP_STATE.cart.map(item => {
     const itemTotal = item.price * item.quantity;
-    if (item.price <= 5000) {
+    const isItemUsd = item.currency === 'USD' || item.currency === '$' || (item.price <= 5000 && item.currency !== 'UZS');
+    const itemCurr = isItemUsd ? 'USD' : 'UZS';
+    if (isItemUsd) {
       usdTotal += itemTotal;
     } else {
       uzsTotal += itemTotal;
@@ -1903,7 +1909,7 @@ function renderCartDrawer() {
             <h4 class="cart-item-title">${escapeHtml(itemName)}</h4>
             <div style="font-size: 0.75rem; color: var(--text-muted);">${t('color')} ${escapeHtml(item.color || 'Standart')}</div>
           </div>
-          <div class="cart-item-price">${formatPrice(item.price, item.currency)}</div>
+          <div class="cart-item-price">${formatPrice(item.price, itemCurr)}</div>
           <div class="cart-item-qty">
             <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)">${getIcon('minus')}</button>
             <span class="qty-num">${item.quantity}</span>
@@ -1918,9 +1924,9 @@ function renderCartDrawer() {
   }).join('');
 
   const formatCartTotal = (usd, uzs) => {
-    if (usd > 0 && uzs > 0) return `${formatPrice(usd)} + ${formatPrice(uzs)}`;
-    if (usd > 0) return formatPrice(usd);
-    return formatPrice(uzs);
+    if (usd > 0 && uzs > 0) return `${formatPrice(usd, 'USD')} + ${formatPrice(uzs, 'UZS')}`;
+    if (usd > 0) return formatPrice(usd, 'USD');
+    return formatPrice(uzs, 'UZS');
   };
 
   if (APP_STATE.discountRate > 0) {
@@ -2506,7 +2512,9 @@ function renderCartPage() {
 
   const itemsHtml = APP_STATE.cart.map(item => {
     const itemTotal = item.price * item.quantity;
-    if (item.price <= 5000) {
+    const isItemUsd = item.currency === 'USD' || item.currency === '$' || (item.price <= 5000 && item.currency !== 'UZS');
+    const itemCurr = isItemUsd ? 'USD' : 'UZS';
+    if (isItemUsd) {
       usdTotal += itemTotal;
     } else {
       uzsTotal += itemTotal;
@@ -2527,7 +2535,7 @@ function renderCartPage() {
             <div class="applebox-cart-brand-tag">${escapeHtml(brand)}</div>
             <h3 class="applebox-cart-item-title" onclick="openProductDetail('${item.id}')">${escapeHtml(itemName)}</h3>
             <div class="applebox-cart-sku">${escapeHtml(sku)}</div>
-            <div class="applebox-cart-price-val">${formatPrice(item.price, item.currency)}</div>
+            <div class="applebox-cart-price-val">${formatPrice(item.price, itemCurr)}</div>
           </div>
         </div>
 
@@ -2547,7 +2555,7 @@ function renderCartPage() {
           </div>
           <div class="applebox-cart-item-subtotal">
             <span class="applebox-cart-subtotal-label">Jami</span>
-            <span class="applebox-cart-subtotal-val">${formatPrice(itemTotal)}</span>
+            <span class="applebox-cart-subtotal-val">${formatPrice(itemTotal, itemCurr)}</span>
           </div>
         </div>
       </div>
@@ -2555,9 +2563,9 @@ function renderCartPage() {
   }).join('');
 
   const formatCartTotal = (usd, uzs) => {
-    if (usd > 0 && uzs > 0) return `${formatPrice(usd)} + ${formatPrice(uzs)}`;
-    if (usd > 0) return formatPrice(usd);
-    return formatPrice(uzs);
+    if (usd > 0 && uzs > 0) return `${formatPrice(usd, 'USD')} + ${formatPrice(uzs, 'UZS')}`;
+    if (usd > 0) return formatPrice(usd, 'USD');
+    return formatPrice(uzs, 'UZS');
   };
 
   const finalTotalFormatted = formatCartTotal(usdTotal, uzsTotal);
@@ -2577,11 +2585,12 @@ function renderCartPage() {
           ${APP_STATE.cart.map(i => {
             const iName = i['name_' + lang] || i.name_uz;
             const iTotal = i.price * i.quantity;
+            const iCurr = i.currency || (i.price <= 5000 ? 'USD' : 'UZS');
             return `
               <div class="applebox-summary-item-row">
                 <span class="applebox-summary-item-name">${escapeHtml(iName)}</span>
                 <span class="applebox-summary-item-qty">×${i.quantity}</span>
-                <span class="applebox-summary-item-price">${formatPrice(iTotal)}</span>
+                <span class="applebox-summary-item-price">${formatPrice(iTotal, iCurr)}</span>
               </div>
             `;
           }).join('')}
@@ -2667,8 +2676,26 @@ function openCheckoutModal() {
   currentDeliveryMethod = 'yandex';
   currentPaymentMethod = t('cashDelivery');
 
-  const total = APP_STATE.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const finalTotal = APP_STATE.discountRate > 0 ? total * (1 - APP_STATE.discountRate) : total;
+  let usdTotal = 0;
+  let uzsTotal = 0;
+  APP_STATE.cart.forEach(item => {
+    const isUsd = item.currency === 'USD' || item.currency === '$' || (item.price <= 5000 && item.currency !== 'UZS');
+    if (isUsd) {
+      usdTotal += item.price * item.quantity;
+    } else {
+      uzsTotal += item.price * item.quantity;
+    }
+  });
+
+  const formatCheckoutTotal = (usd, uzs) => {
+    if (usd > 0 && uzs > 0) return `${formatPrice(usd, 'USD')} + ${formatPrice(uzs, 'UZS')}`;
+    if (usd > 0) return formatPrice(usd, 'USD');
+    return formatPrice(uzs, 'UZS');
+  };
+
+  const discountRate = APP_STATE.discountRate || 0;
+  const finalUsd = discountRate > 0 ? usdTotal * (1 - discountRate) : usdTotal;
+  const finalUzs = discountRate > 0 ? uzsTotal * (1 - discountRate) : uzsTotal;
 
   body.innerHTML = `
     <div style="margin-bottom: 20px;">
@@ -2719,10 +2746,10 @@ function openCheckoutModal() {
       <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
         <div>
           <span style="font-size: 0.95rem; font-weight: 600;">${t('totalPayment')}</span>
-          ${APP_STATE.discountRate > 0 ? `<div style="font-size: 0.78rem; color: var(--text-muted); text-decoration: line-through;">${formatPrice(total)}</div>` : ''}
+          ${APP_STATE.discountRate > 0 ? `<div style="font-size: 0.78rem; color: var(--text-muted); text-decoration: line-through;">${formatCheckoutTotal(usdTotal, uzsTotal)}</div>` : ''}
         </div>
         <div style="text-align: right;">
-          <span style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--yellow-400);">${formatPrice(finalTotal)}</span>
+          <span style="font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--yellow-400);">${formatCheckoutTotal(finalUsd, finalUzs)}</span>
           ${APP_STATE.discountRate > 0 ? `<div style="font-size: 0.78rem; color: #22c55e; font-weight: 600;">-${APP_STATE.discountRate * 100}% (${APP_STATE.promoCode})</div>` : ''}
         </div>
       </div>
@@ -2779,6 +2806,9 @@ async function handleCheckoutSubmit(event) {
   const total = APP_STATE.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const finalTotal = APP_STATE.discountRate > 0 ? total * (1 - APP_STATE.discountRate) : total;
 
+  const isUsdCart = APP_STATE.cart.some(item => item.currency === 'USD' || item.currency === '$' || (item.price <= 5000 && item.currency !== 'UZS'));
+  const orderCurrency = isUsdCart ? 'USD' : 'UZS';
+
   const orderPayload = {
     customer: {
       name: name || (lang === 'ru' ? 'Клиент' : 'Mijoz'),
@@ -2788,11 +2818,13 @@ async function handleCheckoutSubmit(event) {
       notes: `To'lov turi: ${currentPaymentMethod}`
     },
     promoCode: APP_STATE.promoCode || null,
+    currency: orderCurrency,
     items: APP_STATE.cart.map(item => ({
       id: String(item.id),
       name: item['name_' + lang] || item.name_uz || item.name || 'Mahsulot',
       price: item.price ? Number(item.price) : undefined,
       dealPrice: item.dealPrice ? Number(item.dealPrice) : undefined,
+      currency: item.currency || (item.price <= 5000 ? 'USD' : 'UZS'),
       quantity: Math.max(1, Number(item.quantity) || 1)
     }))
   };
@@ -2885,7 +2917,7 @@ async function handleCheckoutSubmit(event) {
         </div>
         <div style="display: flex; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border-subtle);">
           <span style="font-weight: 700;">${t('totalPayment')}</span>
-          <span style="font-weight: 800; color: var(--yellow-400);">${formatPrice(confirmedTotal)}</span>
+          <span style="font-weight: 800; color: var(--yellow-400);">${formatPrice(confirmedTotal, (orderResult && orderResult.currency) || orderCurrency)}</span>
         </div>
       </div>
 
@@ -3529,8 +3561,9 @@ async function executeAiChatMessage(text) {
       const deal = data.deal;
       const safeId = escapeJsString(deal.productId);
       const safeName = escapeHtml(deal.productName || 'Mahsulot');
-      const safePrice = formatSum(deal.price);
-      const safeOld = deal.regularPrice ? formatSum(deal.regularPrice) : '';
+      const dealCurr = (deal.currency === 'USD' || deal.currency === '$' || (Number(deal.price) <= 5000 && deal.currency !== 'UZS')) ? 'USD' : 'UZS';
+      const safePrice = formatPrice(deal.price, dealCurr);
+      const safeOld = deal.regularPrice ? formatPrice(deal.regularPrice, dealCurr) : '';
 
       bubbleHtml += `
         <div class="ai-deal-agreement-card" style="margin-top: 10px; padding: 12px; background: rgba(16, 185, 129, 0.12); border: 1.5px solid #10b981; border-radius: 12px; animation: pulse 2s infinite;">
@@ -3540,7 +3573,7 @@ async function executeAiChatMessage(text) {
           <div style="font-size: 0.8rem; color: #e2e8f0; margin-bottom: 8px;">
             <b>${safeName}</b>: ${safeOld ? `<span style="text-decoration: line-through; color: #94a3b8; font-size: 0.78rem;">${safeOld}</span> ➔ ` : ''}<b style="color: #34d399; font-size: 1.05rem;">${safePrice}</b>
           </div>
-          <button type="button" class="btn btn-primary" onclick="acceptAiDeal('${safeId}', ${deal.price})" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; background: #10b981; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: #fff;">
+          <button type="button" class="btn btn-primary" onclick="acceptAiDeal('${safeId}', ${deal.price}, '${dealCurr}')" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; background: #10b981; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: #fff;">
             <span>🛍️ Kelishilgan narxda savatga olish</span>
           </button>
         </div>
@@ -3568,8 +3601,8 @@ function retryAiMessage(text, btnEl) {
   executeAiChatMessage(text);
 }
 
-function acceptAiDeal(productId, agreedPrice) {
-  addToCart(productId, null, 1, null, agreedPrice);
+function acceptAiDeal(productId, agreedPrice, currency = 'UZS') {
+  addToCart(productId, null, 1, null, agreedPrice, currency);
   toggleCustomerAiChat(false);
   toggleCartDrawer(true);
   showToast("🤝 Kelishilgan maxsus narx savatga kiritildi!", "shoppingBag");

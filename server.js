@@ -685,7 +685,10 @@ async function sendTelegramMessage(botToken, chatId, text, parseMode = 'HTML') {
   }
 }
 
-function formatSum(num) {
+function formatSum(num, currency = null) {
+  if (currency === 'USD' || currency === '$') {
+    return Number(num || 0).toLocaleString('en-US') + ' $';
+  }
   return Number(num || 0).toLocaleString('uz-UZ') + " so'm";
 }
 
@@ -1140,9 +1143,19 @@ app.post('/api/orders', async (req, res) => {
         });
       }
 
-      // Narx bazadan olinadi; agar savdolashilgan narx (dealPrice) bo'lsa, minPrice dan kam emasligi qat'iy tekshiriladi
-      let unitPrice = Number(product.price || 0);
-      const minPrice = Number(product.minPrice || 0);
+      // Valyutani tekshirish (USD yoki UZS)
+      const itemCurr = String(it.currency || req.body.currency || '').toUpperCase();
+      const isUsd = itemCurr === 'USD' || itemCurr === '$' || (Number(it.dealPrice || it.price || 0) <= 5000 && product.priceUsd);
+      const effectiveCurr = isUsd ? 'USD' : 'UZS';
+
+      let unitPrice = isUsd
+        ? (Number(product.priceUsd) || Math.round(Number(product.price || 0) / 12800))
+        : Number(product.price || 0);
+
+      const minPrice = isUsd
+        ? (product.minPrice ? Math.round(Number(product.minPrice) / 12800) : Math.round(unitPrice * 0.92))
+        : Number(product.minPrice || 0);
+
       const clientDealPrice = Number(it.dealPrice || it.price || 0);
 
       if (clientDealPrice > 0 && minPrice > 0 && clientDealPrice >= minPrice && clientDealPrice < unitPrice) {
@@ -1154,6 +1167,7 @@ app.post('/api/orders', async (req, res) => {
         id: product.id,
         name: product.name,
         price: unitPrice,
+        currency: effectiveCurr,
         quantity: qty,
         currentStock
       });
@@ -1177,6 +1191,8 @@ app.post('/api/orders', async (req, res) => {
       serverTotal = Math.round(subtotal * (1 - discountRate));
     }
 
+    const orderCurrency = validatedItems.some(vi => vi.currency === 'USD') ? 'USD' : 'UZS';
+
     const newOrder = {
       id: orderId,
       createdAt: now.toISOString(),
@@ -1192,8 +1208,10 @@ app.post('/api/orders', async (req, res) => {
         id: vi.id,
         name: vi.name,
         price: vi.price,
+        currency: vi.currency,
         quantity: vi.quantity
       })),
+      currency: orderCurrency,
       subtotal,
       discount: discountRate > 0 ? (subtotal - serverTotal) : 0,
       promoCode: discountRate > 0 ? promoCode : null,
@@ -1225,7 +1243,7 @@ app.post('/api/orders', async (req, res) => {
     const tg = settings.telegram;
     if (tg && tg.botToken && tg.chatId && tg.enabled !== false) {
       const itemsText = newOrder.items
-        .map((it, idx) => `  ${idx + 1}. <b>${escapeTelegramHtml(it.name)}</b> x ${it.quantity} ta = ${formatSum(it.price * it.quantity)}`)
+        .map((it, idx) => `  ${idx + 1}. <b>${escapeTelegramHtml(it.name)}</b> x ${it.quantity} ta = ${formatSum(it.price * it.quantity, it.currency || newOrder.currency)}`)
         .join('\n');
       const isPickup = String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('borib') ||
         String(newOrder.customer.deliveryMethod || '').toLowerCase().includes('pickup') ||
@@ -1235,7 +1253,7 @@ app.post('/api/orders', async (req, res) => {
         : "Yandex kuryer orqali yetkazish";
 
       const discountText = discountRate > 0
-        ? `\n<b>Promokod (${escapeTelegramHtml(promoCode)}):</b> -${formatSum(subtotal - serverTotal)}\n<b>Asl summa:</b> <s>${formatSum(subtotal)}</s>\n`
+        ? `\n<b>Promokod (${escapeTelegramHtml(promoCode)}):</b> -${formatSum(subtotal - serverTotal, newOrder.currency)}\n<b>Asl summa:</b> <s>${formatSum(subtotal, newOrder.currency)}</s>\n`
         : '';
 
       const message = `<b>🛍 YANGI BUYURTMA #${escapeTelegramHtml(newOrder.id)}</b>\n\n` +
@@ -1246,7 +1264,7 @@ app.post('/api/orders', async (req, res) => {
         (newOrder.customer.notes ? `<b>📝 Izoh:</b> ${escapeTelegramHtml(newOrder.customer.notes)}\n` : '') +
         `\n<b>📦 Tovarlar:</b>\n${itemsText}\n` +
         discountText +
-        `\n💰 <b>JAMI TO'LOV:</b> <b>${formatSum(newOrder.total)}</b>\n` +
+        `\n💰 <b>JAMI TO'LOV:</b> <b>${formatSum(newOrder.total, newOrder.currency)}</b>\n` +
         `<i>🕒 Vaqt: ${escapeTelegramHtml(formattedDate)}</i>`;
 
       tgResult = await sendTelegramMessage(tg.botToken, tg.chatId, message);
@@ -1364,10 +1382,14 @@ app.post(['/api/chat', '/api/ai/chat'], async (req, res) => {
 
     const catalogContext = products.map(p => {
       const minP = Number(p.minPrice || 0);
+      const usdPrice = Number(p.priceUsd) || Math.round(Number(p.price || 0) / 12800);
+      const minUsd = minP > 0 ? Math.round(minP / 12800) : Math.round(usdPrice * 0.92);
+
       const minNote = minP > 0
-        ? `[MAXFIY MINIMAL CHEGARA: ${formatSum(minP)} (${minP} so'm) — DIQQAT: BU NARXNI XARIDORGA ASLO AYTMA!]`
-        : `[MAXFIY MINIMAL CHEGARA: ${formatSum(Math.round(p.price * 0.92))} (${Math.round(p.price * 0.92)} so'm) — XARIDORGA ASLO AYTMA!]`;
-      return `ID: ${p.id} | Nomi: "${p.name}" | Kategoriya: ${p.category} | Sotuv narxi: ${formatSum(p.price)} (${p.price} so'm) | ${minNote} | Holati: ${p.stock > 0 ? 'Mavjud (' + p.stock + ' ta)' : 'Tugagan'}`;
+        ? `[MAXFIY MINIMAL: ${formatSum(minP)} / $${minUsd} — XARIDORGA ASLO AYTMA!]`
+        : `[MAXFIY MINIMAL: ${formatSum(Math.round(p.price * 0.92))} / $${minUsd} — XARIDORGA ASLO AYTMA!]`;
+
+      return `ID: ${p.id} | Nomi: "${p.name}" | Kategoriya: ${p.category} | Sotuv narxi: ${formatSum(p.price)} ($${usdPrice}) | ${minNote} | Holati: ${p.stock > 0 ? 'Mavjud (' + p.stock + ' ta)' : 'Tugagan'}`;
     }).join('\n');
 
     const storeInfo = `Do'kon: ${settings.shop?.name || 'Black Store'}, Manzil: ${settings.shop?.address || "Malika savdo markazi, B-blok 1-do'kon"}, Ish vaqti: ${settings.shop?.workingHours || '09:00 - 22:00'}, Tel: ${settings.shop?.phone || '+998 (95) 196-44-44'}. 2 soat ichida Yandex orqali yetkazib berish. 1 yil rasmiy kafolat.`;
@@ -1381,38 +1403,46 @@ ${storeInfo}
 DO'KONDAGI TOVARLAR VA MAXFIY CHEGARALAR:
 ${catalogContext}
 
-QAT'IY SAVDOLASHISH QOIDALARI VA BOSQICHLARI:
-1. BIRDANIGA KATTA CHEGIRMA BERISH VA NARXNI TEZ TUSHIRIB YUBORISH QAT'IYAN MAN ETILADI!
-   - Tovardan birdaniga 20 000 - 30 000 so'm yoki 5-10% tushib yuborish XATODIR.
-   - Savdo jarayonini cho'zing! Odamlar darhol narx tushsa, yana va yana tushirishga harakat qilib, aldashga urinadi.
-   - Savdolashish kamida 3-4 bosqichda asta-sekin, qiyinchilik bilan bo'lishi shart!
+QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
+1. VALYUTA MOSLASHUVCHANLIGI (SO'M VA DOLLAR):
+   - Xaridor dollarda ($) savdolashsa (masalan "$1050 ga bering", "1000$ qilaylik", "dollarda qancha bo'ladi?"), siz ham SOF DOLLARDA ($) savdolashing va javob bering!
+   - Xaridor so'mda savdolashsa, SOF SO'MDA savdolashing!
+   - Xaridor qaysi valyutani tanlasa, kelishuv ham aynan o'sha valyutada bo'ladi.
+   - Kelishuv tegi:
+     Agar dollarda kelishsangiz: [DEAL:tovarId:narxDollarda:USD]
+     Misol: [DEAL:100:1050:USD]
+     Agar so'mda kelishsangiz: [DEAL:tovarId:narxSo'mda:UZS]
+     Misol: [DEAL:100:13500000:UZS]
 
-2. SAVDOLASHISHNING 4 TA BOSQICHI:
-   - 1-BOSQICH (Xaridor birinchi marta narx tushirishni so'raganda):
-     ASLO NARX TUSHIRMANG! Asl sotuv narxini himoya qiling:
-     "Aka, bu mahsulot 100% original, rasmiy 1 yil kafolati bor va narxi o'zi Malika bo'yicha eng past narxda qo'yilgan. Narxi o'ziga munosib, ishonavering."
-   - 2-BOSQICH (Xaridor yana tushirishni talab qilsa yoki talabaman/boshqa joyda arzon desa):
-     Faqat ramziy, juda kichik miqdor (masalan 1% atrofida, 5 000 so'm yoki 10 000 so'm) o'tib bering:
-     "Mayli aka, xaridor bo'lganingiz uchun hurmatingiz haqqi 5 000 so'm ramziy o'tib beraman, [masalan 445 000 so'm] qilib beray, nima dedingiz?"
-   - 3-BOSQICH (Xaridor yana tushirishni so'rasa yoki past narx taklif qilsa):
-     Qat'iy turing, foyda qolmayotganini, bu narxga o'zimizga ham kelmasligini ayting:
-     "Yo'q aka, bu narxga umuman qoplamaydi, o'zimizga ham foyda qolishi kerakku. Siz ham ozgina ko'taring, keling siz uchun yana 5 000 - 10 000 so'm o'taman, [masalan 435 000 so'm] qilib beray, rozi bo'ling."
-   - 4-BOSQICH (Faqat 3-4 marta qattiq savdolashgandan keyingina yakuniy o'rtada kelishuv):
-     "Sizgayam emas, mengayam emas, eng oxirgi to'xtagan joyimiz [masalan 425 000 so'm] bo'lsin! Undan bir so'm ham tusholmayman, aka!"
-     (Diqqat: Bu yakuniy narx ham [MAXFIY MINIMAL CHEGARA] dan yuqori bo'lishi shart!).
+2. TOVAR NARXI VA MARJASIGA MOSLASHGAN SAVDO (ADAPTIV SAVDO):
+   - Har bir tovarning o'z darajasi bor. Hamma tovarga bir xil 5 000 so'm tushilmaydi!
+   - Narxga mutanosib qadamlar:
+     * Kichik aksessuarlar (100 000 - 600 000 so'm / $10 - $50):
+       Chegirma qadami: 10 000 - 25 000 so'm ($1 - $2).
+     * O'rta toifadagi tovarlar (1 mln - 5 mln so'm / $80 - $400):
+       Chegirma qadami: 50 000 - 150 000 so'm ($5 - $15).
+     * Qimmat flagmanlar (iPhone, MacBook, 10 mln - 25 mln so'm / $800 - $2000):
+       Chegirma qadami: 100 000 - 350 000 so'm ($10 - $30).
+   - SAVDO BOSQICHLARI (Oltin o'rtaliq):
+     * 1-BOSQICH (Birinchi chegirma so'rovi): Asl narxni himoya qiling, 100% original va 1 yil kafolatini ta'kidlang. Narx tushirmang.
+     * 2-BOSQICH (Xaridor yana tushirishni so'rasa): Tovar toifasiga mos ramziy kichik chegirma qilib bering (aksessuarga 10k, telefonga 100k/$10).
+     * 3-BOSQICH (Xaridor yana tushir desa): Foyda qolmasligini, bu narxga o'zimizga ham kelmasligini ayting, xaridordan ham narxni ko'tarishni so'rab, o'rtada kelishing.
+     * 4-BOSQICH: Faqat 3-4 marta qattiq tortishuvdan so'ng "Sizgayam emas, mengayam emas..." deb yakuniy narxni bering. Bu yakuniy narx ham [MAXFIY MINIMAL CHEGARA] dan yuqori bo'lsin!
+   - O'ta toshday qaysar bo'lmang, lekin darhol bo'shashib minimal narxga ham tushmang.
 
-3. ALDOVGA VA MINIMAL NARXNI SURISHTIRISHGA QARSHI HIMOYALANISH:
-   - Agar xaridor minimal narxdan past narx aytsa, qat'iy rad eting: "Yo'q aka, bu narxga o'zimizga ham kelmaydi, umuman qoplamaydi".
-   - Agar xaridor: "Eng oxirgi narxing qancha?", "Eng minimal narxni ayt?", "Eng ko'pi bilan qanchaga tushib berasan?" desa:
-     ASLO ANIQ NARX AYTMANG! "Aka, aniq bir narx aytolmayman, siz o'zingiz taklif bering, savdolashamiz, ma'qul kelsa kelishamiz!" deng.
+3. ALDOVGA VA MINIMAL NARXNI SURISHTIRISHGA QARSHI:
+   - Xaridor minimal narxdan past aytsa: "Yo'q aka, bu narxga o'zimizga ham kelmaydi, umuman qoplamaydi" deb rad eting.
+   - "Eng oxirgi narxing qancha?", "Eng minimal narxni ayt?" desa:
+     HECH QACHON ANIQ MINIMAL NARXNI OSHKOR QILMANG! "Aka, aniq bir narx aytolmayman, siz o'zingiz taklif bering, savdolashamiz!" deng.
 
-4. BUYURTMANI SHU ARZON NARXDA RASMIYLASHTIRISH VA DEAL ACTION (ENG MUHIM QOIDA):
-   - Har qachon yakuniy narx taklif qilganingizda, yoki xaridor "roziman", "olaman", "qanday buyurtma qilaman", "rasmiylashtiraylik" desa:
-     ALBATTA xabaringizda aniq tushuntiring:
-     "Barakasini bering! Buyurtmani shu maxsus kelishilgan narxda rasmiylashtirish uchun pastdagi yashil 'Kelishilgan narxda savatga olish' tugmasini bosing! Tovar avtomatik ravishda savatingizga kelishilgan narxda tushadi va bir necha soniyada manzilingizga buyurtma berasiz!"
+4. BUYURTMA RASMIYLASHTIRISH VA DEAL ACTION (ENG MUHIM):
+   - Xaridor narxga rozi bo'lsa yoki "qanday rasmiylashtiraman", "olaman", "buyurtma qilaylik" desa:
+     Xabaringizda:
+     "Barakasini bering! Buyurtmani shu maxsus kelishilgan narxda rasmiylashtirish uchun pastdagi yashil 'Kelishilgan narxda savatga olish' tugmasini bosing! Tovar avtomatik ravishda savatingizga kelishilgan narxda tushadi va bir necha soniyada yetkazib berishga buyurtma berasiz!" deb tushuntiring.
      Va xabaringizning eng oxiriga aniq ushbu tegi qo'shing:
-     [DEAL:tovarId:kelishilganNarxRaqamda]
-     Misol: [DEAL:bs-502:425000]
+     [DEAL:tovarId:kelishilganNarx:VALYUTA]
+     Misol dollar uchun: [DEAL:100:1050:USD]
+     Misol so'm uchun: [DEAL:bs-502:425000:UZS]
 
 5. TIL VA USLUB:
    - Xaridor qaysi tilda yozsa (o'zbek yoki rus), o'sha tilda javob bering.
@@ -1551,29 +1581,41 @@ QAT'IY SAVDOLASHISH QOIDALARI VA BOSQICHLARI:
       usedProvider = 'smart-offline';
     }
 
-    // [DEAL:productId:price] tegini ajratib olish va tekshirish
+    // [DEAL:productId:price:currency] yoki [DEAL:productId:price] tegini ajratib olish va tekshirish
     let deal = null;
     let cleanReply = rawReply;
-    const dealMatch = rawReply.match(/\[DEAL:([^:]+):(\d+)\]/i);
+    const dealMatch = rawReply.match(/\[DEAL:([^:]+):(\d+)(?::([a-zA-Z$]+))?\]/i);
 
     if (dealMatch) {
       const dealProdId = String(dealMatch[1]).trim();
       const dealPrice = Number(dealMatch[2]);
+      let dealCurr = (dealMatch[3] || '').trim().toUpperCase();
       const matchedProd = products.find(p => String(p.id) === dealProdId);
 
       if (matchedProd && dealPrice > 0) {
-        const minP = Number(matchedProd.minPrice || 0);
-        // Xavfsizlik: kelishilgan narx minPrice dan past bo'lmasligi kerak
+        if (!dealCurr || dealCurr === '$') {
+          dealCurr = (dealPrice <= 5000 && matchedProd.priceUsd) ? 'USD' : 'UZS';
+        }
+        const isUsd = dealCurr === 'USD';
+        const prodPrice = isUsd
+          ? (Number(matchedProd.priceUsd) || Math.round(Number(matchedProd.price || 0) / 12800))
+          : Number(matchedProd.price || 0);
+
+        const minP = isUsd
+          ? (matchedProd.minPrice ? Math.round(Number(matchedProd.minPrice) / 12800) : Math.round(prodPrice * 0.92))
+          : Number(matchedProd.minPrice || 0);
+
         if (minP === 0 || dealPrice >= minP) {
           deal = {
             productId: matchedProd.id,
             productName: matchedProd.name,
             price: dealPrice,
-            regularPrice: matchedProd.price
+            regularPrice: prodPrice,
+            currency: dealCurr
           };
         }
       }
-      cleanReply = rawReply.replace(/\[DEAL:([^:]+):(\d+)\]/gi, '').trim();
+      cleanReply = rawReply.replace(/\[DEAL:[^\]]+\]/gi, '').trim();
     }
 
     // AUTO-DEAL VA BUYURTMA RASMIYLASHTIRISH HIMOYASI (SAFEGUARD):
@@ -1595,42 +1637,85 @@ QAT'IY SAVDOLASHISH QOIDALARI VA BOSQICHLARI:
       }
 
       if (targetProd) {
-        const priceRegex = /(\d{1,3}(?:\s?\d{3})+)\s*(?:so'm|som|sum)?/gi;
-        let foundPrice = null;
+        const allDiscussed = cleanReply + ' ' + (history || []).slice(-2).map(h => h.content).join(' ');
+        const isDollarContext = allDiscussed.includes('$') || allDiscussed.toLowerCase().includes('dollar') || allDiscussed.toLowerCase().includes('usd');
 
-        // 1. Joriy javob matnidan narx qidirish
-        const matches = [...cleanReply.matchAll(priceRegex)];
-        if (matches.length > 0) {
+        let foundPrice = null;
+        let foundCurr = 'UZS';
+
+        if (isDollarContext) {
+          // Dollar narxlarni qidirish
+          const dollarRegex = /(?:\$|\bUSD\b)?\s*(\d{2,4})\s*(?:\$|\bUSD\b|\bdollar\b)?/gi;
+          const dMatches = [...cleanReply.matchAll(dollarRegex)];
+          for (const m of dMatches) {
+            const num = Number(m[1]);
+            const targetUsd = Number(targetProd.priceUsd) || Math.round(targetProd.price / 12800);
+            const minUsd = targetProd.minPrice ? Math.round(targetProd.minPrice / 12800) : Math.round(targetUsd * 0.92);
+            if (num >= minUsd && num <= targetUsd) {
+              foundPrice = num;
+              foundCurr = 'USD';
+            }
+          }
+        }
+
+        if (!foundPrice) {
+          // So'm narxlarni qidirish
+          const priceRegex = /(\d{1,3}(?:\s?\d{3})+)\s*(?:so'm|som|sum)?/gi;
+          const matches = [...cleanReply.matchAll(priceRegex)];
           for (const m of matches) {
             const num = Number(m[1].replace(/\s+/g, ''));
             const minP = Number(targetProd.minPrice || 0);
             if (num > 10000 && num <= targetProd.price && (minP === 0 || num >= minP)) {
               foundPrice = num;
+              foundCurr = 'UZS';
             }
           }
         }
 
-        // 2. Agar joriy javobda bo'lmasa, lekin xaridor rozi bo'lgan bo'lsa, avvalgi xabardan narxni olish
+        // Agar joriy javobda bo'lmasa, lekin xaridor rozi bo'lgan bo'lsa, avvalgi xabardan narxni olish
         if (!foundPrice && isAgreement && Array.isArray(history) && history.length > 0) {
           const lastAssistantMsg = [...history].reverse().find(h => h.role === 'assistant');
           if (lastAssistantMsg) {
-            const histMatches = [...lastAssistantMsg.content.matchAll(priceRegex)];
-            for (const m of histMatches) {
-              const num = Number(m[1].replace(/\s+/g, ''));
-              const minP = Number(targetProd.minPrice || 0);
-              if (num > 10000 && num <= targetProd.price && (minP === 0 || num >= minP)) {
-                foundPrice = num;
+            const lastText = lastAssistantMsg.content;
+            if (lastText.includes('$') || lastText.toLowerCase().includes('dollar') || lastText.toLowerCase().includes('usd')) {
+              const dollarRegex = /(?:\$|\bUSD\b)?\s*(\d{2,4})\s*(?:\$|\bUSD\b|\bdollar\b)?/gi;
+              const dMatches = [...lastText.matchAll(dollarRegex)];
+              for (const m of dMatches) {
+                const num = Number(m[1]);
+                const targetUsd = Number(targetProd.priceUsd) || Math.round(targetProd.price / 12800);
+                const minUsd = targetProd.minPrice ? Math.round(targetProd.minPrice / 12800) : Math.round(targetUsd * 0.92);
+                if (num >= minUsd && num <= targetUsd) {
+                  foundPrice = num;
+                  foundCurr = 'USD';
+                }
+              }
+            }
+            if (!foundPrice) {
+              const priceRegex = /(\d{1,3}(?:\s?\d{3})+)\s*(?:so'm|som|sum)?/gi;
+              const histMatches = [...lastText.matchAll(priceRegex)];
+              for (const m of histMatches) {
+                const num = Number(m[1].replace(/\s+/g, ''));
+                const minP = Number(targetProd.minPrice || 0);
+                if (num > 10000 && num <= targetProd.price && (minP === 0 || num >= minP)) {
+                  foundPrice = num;
+                  foundCurr = 'UZS';
+                }
               }
             }
           }
         }
 
         if (foundPrice) {
+          const regularPrice = foundCurr === 'USD'
+            ? (Number(targetProd.priceUsd) || Math.round(targetProd.price / 12800))
+            : targetProd.price;
+
           deal = {
             productId: targetProd.id,
             productName: targetProd.name,
             price: foundPrice,
-            regularPrice: targetProd.price
+            regularPrice,
+            currency: foundCurr
           };
 
           if (!cleanReply.includes('savatga olish') && !cleanReply.includes('tugma')) {
@@ -1652,14 +1737,21 @@ QAT'IY SAVDOLASHISH QOIDALARI VA BOSQICHLARI:
 
 function generateSmartFallbackReply(msg, products, shop, history = []) {
   const text = (msg || '').toLowerCase();
+  const isDollar = text.includes('$') || text.includes('dollar') || text.includes('usd');
 
   // Kelishuv va buyurtma rasmiylashtirish
   if (text.includes('rozi') || text.includes('olaman') || text.includes('buyurtma') || text.includes('rasmiy') || text.includes('kelishdik')) {
     const p = products[0];
     if (p) {
+      if (isDollar) {
+        const usdP = Number(p.priceUsd) || Math.round(p.price / 12800);
+        const minUsd = p.minPrice ? Math.round(p.minPrice / 12800) : Math.round(usdP * 0.92);
+        const agreed = Math.max(minUsd, Math.round(usdP * 0.96));
+        return `Barakasini bering! Tabriklayman! Buyurtmani shu maxsus kelishilgan ${agreed} $ narxda rasmiylashtirish uchun quyidagi 'Kelishilgan narxda savatga olish' tugmasini bosing! Tovar avtomatik savatingizga tushadi va manzilingizga buyurtma berasiz! [DEAL:${p.id}:${agreed}:USD]`;
+      }
       const minP = Number(p.minPrice || Math.round(p.price * 0.92));
-      const agreed = Math.max(minP, Math.round(p.price * 0.95));
-      return `Barakasini bering! Tabriklayman! Buyurtmani shu maxsus kelishilgan narxda rasmiylashtirish uchun quyidagi 'Kelishilgan narxda savatga olish' tugmasini bosing! Tovar avtomatik savatingizga tushadi va manzilingizga buyurtma berasiz! [DEAL:${p.id}:${agreed}]`;
+      const agreed = Math.max(minP, Math.round(p.price * 0.96));
+      return `Barakasini bering! Tabriklayman! Buyurtmani shu maxsus kelishilgan narxda rasmiylashtirish uchun quyidagi 'Kelishilgan narxda savatga olish' tugmasini bosing! Tovar avtomatik savatingizga tushadi va manzilingizga buyurtma berasiz! [DEAL:${p.id}:${agreed}:UZS]`;
     }
   }
 

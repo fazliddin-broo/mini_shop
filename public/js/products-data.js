@@ -1578,8 +1578,8 @@ function formatPrice(amount, explicitCurrency = null) {
   if (!amount && amount !== 0) return '';
   const num = Math.round(Number(amount) || 0);
 
-  // Faqat explicit currency === '$' bo'lsa dollarda ko'rsatiladi
-  if (explicitCurrency === '$') {
+  // Explicit USD yoki qiymat <= 5000 bo'lsa dollarda formatlash
+  if (explicitCurrency === '$' || explicitCurrency === 'USD' || (!explicitCurrency && num > 0 && num <= 5000)) {
     return new Intl.NumberFormat('en-US').format(num).replace(/,/g, ' ') + ' $';
   }
 
@@ -1588,3 +1588,4 @@ function formatPrice(amount, explicitCurrency = null) {
   const locale = currentLang === 'ru' ? 'ru-RU' : 'uz-UZ';
   return new Intl.NumberFormat(locale).format(num).replace(/,/g, ' ') + ' ' + currency;
 }
+

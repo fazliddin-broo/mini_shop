@@ -214,10 +214,14 @@ const adminState = {
 };
 
 // Utility: Format currency
-function formatSum(num) {
+function formatSum(num, currency = null) {
+  const n = Number(num || 0);
+  if (currency === 'USD' || currency === '$' || (currency !== 'UZS' && n > 0 && n <= 5000)) {
+    return n.toLocaleString('en-US').replace(/,/g, ' ') + ' $';
+  }
   const locale = adminState.lang === 'ru' ? 'ru-RU' : 'uz-UZ';
   const suffix = adminState.lang === 'ru' ? 'сум' : "so'm";
-  return Number(num || 0).toLocaleString(locale) + ' ' + suffix;
+  return n.toLocaleString(locale).replace(/,/g, ' ') + ' ' + suffix;
 }
 
 // Utility: Escape HTML
@@ -806,7 +810,7 @@ function renderRecentOrdersTable() {
         <td><span class="table-id-badge">#${order.id.slice(-5).toUpperCase()}</span></td>
         <td><span class="table-time-badge">${order.formattedDate || new Date(order.createdAt).toLocaleDateString('uz-UZ')}</span></td>
         <td><span class="table-qty-badge" title="${escapeHtml(itemSummary)}">${escapeHtml(itemSummary)}</span></td>
-        <td><span class="table-sum-bold">${formatSum(order.total)}</span></td>
+        <td><span class="table-sum-bold">${formatSum(order.total, order.currency)}</span></td>
         <td>
           <div class="table-action-btns">
             ${actionBtnsHtml}
@@ -1730,7 +1734,7 @@ function renderAllOrdersTable() {
         </td>
         <td><span class="table-time-badge">${safeDate}</span></td>
         <td><div style="font-size: 0.82rem; line-height: 1.4;">${itemsHtml || 'Gadjetlar'}</div></td>
-        <td style="font-weight: 700; color: var(--accent-teal);">${formatSum(order.total)}</td>
+        <td style="font-weight: 700; color: var(--accent-teal);">${formatSum(order.total, order.currency)}</td>
         <td>${statusBadge}</td>
         <td>
           <div class="table-action-btns">
@@ -1787,19 +1791,19 @@ function openOrderModal(id) {
     <tr>
       <td><b>${escapeHtml(it.name || '')}</b></td>
       <td>${escapeHtml(String(it.quantity || 1))} ta</td>
-      <td>${formatSum(it.price)}</td>
-      <td style="text-align: right; font-weight: 700; color: var(--accent-teal);">${formatSum((it.price || 0) * (it.quantity || 1))}</td>
+      <td>${formatSum(it.price, it.currency || order.currency)}</td>
+      <td style="text-align: right; font-weight: 700; color: var(--accent-teal);">${formatSum((it.price || 0) * (it.quantity || 1), it.currency || order.currency)}</td>
     </tr>
   `).join('');
 
   if (order.promoCode && order.discount) {
     document.getElementById('ord-view-total').innerHTML = `
-      <span style="font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through; margin-right: 8px;">${formatSum(order.subtotal || (order.total + order.discount))}</span>
-      <span>${formatSum(order.total)}</span>
-      <span class="pill-badge pill-yellow" style="margin-left: 8px; font-size: 0.75rem;">${escapeHtml(order.promoCode)} (-${formatSum(order.discount)})</span>
+      <span style="font-size: 0.85rem; color: var(--text-muted); text-decoration: line-through; margin-right: 8px;">${formatSum(order.subtotal || (order.total + order.discount), order.currency)}</span>
+      <span>${formatSum(order.total, order.currency)}</span>
+      <span class="pill-badge pill-yellow" style="margin-left: 8px; font-size: 0.75rem;">${escapeHtml(order.promoCode)} (-${formatSum(order.discount, order.currency)})</span>
     `;
   } else {
-    document.getElementById('ord-view-total').textContent = formatSum(order.total);
+    document.getElementById('ord-view-total').textContent = formatSum(order.total, order.currency);
   }
   document.getElementById('ord-view-status-select').value = order.status || 'new';
 
