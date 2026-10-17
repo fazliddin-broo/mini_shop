@@ -1435,10 +1435,13 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
    - "Eng oxirgi narxing qancha?", "Eng minimal narxni ayt?" desa:
      HECH QACHON ANIQ MINIMAL NARXNI OSHKOR QILMANG! "Aka, aniq bir narx aytolmayman, siz o'zingiz taklif bering, savdolashamiz!" deng.
 
-4. BUYURTMA RASMIYLASHTIRISH VA DEAL ACTION (ENG MUHIM):
-   - Xaridor narxga rozi bo'lsa yoki "qanday rasmiylashtiraman", "olaman", "buyurtma qilaylik" desa:
+4. BUYURTMA RASMIYLASHTIRISH VA DEAL ACTION (ENG QAT'IY QOIDA):
+   - QAT'IY TAQIQLANADI:
+     Xaridor hali narx tushirishni so'rayotganida (masalan "ukam shuni 400 qilib ber", "380 bo'ladimi", "arzonroq bering"), siz narx taklif qilayotganingizda yoki rad etayotganingizda HECH QACHON [DEAL] tegini qo'ymang va "Buyurtmani rasmiylashtirish uchun pastdagi tugmani bosing" deb YOZMANG!
+     Chunki xaridor hali rozi bo'lgani yo'q, u faqat narx tushirishni so'rayapti!
+   - FAQAT VA FAQAT xaridor siz aytgan narxga ROZI BO'LIB, "olaman", "roziman", "kelishdik", "buyurtma qilaylik", "sotib olaman" deb ANIQLIK KIRITGANDAGINA:
      Xabaringizda:
-     "Barakasini bering! Buyurtmani shu maxsus kelishilgan narxda rasmiylashtirish uchun pastdagi yashil 'Kelishilgan narxda savatga olish' tugmasini bosing! Tovar avtomatik ravishda savatingizga kelishilgan narxda tushadi va bir necha soniyada yetkazib berishga buyurtma berasiz!" deb tushuntiring.
+     "Barakasini bering! Tabriklayman! Buyurtmani shu maxsus kelishilgan narxda rasmiylashtirish uchun pastdagi yashil 'Kelishilgan narxda savatga olish' tugmasini bosing! Tovar avtomatik ravishda savatingizga kelishilgan narxda tushadi va bir necha soniyada yetkazib berishga buyurtma berasiz!" deb tushuntiring.
      Va xabaringizning eng oxiriga aniq ushbu tegi qo'shing:
      [DEAL:tovarId:kelishilganNarx:VALYUTA]
      Misol dollar uchun: [DEAL:100:1050:USD]
@@ -1459,8 +1462,73 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
     let rawReply = null;
     let usedProvider = null;
 
-    // 1. PRIMARY AI: OpenAI GPT (faqat limit tugamagan bo'lsa)
-    if (openAiKey && Date.now() > openAiDisabledUntil) {
+    // 1. PRIMARY AI: Google Gemini Flash (Eng tezkor va faol model - 1.2s)
+    if (geminiKey) {
+      try {
+        const contents = [];
+        if (Array.isArray(history)) {
+          history.slice(-8).forEach(h => {
+            const role = h.role === 'user' ? 'user' : 'model';
+            if (contents.length > 0 && contents[contents.length - 1].role === role) {
+              contents[contents.length - 1].parts[0].text += `\n${String(h.content || '')}`;
+            } else {
+              contents.push({
+                role,
+                parts: [{ text: String(h.content || '') }]
+              });
+            }
+          });
+        }
+
+        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+          contents[contents.length - 1].parts[0].text += `\n${message}`;
+        } else {
+          contents.push({ role: 'user', parts: [{ text: message }] });
+        }
+
+        const tryGemini = async (modelName) => {
+          const geminiController = new AbortController();
+          const geminiTimer = setTimeout(() => geminiController.abort(), 6000);
+          try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`;
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              signal: geminiController.signal,
+              body: JSON.stringify({
+                systemInstruction: { parts: [{ text: masterPrompt }] },
+                contents,
+                generationConfig: {
+                  temperature: 0.45,
+                  maxOutputTokens: 500
+                }
+              })
+            });
+            if (!res.ok) {
+              return null;
+            }
+            return await res.json();
+          } catch (_) {
+            return null;
+          } finally {
+            clearTimeout(geminiTimer);
+          }
+        };
+
+        let data = await tryGemini('gemini-2.5-flash');
+        if (!data?.candidates) data = await tryGemini('gemini-flash-latest');
+
+        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          rawReply = data.candidates[0].content.parts[0].text;
+          usedProvider = 'gemini';
+        }
+      } catch (err) {
+        console.warn('⚠️ Gemini xatolik:', err.message);
+      }
+    }
+
+    // 2. SECONDARY AI: OpenAI GPT (faqat Gemini ishlamasa va limit bo'lsa)
+    if (!rawReply && openAiKey && Date.now() > openAiDisabledUntil) {
       const openAiController = new AbortController();
       const openAiTimer = setTimeout(() => openAiController.abort(), 4000);
       try {
@@ -1498,80 +1566,14 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
         } else {
           const errText = await r.text();
           if (r.status === 429 || r.status === 401) {
-            openAiDisabledUntil = Date.now() + 10 * 60 * 1000; // 10 daqiqa kutish
+            openAiDisabledUntil = Date.now() + 24 * 60 * 60 * 1000; // 24 soat kutish
           }
-          console.warn('⚠️ OpenAI javob bermadi (status:', r.status, '), Geminiga o\'tilmoqda');
+          console.warn('⚠️ OpenAI javob bermadi (status:', r.status, '), Smart Offline dvigateliga o\'tilmoqda');
         }
       } catch (err) {
-        console.warn('⚠️ OpenAI tarmoq xatosi, Geminiga o\'tilmoqda:', err.message);
+        console.warn('⚠️ OpenAI tarmoq xatosi, Smart Offline dvigateliga o\'tilmoqda:', err.message);
       } finally {
         clearTimeout(openAiTimer);
-      }
-    }
-
-    // 2. SECONDARY / FAST AI: Google Gemini Flash
-    if (!rawReply && geminiKey) {
-      try {
-        const contents = [];
-        if (Array.isArray(history)) {
-          history.slice(-8).forEach(h => {
-            const role = h.role === 'user' ? 'user' : 'model';
-            // Alternatsiya tekshiruvi: ketma-ket bir xil role bo'lmasligi kerak
-            if (contents.length > 0 && contents[contents.length - 1].role === role) {
-              contents[contents.length - 1].parts[0].text += `\n${String(h.content || '')}`;
-            } else {
-              contents.push({
-                role,
-                parts: [{ text: String(h.content || '') }]
-              });
-            }
-          });
-        }
-
-        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
-          contents[contents.length - 1].parts[0].text += `\n${message}`;
-        } else {
-          contents.push({ role: 'user', parts: [{ text: message }] });
-        }
-
-        const tryGemini = async (modelName) => {
-          const geminiController = new AbortController();
-          const geminiTimer = setTimeout(() => geminiController.abort(), 8000);
-          try {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`;
-            const res = await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              signal: geminiController.signal,
-              body: JSON.stringify({
-                systemInstruction: { parts: [{ text: masterPrompt }] },
-                contents,
-                generationConfig: {
-                  temperature: 0.45,
-                  maxOutputTokens: 500
-                }
-              })
-            });
-            if (!res.ok) {
-              return null;
-            }
-            return await res.json();
-          } catch (_) {
-            return null;
-          } finally {
-            clearTimeout(geminiTimer);
-          }
-        };
-
-        let data = await tryGemini('gemini-flash-latest');
-        if (!data?.candidates) data = await tryGemini('gemini-2.5-flash');
-
-        if (data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-          rawReply = data.candidates[0].content.parts[0].text;
-          usedProvider = 'gemini';
-        }
-      } catch (err) {
-        console.warn('⚠️ Gemini fallback xatolik:', err.message);
       }
     }
 
@@ -1581,145 +1583,117 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
       usedProvider = 'smart-offline';
     }
 
-    // [DEAL:productId:price:currency] yoki [DEAL:productId:price] tegini ajratib olish va tekshirish
+    // Xaridor rozi bo'lgan-bo'lmaganini aniqlash:
+    // Faqat xaridor "olaman", "roziman", "kelishdik", "buyurtma beraman" deb ANIQLIK kiritgandagina KELISHUV amalga oshadi.
+    // Savdolashish paytida ("ukam shuni 400 qilib ber", "arzonroq bering") KELISHUV YO'Q!
+    const isCustomerAgreement = isExplicitCustomerAgreement(message);
+
     let deal = null;
     let cleanReply = rawReply;
     const dealMatch = rawReply.match(/\[DEAL:([^:]+):(\d+)(?::([a-zA-Z$]+))?\]/i);
 
-    if (dealMatch) {
-      const dealProdId = String(dealMatch[1]).trim();
-      const dealPrice = Number(dealMatch[2]);
-      let dealCurr = (dealMatch[3] || '').trim().toUpperCase();
-      const matchedProd = products.find(p => String(p.id) === dealProdId);
-
-      if (matchedProd && dealPrice > 0) {
-        if (!dealCurr || dealCurr === '$') {
-          dealCurr = (dealPrice <= 5000 && matchedProd.priceUsd) ? 'USD' : 'UZS';
-        }
-        const isUsd = dealCurr === 'USD';
-        const prodPrice = isUsd
-          ? (Number(matchedProd.priceUsd) || Math.round(Number(matchedProd.price || 0) / 12800))
-          : Number(matchedProd.price || 0);
-
-        const minP = isUsd
-          ? (matchedProd.minPrice ? Math.round(Number(matchedProd.minPrice) / 12800) : Math.round(prodPrice * 0.92))
-          : Number(matchedProd.minPrice || 0);
-
-        if (minP === 0 || dealPrice >= minP) {
-          deal = {
-            productId: matchedProd.id,
-            productName: matchedProd.name,
-            price: dealPrice,
-            regularPrice: prodPrice,
-            currency: dealCurr
-          };
-        }
-      }
+    // 1. Agar xaridor hali rozi bo'lmagan bo'lsa (savdolashayotgan bo'lsa):
+    if (!isCustomerAgreement) {
+      // Hech qanday DEAL obyekti berilmaydi (yashil karta CHIQMAYDI)
+      deal = null;
+      // Agar model adashib [DEAL] tegini yoki buyurtma rasmiylashtirish matnini qo'shgan bo'lsa, uni tozalaymiz!
       cleanReply = rawReply.replace(/\[DEAL:[^\]]+\]/gi, '').trim();
-    }
+      cleanReply = cleanReply.replace(/\n*🛍️\s*\*\*Buyurtmani shu kelishilgan narxda[^\n*]*\*\*/gi, '').trim();
+      cleanReply = cleanReply.replace(/Buyurtmani shu kelishilgan narxda rasmiylashtirish uchun pastdagi[^.]*\./gi, '').trim();
+      cleanReply = cleanReply.replace(/pastdagi yashil 'Kelishilgan narxda savatga olish' tugmasini bosing!/gi, '').trim();
+    } else {
+      // 2. FAQAT xaridor aniq rozi bo'lgandagina (masalan "olaman", "roziman", "kelishdik"):
+      if (dealMatch) {
+        const dealProdId = String(dealMatch[1]).trim();
+        const dealPrice = Number(dealMatch[2]);
+        let dealCurr = (dealMatch[3] || '').trim().toUpperCase();
+        const matchedProd = products.find(p => String(p.id) === dealProdId);
 
-    // AUTO-DEAL VA BUYURTMA RASMIYLASHTIRISH HIMOYASI (SAFEGUARD):
-    // Agar model [DEAL] tegini qo'yishni unutgan bo'lsa yoki xaridor "roziman/olaman/buyurtma" degan bo'lsa
-    if (!deal && products.length > 0) {
-      const lowerMsg = (message || '').toLowerCase();
-      const isAgreement = (
-        lowerMsg.includes('rozi') || lowerMsg.includes('olaman') || lowerMsg.includes('buyurtma') ||
-        lowerMsg.includes('rasmiy') || lowerMsg.includes('kelishdik') || lowerMsg.includes('qanday')
-      );
+        if (matchedProd && dealPrice > 0) {
+          if (!dealCurr || dealCurr === '$') {
+            dealCurr = (dealPrice <= 5000 && matchedProd.priceUsd) ? 'USD' : 'UZS';
+          }
+          const isUsd = dealCurr === 'USD';
+          const prodPrice = isUsd
+            ? (Number(matchedProd.priceUsd) || Math.round(Number(matchedProd.price || 0) / 12800))
+            : Number(matchedProd.price || 0);
 
-      // Qaysi mahsulot haqida gap ketganini aniqlash
-      let targetProd = null;
-      if (products.length === 1) {
-        targetProd = products[0];
-      } else {
-        const allContextText = (message + ' ' + (history || []).map(h => h.content).join(' ')).toLowerCase();
-        targetProd = products.find(p => allContextText.includes(p.name.toLowerCase()) || allContextText.includes((p.name_uz || '').toLowerCase())) || products[0];
+          const minP = isUsd
+            ? (matchedProd.minPrice ? Math.round(Number(matchedProd.minPrice) / 12800) : Math.round(prodPrice * 0.92))
+            : Number(matchedProd.minPrice || 0);
+
+          if (minP === 0 || dealPrice >= minP) {
+            deal = {
+              productId: matchedProd.id,
+              productName: matchedProd.name,
+              price: dealPrice,
+              regularPrice: prodPrice,
+              currency: dealCurr
+            };
+          }
+        }
+        cleanReply = rawReply.replace(/\[DEAL:[^\]]+\]/gi, '').trim();
       }
 
-      if (targetProd) {
-        const allDiscussed = cleanReply + ' ' + (history || []).slice(-2).map(h => h.content).join(' ');
-        const isDollarContext = allDiscussed.includes('$') || allDiscussed.toLowerCase().includes('dollar') || allDiscussed.toLowerCase().includes('usd');
-
-        let foundPrice = null;
-        let foundCurr = 'UZS';
-
-        if (isDollarContext) {
-          // Dollar narxlarni qidirish
-          const dollarRegex = /(?:\$|\bUSD\b)?\s*(\d{2,4})\s*(?:\$|\bUSD\b|\bdollar\b)?/gi;
-          const dMatches = [...cleanReply.matchAll(dollarRegex)];
-          for (const m of dMatches) {
-            const num = Number(m[1]);
-            const targetUsd = Number(targetProd.priceUsd) || Math.round(targetProd.price / 12800);
-            const minUsd = targetProd.minPrice ? Math.round(targetProd.minPrice / 12800) : Math.round(targetUsd * 0.92);
-            if (num >= minUsd && num <= targetUsd) {
-              foundPrice = num;
-              foundCurr = 'USD';
-            }
-          }
+      // Agar xaridor "olaman / roziman" degan, lekin model [DEAL] tegini qo'ymagan bo'lsa:
+      if (!deal && products.length > 0) {
+        let targetProd = products[0];
+        if (products.length > 1) {
+          const allContextText = (message + ' ' + (history || []).map(h => h.content).join(' ')).toLowerCase();
+          targetProd = products.find(p => allContextText.includes(p.name.toLowerCase()) || allContextText.includes((p.name_uz || '').toLowerCase())) || products[0];
         }
 
-        if (!foundPrice) {
-          // So'm narxlarni qidirish
-          const priceRegex = /(\d{1,3}(?:\s?\d{3})+)\s*(?:so'm|som|sum)?/gi;
-          const matches = [...cleanReply.matchAll(priceRegex)];
-          for (const m of matches) {
-            const num = Number(m[1].replace(/\s+/g, ''));
-            const minP = Number(targetProd.minPrice || 0);
-            if (num > 10000 && num <= targetProd.price && (minP === 0 || num >= minP)) {
-              foundPrice = num;
-              foundCurr = 'UZS';
-            }
-          }
-        }
+        if (targetProd) {
+          const lastAssistantMsg = [...(history || [])].reverse().find(h => h.role === 'assistant');
+          const lastText = (lastAssistantMsg ? lastAssistantMsg.content : '') + ' ' + cleanReply;
+          const isDollarContext = lastText.includes('$') || lastText.toLowerCase().includes('dollar') || lastText.toLowerCase().includes('usd');
 
-        // Agar joriy javobda bo'lmasa, lekin xaridor rozi bo'lgan bo'lsa, avvalgi xabardan narxni olish
-        if (!foundPrice && isAgreement && Array.isArray(history) && history.length > 0) {
-          const lastAssistantMsg = [...history].reverse().find(h => h.role === 'assistant');
-          if (lastAssistantMsg) {
-            const lastText = lastAssistantMsg.content;
-            if (lastText.includes('$') || lastText.toLowerCase().includes('dollar') || lastText.toLowerCase().includes('usd')) {
-              const dollarRegex = /(?:\$|\bUSD\b)?\s*(\d{2,4})\s*(?:\$|\bUSD\b|\bdollar\b)?/gi;
-              const dMatches = [...lastText.matchAll(dollarRegex)];
-              for (const m of dMatches) {
-                const num = Number(m[1]);
-                const targetUsd = Number(targetProd.priceUsd) || Math.round(targetProd.price / 12800);
-                const minUsd = targetProd.minPrice ? Math.round(targetProd.minPrice / 12800) : Math.round(targetUsd * 0.92);
-                if (num >= minUsd && num <= targetUsd) {
-                  foundPrice = num;
-                  foundCurr = 'USD';
-                }
-              }
-            }
-            if (!foundPrice) {
-              const priceRegex = /(\d{1,3}(?:\s?\d{3})+)\s*(?:so'm|som|sum)?/gi;
-              const histMatches = [...lastText.matchAll(priceRegex)];
-              for (const m of histMatches) {
-                const num = Number(m[1].replace(/\s+/g, ''));
-                const minP = Number(targetProd.minPrice || 0);
-                if (num > 10000 && num <= targetProd.price && (minP === 0 || num >= minP)) {
-                  foundPrice = num;
-                  foundCurr = 'UZS';
-                }
+          let foundPrice = null;
+          let foundCurr = 'UZS';
+
+          if (isDollarContext) {
+            const dollarRegex = /(?:\$|\bUSD\b)?\s*(\d{2,4})\s*(?:\$|\bUSD\b|\bdollar\b)?/gi;
+            const dMatches = [...lastText.matchAll(dollarRegex)];
+            for (const m of dMatches) {
+              const num = Number(m[1]);
+              const targetUsd = Number(targetProd.priceUsd) || Math.round(targetProd.price / 12800);
+              const minUsd = targetProd.minPrice ? Math.round(targetProd.minPrice / 12800) : Math.round(targetUsd * 0.92);
+              if (num >= minUsd && num <= targetUsd) {
+                foundPrice = num;
+                foundCurr = 'USD';
               }
             }
           }
-        }
 
-        if (foundPrice) {
-          const regularPrice = foundCurr === 'USD'
-            ? (Number(targetProd.priceUsd) || Math.round(targetProd.price / 12800))
-            : targetProd.price;
+          if (!foundPrice) {
+            const priceRegex = /(\d{1,3}(?:\s?\d{3})+)\s*(?:so'm|som|sum)?/gi;
+            const matches = [...lastText.matchAll(priceRegex)];
+            for (const m of matches) {
+              const num = Number(m[1].replace(/\s+/g, ''));
+              const minP = Number(targetProd.minPrice || 0);
+              if (num > 10000 && num <= targetProd.price && (minP === 0 || num >= minP)) {
+                foundPrice = num;
+                foundCurr = 'UZS';
+              }
+            }
+          }
 
-          deal = {
-            productId: targetProd.id,
-            productName: targetProd.name,
-            price: foundPrice,
-            regularPrice,
-            currency: foundCurr
-          };
+          if (foundPrice) {
+            const regularPrice = foundCurr === 'USD'
+              ? (Number(targetProd.priceUsd) || Math.round(targetProd.price / 12800))
+              : targetProd.price;
 
-          if (!cleanReply.includes('savatga olish') && !cleanReply.includes('tugma')) {
-            cleanReply += `\n\n🛍️ **Buyurtmani shu kelishilgan narxda rasmiylashtirish uchun pastdagi 'Kelishilgan narxda savatga olish' tugmasini bosing!**`;
+            deal = {
+              productId: targetProd.id,
+              productName: targetProd.name,
+              price: foundPrice,
+              regularPrice,
+              currency: foundCurr
+            };
+
+            if (!cleanReply.includes('savatga olish') && !cleanReply.includes('tugma')) {
+              cleanReply += `\n\n🛍️ **Buyurtmani shu kelishilgan narxda rasmiylashtirish uchun pastdagi 'Kelishilgan narxda savatga olish' tugmasini bosing!**`;
+            }
           }
         }
       }
@@ -1735,12 +1709,43 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
   }
 });
 
+function isExplicitCustomerAgreement(userMsg) {
+  const msg = (userMsg || '').toLowerCase().trim();
+
+  // Agar xaridor hali narx tushirishni so'rayotgan yoki savdolashayotgan bo'lsa:
+  // Masalan: "400 qilib ber", "tushirib ber", "380 bo'ladimi", "oxirgi narx qancha", "arzonroq bering"
+  // Bu KELISHUV EMAS!
+  if (
+    msg.includes('qilib ber') || msg.includes('qib ber') || msg.includes('tushir') || 
+    msg.includes('arzon') || msg.includes('chegirma') || msg.includes('berasizmi') ||
+    msg.includes('berarmisiz') || msg.includes('boladimi') || msg.includes("bo'ladimi") ||
+    msg.includes('qancha') || msg.includes('oxiri') || msg.includes('minimal') ||
+    msg.includes('bormi') ||
+    (/\b\d+\s*(?:ga|som|so'm|\$)?\s*(?:qilib\s*)?ber(?:ing)?\b/i.test(msg) && !msg.includes('olaman') && !msg.includes('rozi') && !msg.includes('kelishdik'))
+  ) {
+    return false;
+  }
+
+  // Aniq sotib olish / rozi bo'lish kalit so'zlari:
+  const agreementKeywords = [
+    'olaman', 'olay', 'roziman', 'rozi', 'kelishdik', 'kelishamiz', 
+    'buyurtma', 'zakaz', 'yozing', 'yozvor', 'bering', 'tashang',
+    'yetkazib bering', 'qanday olaman', 'qanday rasmiylashtiraman',
+    'mayli shu narx', 'hop olaman', "xo'p olaman", 'xop olaman',
+    'shu narxga bering', 'shu narxda olaman', "bo'pti olaman", 'bopti olaman',
+    'согласен', 'беру', 'оформляй', 'заказ', 'заберу'
+  ];
+
+  return agreementKeywords.some(kw => msg.includes(kw));
+}
+
 function generateSmartFallbackReply(msg, products, shop, history = []) {
   const text = (msg || '').toLowerCase();
   const isDollar = text.includes('$') || text.includes('dollar') || text.includes('usd');
+  const isAgreement = isExplicitCustomerAgreement(msg);
 
-  // Kelishuv va buyurtma rasmiylashtirish
-  if (text.includes('rozi') || text.includes('olaman') || text.includes('buyurtma') || text.includes('rasmiy') || text.includes('kelishdik')) {
+  // Kelishuv va buyurtma rasmiylashtirish (FAQAT xaridor rozi bo'lganda)
+  if (isAgreement) {
     const p = products[0];
     if (p) {
       if (isDollar) {
@@ -1752,6 +1757,23 @@ function generateSmartFallbackReply(msg, products, shop, history = []) {
       const minP = Number(p.minPrice || Math.round(p.price * 0.92));
       const agreed = Math.max(minP, Math.round(p.price * 0.96));
       return `Barakasini bering! Tabriklayman! Buyurtmani shu maxsus kelishilgan narxda rasmiylashtirish uchun quyidagi 'Kelishilgan narxda savatga olish' tugmasini bosing! Tovar avtomatik savatingizga tushadi va manzilingizga buyurtma berasiz! [DEAL:${p.id}:${agreed}:UZS]`;
+    }
+  }
+
+  // Savdolashish va narx tushirish so'rovi (Kelishuv EMAS, savdolashuv javobi):
+  if (text.includes('qilib ber') || text.includes('qib ber') || text.includes('tush') || text.includes('arzon') || text.includes('chegirma') || text.includes('berasizmi')) {
+    const p = products[0];
+    if (p) {
+      if (isDollar) {
+        const usdP = Number(p.priceUsd) || Math.round(p.price / 12800);
+        const minUsd = p.minPrice ? Math.round(p.minPrice / 12800) : Math.round(usdP * 0.92);
+        const offer = Math.max(minUsd, Math.round(usdP * 0.96));
+        return `Aka, bu narxga bera olmayman, o'zimizga ham kelishi qimmat. Sizga hurmatimiz uchun ${offer} $ qilib bera olaman. Ma'qul kelsa, aytasiz!`;
+      }
+      const minP = Number(p.minPrice || Math.round(p.price * 0.92));
+      const step = p.price > 5000000 ? 200000 : (p.price > 1000000 ? 50000 : 15000);
+      const offer = Math.max(minP, p.price - step);
+      return `Aka, bu narx judayam past, bizga umuman qoplamaydi. Lekin siz uchun bir oz tushib, ${formatSum(offer)} qilib bera olaman. Nima deysiz, rozi bo'lasizmi?`;
     }
   }
 
