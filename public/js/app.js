@@ -96,7 +96,7 @@ async function loadLiveProducts() {
     const res = await fetch('/api/products');
     if (!res.ok) return;
     const data = await res.json();
-    if (!Array.isArray(data) || data.length === 0) return;
+    if (!Array.isArray(data)) return;
 
     // Serverdan kelgan mahsulotlarni Customer vitrinasi formatiga o'tkazish
     const liveProducts = data.map(p => {
@@ -1162,14 +1162,24 @@ function renderProducts() {
   }
 
   if (products.length === 0) {
+    const isStoreEmpty = PRODUCTS.length === 0;
+    const emptyTitle = isStoreEmpty
+      ? (lang === 'ru' ? 'В магазине пока нет товаров' : lang === 'en' ? 'No products available yet' : "Do'konda hozircha mahsulotlar yo'q")
+      : t('emptyTitle');
+    const emptyDesc = isStoreEmpty
+      ? (lang === 'ru' ? 'Администратор скоро добавит новые товары. Загляните позже!' : lang === 'en' ? 'Store owner will add products soon. Please check back later!' : "Admin tez orada yangi mahsulotlarni joylaydi. Birozdan so'ng qayta tekshiring!")
+      : t('emptyDesc');
+
     container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">${getIcon('search')}</div>
-        <h3>${t('emptyTitle')}</h3>
-        <p>${t('emptyDesc')}</p>
-        <button class="hero-cta-btn" style="margin: 0 auto;" onclick="resetFilters()">
-          ${getIcon('grid')} ${t('viewAllBtn')}
-        </button>
+      <div class="empty-state" style="padding: 48px 20px; text-align: center;">
+        <div class="empty-state-icon" style="font-size: 40px; margin-bottom: 12px; color: var(--yellow-400);">${isStoreEmpty ? getIcon('shoppingBag') : getIcon('search')}</div>
+        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">${emptyTitle}</h3>
+        <p style="color: var(--text-muted); max-width: 420px; margin: 0 auto 20px;">${emptyDesc}</p>
+        ${!isStoreEmpty ? `
+          <button class="hero-cta-btn" style="margin: 0 auto;" onclick="resetFilters()">
+            ${getIcon('grid')} ${t('viewAllBtn')}
+          </button>
+        ` : ''}
       </div>
     `;
     return;
@@ -1336,6 +1346,7 @@ function renderHomeDeals() {
 
   if (dealProducts.length === 0) {
     container.style.display = 'none';
+    container.innerHTML = '';
     return;
   }
 

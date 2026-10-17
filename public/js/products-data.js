@@ -497,7 +497,7 @@ const I18N = {
 };
 
 // 6 ta rasmiy brend bo'yicha mahsulotlar to'plami (Apple, Samsung, WHOOP, Ray-Ban, Google, Canon)
-let PRODUCTS = [
+const DEMO_PRODUCTS = [
   // --- APPLE ---
   {
     id: 100,
@@ -1568,6 +1568,10 @@ let PRODUCTS = [
     description_ru: 'Компактный и светосильный фикс-объектив для эффектных портретов с мягким художественным боке.'
   }
 ];
+
+// Server (HTTP) orqali ishlaganda mahsulotlar bazadan (/api/products) to'liq sinxronlanadi.
+// Admin barcha tovarlarni o'chirsa, mijozlar panelida ham 0 ta tovar bo'ladi va demo tovarlar qayta chiqmaydi.
+let PRODUCTS = (typeof window !== 'undefined' && window.location && window.location.protocol.startsWith('http')) ? [] : [...DEMO_PRODUCTS];
 
 function formatPrice(amount, explicitCurrency = null) {
   if (typeof amount === 'string' && isNaN(Number(amount))) return amount;

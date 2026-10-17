@@ -523,6 +523,7 @@ async function deleteProduct(id) {
   const targetId = String(id);
   if (mongoose.connection.readyState === 1) {
     const result = await Product.deleteOne({ id: targetId });
+    await Settings.updateOne({ key: 'main' }, { $set: { seeded: true } }).catch(() => {});
     const list = readJsonSafe(PRODUCTS_FILE, []);
     const filtered = list.filter(p => String(p.id) !== targetId);
     writeJsonSafe(PRODUCTS_FILE, filtered);
