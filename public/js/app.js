@@ -3469,14 +3469,11 @@ async function handleCustomerAiSend(e) {
   if (e && e.preventDefault) e.preventDefault();
   const input = document.getElementById('customerAiInput');
   const messagesBox = document.getElementById('customerAiMessages');
-  const sendBtn = document.getElementById('customerAiSendBtn');
   if (!input || !messagesBox) return;
 
   const text = (input.value || '').trim();
   if (!text) return;
   input.value = '';
-
-  APP_STATE.aiChatHistory = APP_STATE.aiChatHistory || [];
 
   // Append User message
   const userBubble = document.createElement('div');
@@ -3484,6 +3481,16 @@ async function handleCustomerAiSend(e) {
   userBubble.innerHTML = `<div class="ai-bubble-content">${escapeHtml(text)}</div>`;
   messagesBox.appendChild(userBubble);
   messagesBox.scrollTop = messagesBox.scrollHeight;
+
+  await executeAiChatMessage(text);
+}
+
+async function executeAiChatMessage(text) {
+  const messagesBox = document.getElementById('customerAiMessages');
+  const sendBtn = document.getElementById('customerAiSendBtn');
+  if (!messagesBox) return;
+
+  APP_STATE.aiChatHistory = APP_STATE.aiChatHistory || [];
 
   // Append Bot loading bubble
   const botBubble = document.createElement('div');
@@ -3503,6 +3510,11 @@ async function handleCustomerAiSend(e) {
         history: APP_STATE.aiChatHistory.slice(-8)
       })
     });
+
+    if (!res.ok) {
+      throw new Error(`Server status: ${res.status}`);
+    }
+
     const data = await res.json();
     const replyText = (data && data.reply) ? data.reply : "Kechirasiz, javob olishda muammo yuz berdi. Iltimos qaytadan urinib ko'ring.";
 
@@ -3538,11 +3550,22 @@ async function handleCustomerAiSend(e) {
     bubbleHtml += `</div>`;
     botBubble.innerHTML = bubbleHtml;
   } catch (err) {
-    botBubble.innerHTML = `<div class="ai-bubble-content" style="color:#ef4444;">Tarmoq xatosi. Iltimos ulanishingizni tekshiring.</div>`;
+    botBubble.innerHTML = `
+      <div class="ai-bubble-content" style="color:#ef4444;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+        <span>Tarmoq uzilishi yuz berdi. Iltimos qayta urinib ko'ring.</span>
+        <button type="button" onclick="retryAiMessage('${escapeJsString(text)}', this)" style="padding:4px 10px;font-size:0.78rem;font-weight:600;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;">Qayta yuborish 🔄</button>
+      </div>
+    `;
   } finally {
     if (sendBtn) sendBtn.disabled = false;
     messagesBox.scrollTop = messagesBox.scrollHeight;
   }
+}
+
+function retryAiMessage(text, btnEl) {
+  const bubble = btnEl ? btnEl.closest('.ai-chat-bubble') : null;
+  if (bubble) bubble.remove();
+  executeAiChatMessage(text);
 }
 
 function acceptAiDeal(productId, agreedPrice) {
@@ -3555,5 +3578,6 @@ function acceptAiDeal(productId, agreedPrice) {
 window.toggleCustomerAiChat = toggleCustomerAiChat;
 window.sendQuickAiPrompt = sendQuickAiPrompt;
 window.handleCustomerAiSend = handleCustomerAiSend;
+window.retryAiMessage = retryAiMessage;
 window.acceptAiDeal = acceptAiDeal;
 
