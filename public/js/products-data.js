@@ -47,13 +47,12 @@ const BANNERS = [
     badge_uz: '100% Original · Apple Ekosistema',
     badge_ru: '100% Оригинал · Экосистема Apple',
     badge_en: '100% Authentic · Apple Ecosystem',
-    bg_style: 'linear-gradient(90deg, rgba(8, 8, 10, 0.95) 0%, rgba(18, 18, 22, 0.7) 45%, rgba(0, 0, 0, 0.3) 100%)',
+    bg_style: 'linear-gradient(90deg, rgba(8, 8, 12, 0.92) 0%, rgba(12, 12, 16, 0.72) 45%, rgba(0, 0, 0, 0.2) 100%)',
     image: 'images/banner_apple_ecosystem.png',
     image_ru: 'images/banner_apple_ecosystem_ru.png',
     mobile_image: 'images/banner_mobile_applebox.png',
     mobile_image_ru: 'images/banner_mobile_applebox_ru.png',
-    features: ['iPhone 16 Pro Max', 'AirPods Max', 'Apple Watch Ultra', 'MagSafe Ecosystem'],
-    is_graphic: true
+    features: ['iPhone 16 Pro Max', 'AirPods Max', 'Apple Watch Ultra', 'MagSafe Ecosystem']
   },
   {
     id: 11,
@@ -70,11 +69,12 @@ const BANNERS = [
     badge_uz: 'Silicone Case · MagSafe · Carbon Fiber',
     badge_ru: 'Silicone Case · MagSafe · Carbon Fiber',
     badge_en: 'Silicone Case · MagSafe · Carbon Fiber',
-    bg_style: 'linear-gradient(90deg, rgba(8, 8, 10, 0.95) 0%, rgba(20, 20, 24, 0.75) 45%, rgba(0, 0, 0, 0.35) 100%)',
+    bg_style: 'linear-gradient(90deg, rgba(8, 8, 12, 0.92) 0%, rgba(15, 15, 20, 0.72) 45%, rgba(0, 0, 0, 0.2) 100%)',
     image: 'images/banner_cases_protection.png',
     image_ru: 'images/banner_cases_protection_ru.png',
-    features: ['Shockproof Cases', 'MagSafe Wireless', 'Ultra-Durable Glass', 'Fast Power'],
-    is_graphic: true
+    mobile_image: 'images/banner_mobile_cases.png',
+    mobile_image_ru: 'images/banner_mobile_cases_ru.png',
+    features: ['Shockproof Cases', 'MagSafe Wireless', 'Ultra-Durable Glass', 'Fast Power']
   },
   {
     id: 1,
