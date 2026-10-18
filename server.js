@@ -1488,7 +1488,7 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
 
         const tryGemini = async (modelName) => {
           const geminiController = new AbortController();
-          const geminiTimer = setTimeout(() => geminiController.abort(), 6000);
+          const geminiTimer = setTimeout(() => geminiController.abort(), 10000);
           try {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiKey}`;
             const res = await fetch(url, {
@@ -1500,15 +1500,19 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
                 contents,
                 generationConfig: {
                   temperature: 0.45,
-                  maxOutputTokens: 500
+                  maxOutputTokens: 2048,
+                  thinkingConfig: { thinkingBudget: 0 }
                 }
               })
             });
             if (!res.ok) {
+              const errText = await res.text();
+              console.warn(`⚠️ Gemini (${modelName}) xato: status ${res.status}`, errText.substring(0, 120));
               return null;
             }
             return await res.json();
-          } catch (_) {
+          } catch (e) {
+            console.warn(`⚠️ Gemini (${modelName}) tarmoq xatosi:`, e.message);
             return null;
           } finally {
             clearTimeout(geminiTimer);
@@ -1530,7 +1534,7 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
     // 2. SECONDARY AI: OpenAI GPT (faqat Gemini ishlamasa va limit bo'lsa)
     if (!rawReply && openAiKey && Date.now() > openAiDisabledUntil) {
       const openAiController = new AbortController();
-      const openAiTimer = setTimeout(() => openAiController.abort(), 4000);
+      const openAiTimer = setTimeout(() => openAiController.abort(), 8000);
       try {
         const messages = [
           { role: 'system', content: masterPrompt },
@@ -1552,7 +1556,7 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
             model: 'gpt-4o-mini',
             messages,
             temperature: 0.5,
-            max_tokens: 500
+            max_tokens: 1500
           })
         });
 
