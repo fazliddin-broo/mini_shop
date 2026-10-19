@@ -244,10 +244,15 @@ function escapeJsString(str) {
     .replace(/\r/g, '\\r');
 }
 
-// Floating Toast Notification System
+// Floating Toast Notification System (Maksimal 2 ta, ortiqcha to'planib ketmaydi)
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
   if (!container) return;
+
+  // Ekranda ko'pi bilan 2 ta toast turishi mumkin, eskilarini tozalash
+  while (container.children.length >= 2) {
+    container.firstElementChild.remove();
+  }
 
   const item = document.createElement('div');
   item.className = `toast-item ${type}`;
@@ -263,7 +268,7 @@ function showToast(message, type = 'success') {
     item.style.transform = 'translateY(10px)';
     item.style.transition = 'all 0.25s ease';
     setTimeout(() => item.remove(), 250);
-  }, 3500);
+  }, 2200);
 }
 
 // =============================================================================
@@ -533,13 +538,20 @@ async function refreshDashboardData(silent = false) {
   renderChronologyStream();
   renderNotificationsList();
   renderAuditFullTimeline();
+  renderProductsTable();
+  renderAllOrdersTable();
+  if (adminState.analyticsData) {
+    renderAnalytics(adminState.analyticsData);
+  }
 
   if (!silent) {
     if (refreshBtn) {
-      refreshBtn.classList.remove('btn-refreshing');
-      refreshBtn.disabled = false;
+      setTimeout(() => {
+        refreshBtn.classList.remove('btn-refreshing');
+        refreshBtn.disabled = false;
+      }, 500);
     }
-    showToast(adminState.lang === 'ru' ? 'Данные успешно обновлены!' : 'Barcha ma\'lumotlar muvaffaqiyatli yangilandi!', "success");
+    showToast(adminState.lang === 'ru' ? 'Данные успешно обновлены!' : 'Barcha ma\'lumotlar yangilandi!', "success");
   }
 }
 
@@ -783,10 +795,19 @@ function renderDashboardStats() {
   const prodNumEl = document.getElementById('stat-products-number');
   if (prodNumEl) prodNumEl.textContent = `${products.length} ta`;
   const prodStockEl = document.getElementById('stat-products-stock');
-  const totalStock = products.reduce((acc, p) => acc + (p.stock || 0), 0);
+  const totalStock = products.reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
   if (prodStockEl) prodStockEl.textContent = `${totalStock} dona qoldiq`;
   const prodActiveEl = document.getElementById('stat-products-active');
-  if (prodActiveEl) prodActiveEl.textContent = `${products.length} ta faol`;
+  const activeCount = products.filter(p => (Number(p.stock) || 0) > 0).length;
+  if (prodActiveEl) {
+    if (activeCount > 0) {
+      prodActiveEl.className = 'pill-badge pill-green';
+      prodActiveEl.textContent = `${activeCount} ta mavjud`;
+    } else {
+      prodActiveEl.className = 'pill-badge pill-red';
+      prodActiveEl.textContent = `0 ta mavjud (qolmagan)`;
+    }
+  }
 
   // Database Tab Counters
   const dbProdCount = document.getElementById('db-prod-count');
@@ -804,10 +825,13 @@ function renderDashboardStats() {
   }
   const notifCount = document.getElementById('header-notif-count');
   if (notifCount) {
-    const newOrders = orders.filter(o => !o.status || o.status === 'new' || o.status === 'pending');
-    const lowStockCount = products.filter(p => (p.stock || 0) <= 3).length;
-    const totalNotifs = newOrders.length + lowStockCount;
-    const unreadCount = adminState.notificationsSeen ? 0 : totalNotifs;
+    const seenTs = Number(localStorage.getItem('admin_notif_seen_ts') || 0);
+    const unreadOrders = orders.filter(o => {
+      const oTime = new Date(o.createdAt).getTime() || 0;
+      const isNew = (!o.status || o.status === 'new' || o.status === 'pending');
+      return isNew && oTime > seenTs;
+    });
+    const unreadCount = unreadOrders.length;
     notifCount.textContent = unreadCount;
     notifCount.style.display = unreadCount > 0 ? 'inline-flex' : 'none';
   }
@@ -823,7 +847,9 @@ function renderRecentOrdersTable() {
     tbody.innerHTML = `
       <tr>
         <td colspan="6" style="text-align: center; padding: 42px 16px; color: var(--text-muted);">
-          <div style="font-size: 2.2rem; margin-bottom: 8px;">🛒</div>
+          <div style="display: flex; justify-content: center; margin-bottom: 12px; color: var(--text-muted);">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+          </div>
           <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 4px;">Hozircha buyurtmalar yo'q</div>
           <div style="font-size: 0.85rem; max-width: 440px; margin: 0 auto; line-height: 1.5; color: var(--text-muted);">Mijozlar buyurtma berganda bu yerda avtomatik ko'rinadi.</div>
         </td>
@@ -859,7 +885,7 @@ function renderRecentOrdersTable() {
       `;
     } else if (isConfirmed) {
       actionBtnsHtml = `
-        <span class="pill-badge pill-green">✓ Tasdiqlangan</span>
+        <span class="pill-badge pill-green">Tasdiqlangan</span>
         <button class="tbl-btn tbl-btn-view" onclick="openOrderModal('${safeJsOrderId}')" title="Batafsil ko'rish">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           <span>Ko'rish</span>
@@ -915,13 +941,11 @@ function renderRecentOrdersTable() {
 
 async function confirmOrder(id) {
   await updateOrderStatus(id, 'confirmed');
-  showToast("Buyurtma muvaffaqiyatli tasdiqlandi!", "success");
 }
 
 async function cancelOrder(id) {
   if (!confirm(`Haqiqatan ham #${id.slice(-5).toUpperCase()} raqamli buyurtmani bekor qilmoqchimisiz?`)) return;
   await updateOrderStatus(id, 'cancelled');
-  showToast("Buyurtma bekor qilindi", "info");
 }
 
 function renderChronologyStream() {
@@ -1143,7 +1167,7 @@ function renderAuditFullTimeline() {
 
     let statusBadge = '';
     if (order.status === 'confirmed') {
-      statusBadge = '<span class="pill-badge pill-green">✓ Tasdiqlangan</span>';
+      statusBadge = '<span class="pill-badge pill-green">Tasdiqlangan</span>';
     } else if (order.status === 'completed') {
       statusBadge = '<span class="pill-badge pill-teal">Topshirildi</span>';
     } else if (order.status === 'cancelled') {
@@ -1244,7 +1268,9 @@ function renderAuditFullTimeline() {
   if (displayLogs.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 48px 16px; color: var(--text-muted);">
-        <div style="font-size: 2.2rem; margin-bottom: 8px;">📋</div>
+        <div style="display: flex; justify-content: center; margin-bottom: 12px; color: var(--text-muted);">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+        </div>
         <div style="font-weight: 700; color: var(--text-main); font-size: 1rem;">Tanlangan toifada audit yozuvlari topilmadi</div>
         <button class="btn btn-outline" style="margin-top: 12px; font-size: 0.8rem;" onclick="setAuditFilter('all')">Barcha qaydlarni ko'rsatish</button>
       </div>
@@ -1370,9 +1396,11 @@ function initNotificationsControls() {
       if (isHidden) {
         notifDropdown.classList.remove('hidden');
         renderNotificationsList();
+        localStorage.setItem('admin_notif_seen_ts', Date.now().toString());
         adminState.notificationsSeen = true;
         if (notifCountBadge) {
           notifCountBadge.style.display = 'none';
+          notifCountBadge.textContent = '0';
         }
       } else {
         notifDropdown.classList.add('hidden');
@@ -1394,9 +1422,11 @@ function initNotificationsControls() {
 
   if (clearNotifBtn) {
     clearNotifBtn.addEventListener('click', () => {
+      localStorage.setItem('admin_notif_seen_ts', Date.now().toString());
       adminState.notificationsSeen = true;
       if (notifCountBadge) {
         notifCountBadge.style.display = 'none';
+        notifCountBadge.textContent = '0';
       }
       if (notifDropdown) notifDropdown.classList.add('hidden');
       showToast("Barcha bildirishnomalar o'qilgan deb belgilandi", "success");
@@ -1490,9 +1520,35 @@ function renderSvgSalesChart(timeline) {
     <circle class="chart-point" cx="${pt.x}" cy="${pt.y}" r="5" data-idx="${i}"></circle>
   `).join('');
 
+  const shortDaysUz = {
+    'Dushanba': 'Du',
+    'Seshanba': 'Se',
+    'Chorshanba': 'Cho',
+    'Payshanba': 'Pay',
+    'Juma': 'Jum',
+    'Shanba': 'Sha',
+    'Yakshanba': 'Yak'
+  };
+  const shortDaysRu = {
+    'Понедельник': 'Пн',
+    'Вторник': 'Вт',
+    'Среда': 'Ср',
+    'Четверг': 'Чт',
+    'Пятница': 'Пт',
+    'Суббота': 'Сб',
+    'Воскресенье': 'Вс'
+  };
+
   labelsRow.innerHTML = timeline.map(d => {
-    const label = adminState.lang === 'ru' ? (d.labelRu || d.labelUz) : d.labelUz;
-    return `<span class="chart-lbl">${label}</span>`;
+    let label = adminState.lang === 'ru' ? (d.labelRu || d.labelUz) : d.labelUz;
+    if (adminState.lang === 'ru' && shortDaysRu[label]) {
+      label = shortDaysRu[label];
+    } else if (shortDaysUz[label]) {
+      label = shortDaysUz[label];
+    } else if (label.includes('hafta') || label.includes('неделя')) {
+      label = label.replace(/\s*\([^)]*\)/, '');
+    }
+    return `<span class="chart-lbl">${escapeHtml(label)}</span>`;
   }).join('');
 
   pointsGroup.querySelectorAll('.chart-point').forEach(circle => {
@@ -1624,7 +1680,7 @@ function renderProductsTable() {
         </td>
         <td style="font-weight: 700; color: var(--accent-teal);">
           <div>${formatSum(prod.price)}</div>
-          ${prod.minPrice ? `<small style="display:inline-flex; align-items:center; gap:3px; color: #f59e0b; font-weight: 600; font-size: 0.76rem; margin-top: 3px;" title="AI savdolashishining eng quyi chegarasi">🛡️ Min: ${formatSum(prod.minPrice)}</small>` : '<small style="color: var(--text-muted); font-size: 0.72rem;">Min narx belgilanmagan</small>'}
+          ${prod.minPrice ? `<small style="display:inline-flex; align-items:center; gap:4px; color: #f59e0b; font-weight: 600; font-size: 0.76rem; margin-top: 3px;" title="AI savdolashishining eng quyi chegarasi"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg> Min: ${formatSum(prod.minPrice)}</small>` : '<small style="color: var(--text-muted); font-size: 0.72rem;">Min narx belgilanmagan</small>'}
         </td>
         <td><span class="pill-badge ${prod.stock > 0 ? 'pill-green' : 'pill-red'}">${Number(prod.stock || 0)} ta</span></td>
         <td>${safeBadge ? `<span class="pill-badge pill-yellow">${safeBadge}</span>` : '—'}</td>
@@ -1846,8 +1902,8 @@ function renderAllOrdersTable() {
         <td>
           <div class="table-action-btns">
             <button class="tbl-btn" onclick="openOrderModal('${safeJsOrderId}')">Ko'rish</button>
-            <button class="tbl-btn tbl-btn-success" onclick="updateOrderStatus('${safeJsOrderId}', 'completed')" title="Yetkazildi">✓</button>
-            <button class="tbl-btn tbl-btn-danger" onclick="updateOrderStatus('${safeJsOrderId}', 'cancelled')" title="Bekor qilish">✕</button>
+            <button class="tbl-btn tbl-btn-success" onclick="updateOrderStatus('${safeJsOrderId}', 'completed')" title="Yetkazildi">Topshirildi</button>
+            <button class="tbl-btn tbl-btn-danger" onclick="updateOrderStatus('${safeJsOrderId}', 'cancelled')" title="Bekor qilish">Bekor</button>
           </div>
         </td>
       </tr>
@@ -1863,14 +1919,18 @@ async function updateOrderStatus(id, status) {
       body: JSON.stringify({ status })
     });
     if (res.ok) {
-      showToast(`Buyurtma holati "${status}" ga o'zgartirildi!`, "success");
+      const statusUz = status === 'confirmed' ? "tasdiqlandi" : (status === 'completed' ? "topshirildi" : (status === 'cancelled' ? "bekor qilindi" : status));
+      showToast(`Buyurtma muvaffaqiyatli ${statusUz}!`, "success");
       await loadOrders();
-      refreshDashboardData(true);
+      renderRecentOrdersTable();
+      renderAllOrdersTable();
+      renderDashboardStats();
       if (adminState.selectedViewingOrder && adminState.selectedViewingOrder.id === id) {
         openOrderModal(id);
       }
     } else {
-      showToast("Holatni yangilashda xatolik!", "error");
+      const errData = await res.json().catch(() => ({}));
+      showToast(`Xatolik: ${errData.error || "Holatni yangilab bo'lmadi"}`, "error");
     }
   } catch (err) {
     console.error('Status error:', err);
@@ -2333,7 +2393,9 @@ function setupEventListeners() {
         noRow.id = 'dash-no-search-row';
         noRow.innerHTML = `
           <td colspan="6" style="text-align: center; padding: 28px 16px; color: var(--text-muted);">
-            <div style="font-size: 1.5rem; margin-bottom: 6px;">🔍</div>
+            <div style="display: flex; justify-content: center; margin-bottom: 8px; color: var(--text-muted);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </div>
             <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">"${escapeHtml(q)}" bo'yicha hech qanday buyurtma topilmadi</div>
             <button class="btn btn-outline" style="margin-top: 8px; padding: 4px 12px; font-size: 0.78rem;" onclick="clearDashSearch()">Qidiruvni tozalash</button>
           </td>

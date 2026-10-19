@@ -1225,10 +1225,16 @@ function renderProducts() {
             ` : ''}
           </div>
 
-          <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart('${safeJsId}', null, 1, this)">
-            ${getIcon('shoppingBag')}
-            <span>${t('addToCart')}</span>
-          </button>
+          ${(prod.stock !== undefined && prod.stock !== null && Number(prod.stock) <= 0) ? `
+            <button class="btn-add-cart disabled" disabled style="opacity: 0.65; cursor: not-allowed; background: var(--bg-card-subtle, #27272a); border-color: rgba(255,255,255,0.1); color: var(--text-muted, #94a3b8);" title="Omborda qolmagan">
+              <span>${currentLang === 'ru' ? 'Закончился' : (currentLang === 'en' ? 'Out of stock' : 'Tugagan')}</span>
+            </button>
+          ` : `
+            <button class="btn-add-cart" onclick="event.stopPropagation(); addToCart('${safeJsId}', null, 1, this)">
+              ${getIcon('shoppingBag')}
+              <span>${t('addToCart')}</span>
+            </button>
+          `}
         </div>
       </div>
     `;
@@ -1682,6 +1688,11 @@ function addToCart(productId, selectedColor = null, quantity = 1, btnElement = n
   const pId = String(productId);
   const prod = PRODUCTS.find(p => String(p.id) === pId);
   if (!prod) return;
+
+  if (prod.stock !== undefined && prod.stock !== null && Number(prod.stock) <= 0) {
+    showToast(APP_STATE.lang === 'ru' ? 'Товар закончился на складе!' : 'Ushbu mahsulot omborda tugagan!', 'alertTriangle');
+    return;
+  }
 
   const existingIndex = APP_STATE.cart.findIndex(item => String(item.id) === pId);
   const finalPrice = customPrice ? Number(customPrice) : prod.price;
