@@ -1,318 +1,233 @@
 /**
  * MENISCUS LIQUID NAVIGATION (Customer Panel)
- * Zero-dependency liquid bottom navigation bar.
- * The active tab acts as a glowing bead that dips beneath the bar's liquid surface.
- * High-speed fluid spring physics with volume-preserving squash and dynamic meniscus trough.
+ * Zero-dependency liquid bottom navigation bar based on the exact parametric SVG notch algorithm.
  */
 
 (function () {
   'use strict';
 
-  function initMeniscus() {
-    const dock = document.getElementById('dock');
-    const svg = document.getElementById('skin');
-    const fillP = document.getElementById('skinFill');
-    const bead = document.getElementById('bead');
-    if (!dock || !svg || !fillP || !bead) return null;
-
-    const tabs = [...dock.querySelectorAll('.tab')];
-    if (tabs.length === 0) return null;
-
-    const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
-    const smooth = (t) => t * t * (3 - 2 * t);
-
-    // Palettes per tab
-    const hexToRgb = (s) => {
-      const h = s.trim().replace('#', '');
-      const n = parseInt(h.length === 3 ? h.replace(/./g, '$&$&') : h, 16);
-      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  document.addEventListener('DOMContentLoaded', () => {
+    const ICONS = {
+      home:  '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/>',
+      grid:  '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+      cart:  '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+      heart: '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+      phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>'
     };
-    const ACC = tabs.map((t) => hexToRgb(getComputedStyle(t).getPropertyValue('--acc') || '#f59e0b'));
-    const mixRGB = (a, b, t) =>
-      `${Math.round(a[0] + (b[0] - a[0]) * t)} ${Math.round(a[1] + (b[1] - a[1]) * t)} ${Math.round(a[2] + (b[2] - a[2]) * t)}`;
 
-    const G = { W: 0, H: 0, R: 18, D: 50, RB: 31, S: 14, CY: -2, slots: [], span: 70 };
+    const TABS = [
+      { id: 'bottomTabHome',     key: 'home',     label: 'Bosh sahifa',   icon: 'home',  color: '#c9f24a', action: (e) => { if (typeof window.goToHome === 'function') window.goToHome(e); } },
+      { id: 'bottomTabCatalog',  key: 'catalog',  label: 'Katalog',       icon: 'grid',  color: '#4fe0c4', action: (e) => { if (typeof window.openCatalogView === 'function') window.openCatalogView(e); } },
+      { id: 'bottomTabCart',     key: 'cart',     label: 'Savat',         icon: 'cart',  color: '#ff9f43', isCart: true, action: (e) => { if (typeof window.openCartView === 'function') window.openCartView(e); } },
+      { id: 'bottomTabWishlist', key: 'wishlist', label: 'Sevimlilar',    icon: 'heart', color: '#7aa2ff', isWish: true, action: (e) => { if (typeof window.filterByWishlist === 'function') window.filterByWishlist(e); } },
+      { id: 'bottomTabContact',  key: 'contact',  label: 'Aloqa',         icon: 'phone', color: '#ff5c8a', action: (e) => { if (typeof window.openContactModal === 'function') window.openContactModal(); } }
+    ];
 
-    const reach = (s, rb, by) => Math.sqrt(Math.max((s + rb) ** 2 - (s - by) ** 2, 1));
+    const svgIcon = (n) => `<svg class="i" viewBox="0 0 24 24">${ICONS[n] || ICONS.home}</svg>`;
+    const $ = (id) => document.getElementById(id);
+    const dock = $('dock'), bead = $('bead'), tabsEl = $('tabs'), fill = $('skinFill');
 
-    function measure() {
-      const r = dock.getBoundingClientRect();
-      const W = Math.round(r.width);
-      const H = Math.round(r.height);
-      if (W < 40 || H < 30) return false;
+    if (!dock || !bead || !tabsEl || !fill) return;
 
-      G.slots = tabs.map((t) => {
-        const b = t.getBoundingClientRect();
-        return b.left - r.left + b.width / 2;
-      });
-      G.span = G.slots.length > 1 ? G.slots[1] - G.slots[0] : W;
+    /* geometry */
+    const H = 82, CORNER = 18, BOWL = 36, SHOULDER = 14, BEAD = 58;
+    let W = 0, PAD = 0, GAP = 0;
 
-      G.W = W;
-      G.H = H;
-      G.R = clamp(H * 0.28, 14, 22);
-      G.CY = 0; // The bead rides directly on the surface line
+    /* state */
+    let active = 0, x = 0, v = 0, q = 0, target = 0, dragging = false, raf = 0;
+    const centerOf = (i) => PAD + GAP * i;
+    const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      let D = Math.min(H * 0.72, G.span * 0.74);
-      const room = G.slots[0] - G.R - 4;
-      for (let i = 0; i < 3; i++) {
-        const hw = reach(D * 0.22, D / 2 + 5, G.CY);
-        if (hw <= room) break;
-        D *= room / hw;
+    // Clear old tabs container and generate fresh buttons
+    tabsEl.innerHTML = '';
+
+    TABS.forEach((t, i) => {
+      const b = document.createElement('button');
+      b.className = 'tab nav-tab-item' + (i === 0 ? ' active' : '');
+      b.role = 'tab';
+      b.type = 'button';
+      b.id = t.id;
+      b.setAttribute('aria-label', t.label);
+      b.setAttribute('aria-selected', String(i === 0));
+
+      let badgeHtml = '';
+      if (t.isCart) {
+        badgeHtml = `<span class="nav-tab-badge cart-count-badge" style="display: none;">0</span>`;
+      } else if (t.isWish) {
+        badgeHtml = `<span class="nav-tab-badge wishlist-count-badge" style="display: none;">0</span>`;
       }
-      G.D = Math.max(Math.round(D), 36);
-      G.S = G.D * 0.22;
-      G.RB = G.D / 2 + 5;
 
-      svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      dock.style.setProperty('--dock-r', `${G.R.toFixed(1)}px`);
-      dock.style.setProperty('--bead-d', `${G.D}px`);
-      dock.style.setProperty('--bead-cy', `${G.CY}px`);
-      dock.style.setProperty('--rise', `${(H / 2 - G.CY).toFixed(1)}px`);
-      return true;
-    }
+      b.innerHTML = `
+        <span class="tab__ic">${svgIcon(t.icon)}</span>
+        ${badgeHtml}
+        <span class="tab__label">${t.label}</span>
+      `;
+      b.style.setProperty('--acc', t.color);
 
-    function trough(bx, by, rb, sL, sR) {
-      const { W, H, R } = G;
-
-      const wing = (s, side) => {
-        const L = s + rb;
-        const half = reach(s, rb, by);
-        const sx = bx + side * half;
-        return { sx, s, tx: sx + ((bx - sx) / L) * s, ty: s + ((by - s) / L) * s };
-      };
-      const A = wing(sL, -1);
-      const B = wing(sR, +1);
-
-      const a0 = Math.atan2(A.ty - by, A.tx - bx);
-      const a1 = Math.atan2(B.ty - by, B.tx - bx);
-      let sweep = ((a0 - a1) * 180) / Math.PI;
-      while (sweep < 0) sweep += 360;
-      const large = sweep > 180 ? 1 : 0;
-
-      const n = (v) => v.toFixed(2);
-      return (
-        `M0 ${n(R)}` +
-        `A${n(R)} ${n(R)} 0 0 1 ${n(R)} 0` +
-        `L${n(clamp(A.sx, R, W - R))} 0` +
-        `A${n(sL)} ${n(sL)} 0 0 1 ${n(A.tx)} ${n(A.ty)}` +
-        `A${n(rb)} ${n(rb)} 0 ${large} 0 ${n(B.tx)} ${n(B.ty)}` +
-        `A${n(sR)} ${n(sR)} 0 0 1 ${n(clamp(B.sx, R, W - R))} 0` +
-        `L${n(W - R)} 0` +
-        `A${n(R)} ${n(R)} 0 0 1 ${n(W)} ${n(R)}` +
-        `L${n(W)} ${n(H - R)}` +
-        `A${n(R)} ${n(R)} 0 0 1 ${n(W - R)} ${n(H)}` +
-        `L${n(R)} ${n(H)}` +
-        `A${n(R)} ${n(R)} 0 0 1 0 ${n(H - R)}` +
-        `Z`
-      );
-    }
-
-    let x = 0;
-    let v = 0;
-    let target = 0;
-    let dragging = false;
-    let raf = 0;
-    let last = 0;
-
-    function paint() {
-      const q = clamp(v / 1400, -1, 1) * (dragging ? 0.6 : 1);
-      const mag = Math.abs(q);
-
-      const sL = clamp(G.S * (1 + 0.08 * mag + 0.42 * q), G.S * 0.5, G.S * 2.2);
-      const sR = clamp(G.S * (1 + 0.08 * mag - 0.42 * q), G.S * 0.5, G.S * 2.2);
-
-      const d = trough(x, G.CY, G.RB, sL, sR);
-      fillP.setAttribute('d', d);
-
-      // Fast volume-preserving squash
-      const sx = 1 + 0.12 * mag;
-      bead.style.transform = `translate3d(${x.toFixed(2)}px,0,0) scale(${sx.toFixed(3)},${(1 / sx).toFixed(3)})`;
-
-      let near = 0;
-      let nd = Infinity;
-      for (let i = 0; i < tabs.length; i++) {
-        const dx = Math.abs(x - G.slots[i]);
-        if (dx < nd) {
-          nd = dx;
-          near = i;
+      b.addEventListener('click', (e) => {
+        select(i);
+        if (typeof t.action === 'function') {
+          t.action(e);
         }
-        tabs[i].style.setProperty('--t', smooth(clamp(1 - dx / (G.span * 0.55), 0, 1)).toFixed(3));
-      }
-
-      const side = x >= G.slots[near] ? 1 : -1;
-      const other = clamp(near + side, 0, tabs.length - 1);
-      const t = other === near ? 0 : clamp(Math.abs(x - G.slots[near]) / G.span, 0, 1);
-      const rgbVal = mixRGB(ACC[near], ACC[other], t);
-      dock.style.setProperty('--glow-rgb', rgbVal);
-      document.documentElement.style.setProperty('--glow-rgb', rgbVal);
-    }
-
-    function loop(now) {
-      raf = 0;
-      const dt = Math.min((now - last) / 1000, 1 / 30);
-      last = now;
-
-      // Snappy, rapid spring physics: K=360, C=30 (reaches destination cleanly in ~220ms, zero sluggishness!)
-      const K = dragging ? 950 : 360;
-      const C = dragging ? 56 : 30;
-      let step = dt;
-      while (step > 0) {
-        const h = Math.min(step, 1 / 240);
-        v += (-K * (x - target) - C * v) * h;
-        x += v * h;
-        step -= h;
-      }
-
-      paint();
-      if (Math.abs(x - target) > 0.06 || Math.abs(v) > 0.8 || dragging) {
-        run();
-      } else {
-        x = target;
-        v = 0;
-        paint();
-      }
-    }
-
-    function run() {
-      if (raf) return;
-      last = performance.now();
-      raf = requestAnimationFrame(loop);
-    }
-
-    function jump(to) {
-      target = to;
-      if (reduced() && !dragging) {
-        x = to;
-        v = 0;
-        paint();
-        return;
-      }
-      run();
-    }
-
-    let current = Math.max(0, tabs.findIndex((t) => t.classList.contains('active') || t.getAttribute('aria-selected') === 'true'));
-
-    function select(i, { animate = true, userClick = false } = {}) {
-      if (i < 0 || i >= tabs.length) return;
-      current = i;
-      tabs.forEach((t, n) => {
-        const isSel = n === current;
-        t.setAttribute('aria-selected', String(isSel));
-        t.classList.toggle('active', isSel);
       });
-      if (animate) {
-        jump(G.slots[current]);
+
+      b.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') select(Math.min(i + 1, TABS.length - 1), true);
+        if (e.key === 'ArrowLeft') select(Math.max(i - 1, 0), true);
+      });
+
+      tabsEl.appendChild(b);
+    });
+
+    const tabBtns = [...tabsEl.children];
+
+    /* one path: the notch is a parametric socket, not a stack of curves.
+       Shoulder circle is tangent to the top edge AND to the bowl. */
+    function skinPath(cx, lean) {
+      const rl = SHOULDER * (1 + 0.45 * lean);
+      const rr = SHOULDER * (1 - 0.45 * lean);
+      const side = (rs, s) => {
+        const dx = Math.sqrt(Math.max((BOWL + rs) ** 2 - rs ** 2, 1));
+        const fx = cx + s * dx;
+        const k = BOWL / (BOWL + rs);
+        return { tx: fx, px: cx + (fx - cx) * k, py: rs * k };
+      };
+      const L = side(rl, -1);
+      const R = side(rr, 1);
+      const r = CORNER;
+      return `M${r} 0 H${L.tx} A${rl} ${rl} 0 0 1 ${L.px} ${L.py}
+              A${BOWL} ${BOWL} 0 0 0 ${R.px} ${R.py}
+              A${rr} ${rr} 0 0 1 ${R.tx} 0 H${W - r}
+              A${r} ${r} 0 0 1 ${W} ${r} V${H - r} A${r} ${r} 0 0 1 ${W - r} ${H}
+              H${r} A${r} ${r} 0 0 1 0 ${H - r} V${r} A${r} ${r} 0 0 1 ${r} 0Z`;
+    }
+
+    function render() {
+      bead.style.transform = `translate(${x - BEAD / 2}px, ${-BEAD / 2}px)`;
+      fill.setAttribute('d', skinPath(x, q));
+    }
+
+    function tick() {
+      if (dragging) {
+        const d = (target - x) * 0.5;
+        v = d;
+        x += d;
       } else {
-        x = target = G.slots[current];
+        v = (v + (target - x) * 0.16) * 0.78;
+        x += v;
+      }
+      x = clamp(x, PAD, W - PAD);
+      q += (clamp(v / 9, -1, 1) - q) * 0.3; // velocity leans the surface
+      render();
+      const still = !dragging && Math.abs(v) < 0.02 && Math.abs(target - x) < 0.05 && Math.abs(q) < 0.01;
+      if (still) {
+        x = target;
+        q = 0;
         v = 0;
-        paint();
+        render();
+        raf = 0;
+      } else {
+        raf = requestAnimationFrame(tick);
       }
     }
 
-    function selectById(tabId, animate = true) {
-      const idx = tabs.findIndex((t) => t.id === tabId);
-      if (idx !== -1) {
-        select(idx, { animate });
+    const kick = () => {
+      if (reduce) {
+        x = target;
+        q = 0;
+        render();
+      } else if (!raf) {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+
+    function paint(i, animate) {
+      const t = TABS[i];
+      if (!t) return;
+      document.documentElement.style.setProperty('--acc', t.color);
+      tabBtns.forEach((b, k) => {
+        b.setAttribute('aria-selected', String(k === i));
+        b.classList.toggle('active', k === i);
+      });
+      bead.innerHTML = svgIcon(t.icon);
+      if (animate && bead.firstChild) {
+        bead.firstChild.classList.add('pop');
       }
     }
 
-    // Pointer Dragging on the bead
-    let startX = 0;
-    let pid = null;
-    let suppressClick = false;
-
-    dock.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0 && e.pointerType === 'mouse') return;
-      pid = e.pointerId;
-      startX = e.clientX;
-      suppressClick = false;
-    });
-
-    dock.addEventListener('pointermove', (e) => {
-      if (e.pointerId !== pid) return;
-      if (!dragging && Math.abs(e.clientX - startX) < 8) return;
-      if (!dragging) {
-        dragging = true;
-        suppressClick = true;
-        dock.classList.add('is-dragging');
-        dock.setPointerCapture(pid);
+    function select(i, focus) {
+      if (i < 0 || i >= TABS.length) return;
+      if (i !== active) {
+        active = i;
+        paint(i, true);
       }
-      e.preventDefault();
-      const left = dock.getBoundingClientRect().left;
-      target = clamp(e.clientX - left, G.slots[0], G.slots[G.slots.length - 1]);
-      run();
+      target = centerOf(i);
+      kick();
+      if (focus && tabBtns[i]) tabBtns[i].focus();
+    }
+
+    /* drag the bead */
+    bead.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      bead.setPointerCapture(e.pointerId);
+      kick();
     });
 
-    function release(e) {
-      if (e.pointerId !== pid) return;
-      pid = null;
+    bead.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      target = clamp(e.clientX - dock.getBoundingClientRect().left, PAD, W - PAD);
+      const near = clamp(Math.round((target - PAD) / GAP), 0, TABS.length - 1);
+      if (near !== active) {
+        active = near;
+        paint(near, true);
+      }
+    });
+
+    const drop = () => {
       if (!dragging) return;
       dragging = false;
-      dock.classList.remove('is-dragging');
-      let near = 0;
-      let nd = Infinity;
-      G.slots.forEach((s, i) => {
-        const d = Math.abs(target - s);
-        if (d < nd) {
-          nd = d;
-          near = i;
-        }
-      });
-      select(near);
-      const tabEl = tabs[near];
-      if (tabEl && typeof tabEl.click === 'function') {
-        tabEl.click();
+      target = centerOf(active);
+      kick();
+      const t = TABS[active];
+      if (t && typeof t.action === 'function') {
+        t.action();
       }
-      setTimeout(() => {
-        suppressClick = false;
-      }, 50);
-    }
-
-    dock.addEventListener('pointerup', release);
-    dock.addEventListener('pointercancel', release);
-
-    tabs.forEach((t, i) => {
-      t.addEventListener('click', (e) => {
-        if (suppressClick) {
-          e.preventDefault();
-          e.stopPropagation();
-          return;
-        }
-        select(i, { animate: true, userClick: true });
-      });
-    });
-
-    function layout(animate = false) {
-      if (!measure()) return;
-      if (animate) jump(G.slots[current]);
-      else {
-        x = target = G.slots[current];
-        v = 0;
-        paint();
-      }
-      dock.classList.add('is-ready');
-    }
-
-    layout(false);
-    setTimeout(() => layout(false), 80);
-    setTimeout(() => layout(false), 300);
-
-    if (window.ResizeObserver) {
-      new ResizeObserver(() => layout(false)).observe(dock);
-    }
-    window.addEventListener('resize', () => layout(false), { passive: true });
-    window.addEventListener('orientationchange', () => setTimeout(() => layout(false), 120));
-
-    return {
-      select,
-      selectById,
-      layout,
-      slots: () => G.slots
     };
-  }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    window.__meniscus = initMeniscus();
+    bead.addEventListener('pointerup', drop);
+    bead.addEventListener('pointercancel', drop);
+
+    /* layout */
+    function layout() {
+      W = dock.clientWidth || 440;
+      PAD = Math.max(50, W * 0.12);
+      GAP = (W - 2 * PAD) / (TABS.length - 1);
+      tabBtns.forEach((b, i) => {
+        b.style.left = centerOf(i) + 'px';
+      });
+      const skinSvg = $('skin');
+      if (skinSvg) skinSvg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      x = target = centerOf(active);
+      q = v = 0;
+      render();
+    }
+
+    new ResizeObserver(layout).observe(dock);
+    window.addEventListener('resize', layout, { passive: true });
+    window.addEventListener('orientationchange', () => setTimeout(layout, 150));
+
+    layout();
+    paint(0, false);
+
+    // Global handle so app.js can trigger active tab
+    window.__meniscus = {
+      select,
+      selectById: (id) => {
+        const idx = TABS.findIndex((t) => t.id === id || t.key === id);
+        if (idx !== -1) select(idx);
+      },
+      layout
+    };
   });
 })();

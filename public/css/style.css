@@ -3077,57 +3077,54 @@ html.light .brand-drawer-card.active .brand-drawer-name {
 }
 
 /* ==========================================================================
-   MOBILE BOTTOM NAVIGATION BAR — MENISCUS LIQUID DOCK
+   MENISCUS LIQUID NAVIGATION (Exact User CSS)
    ========================================================================== */
-.mobile-bottom-bar.meniscus-dock {
+@property --acc { syntax: '<color>'; inherits: true; initial-value: #c9f24a; }
+
+:root {
+  --acc: #c9f24a;
+  transition: --acc .55s ease;
+}
+
+.dockwrap {
   position: fixed;
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
-  width: min(450px, calc(100% - 24px));
-  height: 68px;
+  width: min(460px, calc(100vw - 20px));
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  touch-action: pan-y;
+  pointer-events: auto;
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 560px;
+  height: 380px;
+  max-width: 160vw;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--acc) 28%, transparent), transparent);
+  filter: blur(34px);
+  pointer-events: none;
+}
+
+.dock {
+  position: relative;
+  height: 82px;
+  touch-action: none;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
 }
 
-@media (min-width: 992px) {
-  .mobile-bottom-bar.meniscus-dock {
-    display: flex !important;
-    width: 460px;
-    height: 72px;
-    bottom: 22px;
-  }
-}
-
-/* Cast soft ground shadow */
-.dock__cast {
-  position: absolute;
-  inset: 42% 6% 3% 6%;
-  border-radius: 999px;
-  background: #000;
-  box-shadow: 0 14px 28px -6px rgba(0, 0, 0, 0.72), 0 28px 50px -14px rgba(0, 0, 0, 0.65);
-  pointer-events: none;
-}
-
-/* Parametric SVG Skin that renders the liquid notch */
 .dock__skin {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, 0.48));
+  filter: drop-shadow(0 18px 28px rgba(0,0,0,.5));
   pointer-events: none;
 }
 
@@ -3137,134 +3134,125 @@ html.light .brand-drawer-card.active .brand-drawer-name {
   stroke-width: 1.2;
 }
 
-.dock__plate-hi { stop-color: #21192e; }
-.dock__plate-lo { stop-color: #0c0815; }
-.dock__rim-hi { stop-color: #ffffff; stop-opacity: 0.65; }
-.dock__rim-lo { stop-color: #ffffff; stop-opacity: 0.08; }
-
-html.light .dock__plate-hi { stop-color: #261f33; }
-html.light .dock__plate-lo { stop-color: #0e0a18; }
-html.light .dock__rim-hi { stop-color: #ffffff; stop-opacity: 0.75; }
-
-/* The Glowing Liquid Bead (Dumaloq) */
 .dock__bead {
   position: absolute;
-  top: var(--bead-cy, -2px);
   left: 0;
-  width: var(--bead-d, 50px);
-  height: var(--bead-d, 50px);
-  margin: calc(var(--bead-d, 50px) / -2) 0 0 calc(var(--bead-d, 50px) / -2);
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ffffff 0%, rgb(var(--glow-rgb, 245 158 11)) 52%, color-mix(in srgb, rgb(var(--glow-rgb, 245 158 11)) 85%, #000) 100%);
-  box-shadow:
-    0 0 0 1.5px rgb(var(--glow-rgb, 245 158 11) / 0.7),
-    0 0 28px 5px rgb(var(--glow-rgb, 245 158 11) / 0.58),
-    0 10px 20px -5px rgba(0, 0, 0, 0.75),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -3px 5px rgba(0, 0, 0, 0.35);
-  will-change: transform;
-  pointer-events: none;
+  top: 0;
   z-index: 3;
-  transition: opacity 0.2s ease;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #16111f;
+  background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--acc) 62%, #fff), var(--acc) 62%);
+  box-shadow:
+    0 0 30px color-mix(in srgb, var(--acc) 60%, transparent),
+    inset 0 -5px 9px rgba(0,0,0,.16);
+  cursor: grab;
+  touch-action: none;
+  will-change: transform;
 }
 
-.meniscus-dock:not(.is-ready) .dock__bead {
-  opacity: 0;
+.dock__bead:active {
+  cursor: grabbing;
 }
 
-/* Tabs container */
-.dock__tabs {
+.dock__bead svg {
+  width: 24px;
+  height: 24px;
+}
+
+.dock__bead svg.pop {
+  animation: pop .38s cubic-bezier(.2,1.4,.4,1);
+}
+
+@keyframes pop {
+  from { transform: scale(.55) rotate(-12deg); opacity: .2; }
+}
+
+/* tabs */
+[role=tablist] {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  z-index: 4;
-  padding: 0 4px;
+  z-index: 2;
 }
 
-/* Individual tab button */
-.tab.nav-tab-item {
-  position: relative;
-  flex: 1;
+.tab {
+  position: absolute;
+  top: 0;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: none !important;
-  border: none !important;
-  outline: none;
-  padding: 0;
-  margin: 0;
+  width: 60px;
+  transform: translateX(-50%);
+  border: 0;
+  background: none;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  --t: 0;
+  color: rgba(255,255,255,.58);
+  font: inherit;
+  outline: none;
 }
 
-.tab.nav-tab-item:focus-visible {
-  outline: 2px solid var(--acc, #f59e0b);
-  outline-offset: -3px;
-  border-radius: 12px;
+.tab:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: -6px;
+  border-radius: 14px;
 }
 
-/* Tab Icon rising smoothly into the bead */
-.tab__icon {
+.tab__ic {
   position: absolute;
   left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) translateY(calc(var(--t, 0) * var(--rise, 28px) * -1));
-  display: inline-flex;
+  top: 30px;
+  width: 24px;
+  height: 24px;
+  transform: translateX(-50%);
+  transition: opacity .2s, color .2s, transform .2s;
+  display: flex;
   align-items: center;
   justify-content: center;
-  color: color-mix(in srgb, #9ca3af calc((1 - var(--t, 0)) * 100%), #111827);
-  will-change: transform, color;
-  transition: transform 0.04s linear;
-  pointer-events: none;
 }
 
-.tab__icon svg {
-  width: 23px;
-  height: 23px;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  transition: stroke 0.15s ease, filter 0.15s ease;
+.tab:hover .tab__ic {
+  color: #fff;
 }
 
-.tab.active .tab__icon svg,
-.tab[aria-selected="true"] .tab__icon svg {
-  stroke: #0a0710 !important;
-  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.4));
+.tab:active .tab__ic {
+  transform: translateX(-50%) scale(.88);
 }
 
-/* Tab Label appearing below active tab */
+.tab__ic svg {
+  width: 100%;
+  height: 100%;
+}
+
 .tab__label {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 8px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  text-align: center;
-  color: var(--acc, #f59e0b);
-  opacity: 0;
-  transform: translateY(calc((1 - var(--t, 0)) * 5px));
-  pointer-events: none;
+  left: 50%;
+  top: 55px;
+  transform: translateX(-50%) translateY(4px);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .01em;
   white-space: nowrap;
-  will-change: transform, opacity;
-  transition: opacity 0.15s ease;
+  color: var(--acc);
+  opacity: 0;
+  transition: opacity .25s, transform .25s;
+  pointer-events: none;
 }
 
-.tab[aria-selected="true"] .tab__label,
-.tab.active .tab__label,
-.meniscus-dock.is-dragging .tab__label {
-  opacity: var(--t, 1);
+.tab[aria-selected=true] .tab__ic,
+.tab.active .tab__ic {
+  opacity: 0;
+}
+
+.tab[aria-selected=true] .tab__label,
+.tab.active .tab__label {
+  opacity: 1;
+  transform: translateX(-50%);
 }
 
 .nav-tab-badge {
   position: absolute;
-  top: 8px;
+  top: 18px;
   right: calc(50% - 18px);
   background: #ef4444;
   color: #ffffff;
@@ -3279,6 +3267,14 @@ html.light .dock__rim-hi { stop-color: #ffffff; stop-opacity: 0.75; }
   justify-content: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
   z-index: 10;
+}
+
+svg.i {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* ==========================================================================
