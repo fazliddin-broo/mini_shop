@@ -1728,10 +1728,11 @@ function isExplicitCustomerAgreement(userMsg) {
   const msg = (userMsg || '').toLowerCase().trim();
 
   // Agar xaridor hali narx tushirishni so'rayotgan yoki savdolashayotgan bo'lsa:
-  // Masalan: "400 qilib ber", "tushirib ber", "380 bo'ladimi", "oxirgi narx qancha", "arzonroq bering"
+  // Masalan: "400 qilib ber", "tushirib ber", "380 bo'ladimi", "oxirgi narx qancha", "arzonroq bering", "sal o'tib bering"
   // Bu KELISHUV EMAS!
   if (
     msg.includes('qilib ber') || msg.includes('qib ber') || msg.includes('tushir') || 
+    msg.includes("o'tib") || msg.includes('otib') || msg.includes('tushib') || msg.includes('kamaytir') ||
     msg.includes('arzon') || msg.includes('chegirma') || msg.includes('berasizmi') ||
     msg.includes('berarmisiz') || msg.includes('boladimi') || msg.includes("bo'ladimi") ||
     msg.includes('qancha') || msg.includes('oxiri') || msg.includes('minimal') ||
@@ -1744,10 +1745,10 @@ function isExplicitCustomerAgreement(userMsg) {
   // Aniq sotib olish / rozi bo'lish kalit so'zlari:
   const agreementKeywords = [
     'olaman', 'olay', 'roziman', 'rozi', 'kelishdik', 'kelishamiz', 
-    'buyurtma', 'zakaz', 'yozing', 'yozvor', 'bering', 'tashang',
+    'buyurtma', 'zakaz', 'yozing', 'yozvor', 'menga bering', 'shu narxga bering',
     'yetkazib bering', 'qanday olaman', 'qanday rasmiylashtiraman',
     'mayli shu narx', 'hop olaman', "xo'p olaman", 'xop olaman',
-    'shu narxga bering', 'shu narxda olaman', "bo'pti olaman", 'bopti olaman',
+    'shu narxda olaman', "bo'pti olaman", 'bopti olaman',
     'согласен', 'беру', 'оформляй', 'заказ', 'заберу'
   ];
 
