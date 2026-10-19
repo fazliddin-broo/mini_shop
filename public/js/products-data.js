@@ -5,6 +5,8 @@
 const CATEGORIES = [
   { id: 'all', name_uz: 'Barchasi', name_ru: 'Все', name_en: 'All', icon: 'grid', count: 35 },
   { id: 'telefon-planshetlar', name_uz: 'Telefon va planshetlar', name_ru: 'Телефоны и планшеты', name_en: 'Phones & Tablets', icon: 'tablet', count: 12 },
+  { id: 'noutbuklar', name_uz: 'Noutbuklar va MacBook', name_ru: 'Ноутбуки и MacBook', name_en: 'Laptops & MacBook', icon: 'laptop', count: 0 },
+  { id: 'kompyuterlar', name_uz: 'Kompyuterlar va Monobloklar', name_ru: 'Компьютеры и Моноблоки', name_en: 'Computers & Desktops', icon: 'monitor', count: 0 },
   { id: 'telefon-aksessuar', name_uz: 'Telefon aksessuarlari', name_ru: 'Аксессуары для телефонов', name_en: 'Phone Accessories', icon: 'casePhone', count: 14 },
   { id: 'naushniki-quloqchinlar', name_uz: 'Quloqchinlar va naushniklar', name_ru: 'Наушники и гарнитуры', name_en: 'Headphones & Audio', icon: 'headphones', count: 8 },
   { id: 'smart-watch-fitnes', name_uz: 'Aqlli soatlar va fitnes', name_ru: 'Умные часы и фитнес', name_en: 'Smart Watches & Fitness', icon: 'watch', count: 6 },
@@ -26,7 +28,11 @@ const BRANDS = [
   { id: 'WHOOP', name: 'WHOOP', logo: 'images/brands/whoop.png' },
   { id: 'Ray-Ban', name: 'Ray-Ban', logo: 'images/brands/meta.png' },
   { id: 'Google', name: 'Google', logo: 'images/brands/google.png' },
-  { id: 'Canon', name: 'Canon', logo: 'images/brands/canon.png' }
+  { id: 'Canon', name: 'Canon', logo: 'images/brands/canon.png' },
+  { id: 'ASUS', name: 'ASUS' },
+  { id: 'Lenovo', name: 'Lenovo' },
+  { id: 'HP', name: 'HP' },
+  { id: 'Dell', name: 'Dell' }
 ];
 
 // Bannerlar — Screenshot 2 dagi Applebox uslubida
