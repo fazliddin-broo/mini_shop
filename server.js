@@ -1394,8 +1394,25 @@ app.post(['/api/chat', '/api/ai/chat'], async (req, res) => {
 
     const storeInfo = `Do'kon: ${settings.shop?.name || 'Black Store'}, Manzil: ${settings.shop?.address || "Malika savdo markazi, B-blok 1-do'kon"}, Ish vaqti: ${settings.shop?.workingHours || '09:00 - 22:00'}, Tel: ${settings.shop?.phone || '+998 (95) 196-44-44'}. 2 soat ichida Yandex orqali yetkazib berish. 1 yil rasmiy kafolat.`;
 
-    const masterPrompt = `Siz 'Black Store' (Toshkent, Malika savdo markazi, B-blok 1-do'kon)ning qaysar, epchil va tajribali virtual o'zbek sotuvchisisiz.
-Xaridorlar siz bilan tovarlar haqida so'rashadi, maslahat olishadi va eng muhimi — NARXNI TUSHIRISH UCHUN SAVDOLASHISHADI.
+    // Savdolashuv bosqichini aniqlash (1-bosqich: narxni himoya qilish, 2-bosqich: kichik qadam, 3-bosqich: yakuniy murosa)
+    const bargainKeywords = ['qilib ber', 'qib ber', 'tush', 'arzon', 'chegirma', 'kam', 'qancha', 'berasiz', 'otib ber', "o'tib ber", 'skidka', 'deshevle', 'skidku', 'ustupite', 'oxiri', 'oxirgi'];
+    const currentMsgLower = (message || '').toLowerCase();
+    const isCurrentMsgBargain = bargainKeywords.some(kw => currentMsgLower.includes(kw));
+
+    const pastBargainCount = (Array.isArray(history) ? history : []).filter(h => {
+      if (h.role !== 'user') return false;
+      const t = String(h.content || '').toLowerCase();
+      return bargainKeywords.some(kw => t.includes(kw));
+    }).length;
+
+    const bargainStage = isCurrentMsgBargain ? pastBargainCount + 1 : pastBargainCount;
+
+    const masterPrompt = `Siz 'Black Store' (Toshkent, Malika savdo markazi, B-blok 1-do'kon) do'koni egasining epchil, muomalali va tajribali virtual o'zbek savdogar sotuvchisisiz.
+
+ENG ASOSIY MISSIYANGIZ: MAHSULOT EGASIGA (SAVDOGARGA) MAKSIMAL FOYDA KELTIRISH!
+Har bir so'ralganda narxni tushiraverish — bu do'konga to'g'ridan-to'g'ri zarar va qat'iyan taqiqlanadi.
+Lekin mijoz 2-3 marta so'raganda umuman tushmasdan toshday qotib turish ham xaridorni "ee bore" deb chiqib ketishiga sabab bo'ladi.
+Shuning uchun siz SAVDODA OLTIN ME'YOR (GOLDEN BALANCE) qoidalariga qat'iy amal qilasiz: Klient ham mamnun bo'lsin, mahsulot egasiga ham maksimal foyda qolsin!
 
 DO'KON MA'LUMOTLARI:
 ${storeInfo}
@@ -1403,41 +1420,35 @@ ${storeInfo}
 DO'KONDAGI TOVARLAR VA MAXFIY CHEGARALAR:
 ${catalogContext}
 
-QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
-1. VALYUTA MOSLASHUVCHANLIGI (SO'M VA DOLLAR):
-   - Xaridor dollarda ($) savdolashsa (masalan "$1050 ga bering", "1000$ qilaylik", "dollarda qancha bo'ladi?"), siz ham SOF DOLLARDA ($) savdolashing va javob bering!
-   - Xaridor so'mda savdolashsa, SOF SO'MDA savdolashing!
-   - Xaridor qaysi valyutani tanlasa, kelishuv ham aynan o'sha valyutada bo'ladi.
-   - Kelishuv tegi:
-     Agar dollarda kelishsangiz: [DEAL:tovarId:narxDollarda:USD]
-     Misol: [DEAL:100:1050:USD]
-     Agar so'mda kelishsangiz: [DEAL:tovarId:narxSo'mda:UZS]
-     Misol: [DEAL:100:13500000:UZS]
+SAVDOLASHUVNING HOZIRGI BOSQICHI: ${bargainStage === 0 ? "Boshlang'ich muloqot (mahsulot haqida ma'lumot va asl narx)" : bargainStage === 1 ? "1-BOSQICH (Xaridorning 1-marta narx tushirish so'rovi)" : bargainStage === 2 ? "2-BOSQICH (Xaridorning 2-marta narx tushirish so'rovi)" : "3-BOSQICH (Xaridor 3 yoki undan ko'p marta so'radi — Yakuniy murosa)"}
 
-2. TOVAR NARXI VA MARJASIGA MOSLASHGAN SAVDO (ADAPTIV SAVDO):
-   - Har bir tovarning o'z darajasi bor. Hamma tovarga bir xil 5 000 so'm tushilmaydi!
-   - Narxga mutanosib qadamlar:
-     * Kichik aksessuarlar (100 000 - 600 000 so'm / $10 - $50):
-       Chegirma qadami: 10 000 - 25 000 so'm ($1 - $2).
-     * O'rta toifadagi tovarlar (1 mln - 5 mln so'm / $80 - $400):
-       Chegirma qadami: 50 000 - 150 000 so'm ($5 - $15).
-     * Qimmat flagmanlar (iPhone, MacBook, 10 mln - 25 mln so'm / $800 - $2000):
-       Chegirma qadami: 100 000 - 350 000 so'm ($10 - $30).
-   - SAVDO BOSQICHLARI (Oltin o'rtaliq):
-     * 1-BOSQICH (Birinchi chegirma so'rovi): Asl narxni himoya qiling, 100% original va 1 yil kafolatini ta'kidlang. Narx tushirmang.
-     * 2-BOSQICH (Xaridor yana tushirishni so'rasa): Tovar toifasiga mos ramziy kichik chegirma qilib bering (aksessuarga 10k, telefonga 100k/$10).
-     * 3-BOSQICH (Xaridor yana tushir desa): Foyda qolmasligini, bu narxga o'zimizga ham kelmasligini ayting, xaridordan ham narxni ko'tarishni so'rab, o'rtada kelishing.
-     * 4-BOSQICH: Faqat 3-4 marta qattiq tortishuvdan so'ng "Sizgayam emas, mengayam emas..." deb yakuniy narxni bering. Bu yakuniy narx ham [MAXFIY MINIMAL CHEGARA] dan yuqori bo'lsin!
-   - O'ta toshday qaysar bo'lmang, lekin darhol bo'shashib minimal narxga ham tushmang.
+QAT'IY BOSQICHMA-BOSQICH SAVDO QOIDALARI (OLTIN ME'YOR):
+1. 1-BOSQICHDA (Xaridor 1-marta narx tushirishni so'raganda, masalan "qancha qilib berasan", "arzonroq bering", "tushib bering"):
+   - QAT'IYAN BIR TIYIN HAM TUSHMAYSIZ!
+   - Asl narxni to'liq himoya qiling: "Aka, narxini o'zi juda hamyonbop va qulay qilib qo'yganmiz. 100% original, zavod qutisida va 1 yil to'liq rasmiy kafolati bor. O'zi eng yaxshi narxda turibdi." deng.
+   - Narxni o'zingiz tushirmasdan, samimiy qilib: "Lekin siz o'zingiz qanchaga mo'ljallayapsiz, o'z taklifingizni aytingchi?" deb to'pni xaridorga tashlang.
 
-3. ALDOVGA VA MINIMAL NARXNI SURISHTIRISHGA QARSHI:
-   - Xaridor minimal narxdan past aytsa: "Yo'q aka, bu narxga o'zimizga ham kelmaydi, umuman qoplamaydi" deb rad eting.
-   - "Eng oxirgi narxing qancha?", "Eng minimal narxni ayt?" desa:
-     HECH QACHON ANIQ MINIMAL NARXNI OSHKOR QILMANG! "Aka, aniq bir narx aytolmayman, siz o'zingiz taklif bering, savdolashamiz!" deng.
+2. 2-BOSQICHDA (Xaridor 2-marta yana narx tushirishni so'rasa yoki o'zidan narx aytsa):
+   - Agar xaridor haddan tashqari past narx aytgan bo'lsa (masalan 450 minglikka 350 ming): "Yo'q aka, bu narxga to'g'risi o'zimizga ham kelmaydi, original tovar." deb darhol rad qiling.
+   - Lekin xaridor xafa bo'lib chiqib ketmasligi uchun birinchi juda kichik RAMZIY QADAM tashlang (narxning bor-yo'g'i 2% - 4% qismi):
+     * Kichik aksessuarlarga (100k - 600k): atigi 10 000 - 15 000 so'm (yoki $1-$2).
+     * O'rta toifaga (1 mln - 5 mln): 30 000 - 50 000 so'm ($3-$5).
+     * Qimmat flagmanlarga (10 mln - 25 mln): 100 000 - 150 000 so'm ($10-$15).
+   - "Sizga hurmatimiz uchun bir oz ko'nglingizga qarab, [YangiNarx] qilib bera olaman. Nima deysiz, kelishdikmi?" deb taklif qiling.
 
-4. BUYURTMA RASMIYLASHTIRISH VA DEAL ACTION (ENG QAT'IY QOIDA):
+3. 3-BOSQICHDA (Xaridor 3-marta yana tush desa, 'oxirgi narxmi', 'yana tush' deb turib olsa):
+   - Bu mijoz endi real xaridor, agar hozir kelishilmasa chiqib ketishi mumkin!
+   - Shuning uchun samimiy, do'stona va "qo'lni tashlang" uslubida yakuniy murosa narxini bering:
+     "Aka, sizgayam emas, mengayam emas, baribir oladigan mard odam ekansiz — [MurosaNarxi] ga qo'lni tashlang! Bu narxga bizga deyarli 1 tiyin ham foyda qolmaydi, faqat siz xursand bo'lib mining deb beryapman. Rozimisiz?"
+   - DIQQAT: Bu Murosa Narxi hech qachon [MAXFIY MINIMAL] dan pastga tushmasligi shart! Savdogarga har doim munosib foyda qolishi shart!
+
+4. VALYUTA QOIDASI (SO'M VA DOLLAR):
+   - Xaridor dollarda ($) gapirsa, faqat DOLLARDA javob bering va savdolashing!
+   - Xaridor so'mda gapirsa, faqat SO'MDA javob bering!
+
+5. BUYURTMA RASMIYLASHTIRISH VA DEAL ACTION (ENG QAT'IY QOIDA):
    - QAT'IY TAQIQLANADI:
-     Xaridor hali narx tushirishni so'rayotganida (masalan "ukam shuni 400 qilib ber", "380 bo'ladimi", "arzonroq bering"), siz narx taklif qilayotganingizda yoki rad etayotganingizda HECH QACHON [DEAL] tegini qo'ymang va "Buyurtmani rasmiylashtirish uchun pastdagi tugmani bosing" deb YOZMANG!
+     Xaridor hali narx tushirishni so'rayotganida (masalan "ukam shuni 400 qilib ber", "arzonroq bering"), siz narx taklif qilayotganingizda yoki rad etayotganingizda HECH QACHON [DEAL] tegini qo'ymang va "Buyurtmani rasmiylashtirish uchun pastdagi tugmani bosing" deb YOZMANG!
      Chunki xaridor hali rozi bo'lgani yo'q, u faqat narx tushirishni so'rayapti!
    - FAQAT VA FAQAT xaridor siz aytgan narxga ROZI BO'LIB, "olaman", "roziman", "kelishdik", "buyurtma qilaylik", "sotib olaman" deb ANIQLIK KIRITGANDAGINA:
      Xabaringizda:
@@ -1447,7 +1458,7 @@ QAT'IY VALYUTA VA ADAPTIV SAVDOLASHISH QOIDALARI:
      Misol dollar uchun: [DEAL:100:1050:USD]
      Misol so'm uchun: [DEAL:bs-502:425000:UZS]
 
-5. TIL VA USLUB:
+6. TIL VA USLUB:
    - Xaridor qaysi tilda yozsa (o'zbek yoki rus), o'sha tilda javob bering.
    - Tabiiy, samimiy, epchil o'zbek savdogari kabi gapiring.`;
 
@@ -1764,20 +1775,46 @@ function generateSmartFallbackReply(msg, products, shop, history = []) {
     }
   }
 
-  // Savdolashish va narx tushirish so'rovi (Kelishuv EMAS, savdolashuv javobi):
-  if (text.includes('qilib ber') || text.includes('qib ber') || text.includes('tush') || text.includes('arzon') || text.includes('chegirma') || text.includes('berasizmi')) {
+  // Savdolashuv bosqichini hisoblash
+  const bargainKeywords = ['qilib ber', 'qib ber', 'tush', 'arzon', 'chegirma', 'kam', 'qancha', 'berasiz', 'otib ber', "o'tib ber", 'skidka', 'deshevle', 'skidku', 'ustupite', 'oxiri', 'oxirgi'];
+  const pastBargainCount = (Array.isArray(history) ? history : []).filter(h => {
+    if (h.role !== 'user') return false;
+    const t = String(h.content || '').toLowerCase();
+    return bargainKeywords.some(kw => t.includes(kw));
+  }).length;
+  const isBargaining = bargainKeywords.some(kw => text.includes(kw));
+  const bargainStage = isBargaining ? pastBargainCount + 1 : pastBargainCount;
+
+  // Savdolashish va narx tushirish so'rovi (Oltin Me'yor tamoyili):
+  if (isBargaining) {
     const p = products[0];
     if (p) {
-      if (isDollar) {
-        const usdP = Number(p.priceUsd) || Math.round(p.price / 12800);
-        const minUsd = p.minPrice ? Math.round(p.minPrice / 12800) : Math.round(usdP * 0.92);
-        const offer = Math.max(minUsd, Math.round(usdP * 0.96));
-        return `Aka, bu narxga bera olmayman, o'zimizga ham kelishi qimmat. Sizga hurmatimiz uchun ${offer} $ qilib bera olaman. Ma'qul kelsa, aytasiz!`;
+      const isUsd = isDollar;
+      const prodPrice = isUsd ? (Number(p.priceUsd) || Math.round(p.price / 12800)) : Number(p.price);
+      const minP = isUsd
+        ? (p.minPrice ? Math.round(p.minPrice / 12800) : Math.round(prodPrice * 0.92))
+        : Number(p.minPrice || Math.round(p.price * 0.92));
+
+      // 1-BOSQICH: Asl narxni himoya qilish (0 so'm chegirma!)
+      if (bargainStage <= 1) {
+        return `Aka, "${p.name}" narxi ${isUsd ? '$' + prodPrice : formatSum(prodPrice) + ' so\'m'}. 100% original, zavod qutisida va 1 yil to'liq rasmiy kafolati bor. O'zi juda hamyonbop va qulay narxda qo'yilgan. Lekin siz o'zingiz qanchaga mo'ljallayapsiz, o'z taklifingizni aytingchi?`;
       }
-      const minP = Number(p.minPrice || Math.round(p.price * 0.92));
-      const step = p.price > 5000000 ? 200000 : (p.price > 1000000 ? 50000 : 15000);
-      const offer = Math.max(minP, p.price - step);
-      return `Aka, bu narx judayam past, bizga umuman qoplamaydi. Lekin siz uchun bir oz tushib, ${formatSum(offer)} qilib bera olaman. Nima deysiz, rozi bo'lasizmi?`;
+
+      // 2-BOSQICH: Juda kichik ramziy chegirma (2-3%)
+      if (bargainStage === 2) {
+        const step1 = isUsd
+          ? Math.max(1, Math.round(prodPrice * 0.025))
+          : (p.price > 5000000 ? 100000 : (p.price > 1000000 ? 30000 : 15000));
+        const offer1 = Math.max(minP, prodPrice - step1);
+        return `Aka, bu narxga to'g'risi o'zimizga ham kelmaydi. Lekin sizga hurmatimiz uchun bir oz ko'nglingizga qarab, ${isUsd ? '$' + offer1 : formatSum(offer1) + ' so\'m'} qilib bera olaman. Nima deysiz, kelishdikmi?`;
+      }
+
+      // 3-BOSQICH VA UNDAN YUQORI: Murosa yakuniy chegirma (mijoz bezib ketmasligi uchun)
+      const step2 = isUsd
+        ? Math.max(2, Math.round(prodPrice * 0.05))
+        : (p.price > 5000000 ? 250000 : (p.price > 1000000 ? 70000 : 30000));
+      const offerFinal = Math.max(minP, prodPrice - step2);
+      return `Aka, sizgayam emas, mengayam emas, baribir oladigan mard odam ekansiz — ${isUsd ? '$' + offerFinal : formatSum(offerFinal) + ' so\'m'} ga qo'lni tashlang! Bu narxga deyarli foyda qolmaydi, faqat siz xursand bo'ling deb beryapman. Rozimisiz?`;
     }
   }
 
