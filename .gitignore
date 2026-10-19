@@ -18,3 +18,6 @@ npm-debug.log*
 # data/products.json
 # data/orders.json
 # data/settings.json
+
+*.mp4
+*.MP4

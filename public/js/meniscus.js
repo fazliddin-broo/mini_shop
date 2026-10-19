@@ -51,7 +51,7 @@
       G.W = W;
       G.H = H;
       G.R = clamp(H * 0.28, 14, 22);
-      G.CY = -2; // The bead sits slightly raised on the surface line
+      G.CY = 0; // The bead rides directly on the surface line
 
       let D = Math.min(H * 0.72, G.span * 0.74);
       const room = G.slots[0] - G.R - 4;
@@ -143,7 +143,9 @@
       const side = x >= G.slots[near] ? 1 : -1;
       const other = clamp(near + side, 0, tabs.length - 1);
       const t = other === near ? 0 : clamp(Math.abs(x - G.slots[near]) / G.span, 0, 1);
-      dock.style.setProperty('--glow-rgb', mixRGB(ACC[near], ACC[other], t));
+      const rgbVal = mixRGB(ACC[near], ACC[other], t);
+      dock.style.setProperty('--glow-rgb', rgbVal);
+      document.documentElement.style.setProperty('--glow-rgb', rgbVal);
     }
 
     function loop(now) {

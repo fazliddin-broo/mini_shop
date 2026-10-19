@@ -3081,11 +3081,11 @@ html.light .brand-drawer-card.active .brand-drawer-name {
    ========================================================================== */
 .mobile-bottom-bar.meniscus-dock {
   position: fixed;
-  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
-  width: min(440px, calc(100% - 20px));
-  height: 66px;
+  width: min(450px, calc(100% - 24px));
+  height: 68px;
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -3103,7 +3103,10 @@ html.light .brand-drawer-card.active .brand-drawer-name {
 
 @media (min-width: 992px) {
   .mobile-bottom-bar.meniscus-dock {
-    display: none;
+    display: flex !important;
+    width: 460px;
+    height: 72px;
+    bottom: 22px;
   }
 }
 
