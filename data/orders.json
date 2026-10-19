@@ -1,5 +1,33 @@
 [
   {
+    "id": "ORD-78161999",
+    "createdAt": "2026-10-18T16:43:01.647Z",
+    "formattedDate": "21:43, 18/10/2026",
+    "customer": {
+      "name": "Aziz Rahimov",
+      "phone": "+998901234567",
+      "address": "Toshkent sh., Yunusobod 4-mavze, 12-uy",
+      "deliveryMethod": "Yetkazib berish (Toshkent bo'ylab)",
+      "notes": ""
+    },
+    "items": [
+      {
+        "id": "100",
+        "name": "Apple iPhone 15 Pro 128GB Natural Titanium | 100% Original",
+        "price": 13990000,
+        "currency": "UZS",
+        "quantity": 1
+      }
+    ],
+    "currency": "UZS",
+    "subtotal": 13990000,
+    "discount": 0,
+    "promoCode": null,
+    "total": 13990000,
+    "status": "new",
+    "telegramSent": true
+  },
+  {
     "id": "ORD-76192",
     "createdAt": "2026-10-13T13:24:36.192Z",
     "formattedDate": "18:24, 13/10/2026",
