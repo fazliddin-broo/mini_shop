@@ -450,31 +450,48 @@
   </footer>
 
   <!-- ==========================================================================
-       MOBILE BOTTOM NAVIGATION BAR (IMG_2191: 5 ta asosiy bo'lim)
+       MOBILE BOTTOM NAVIGATION BAR — MENISCUS LIQUID DOCK
        ========================================================================== -->
-  <nav class="mobile-bottom-bar" aria-label="Mobil boshqaruv paneli">
-    <button class="nav-tab-item active" onclick="goToHome(event);" id="bottomTabHome" title="Bosh sahifa">
-      <span id="navHomeIcon"></span>
-      <span>Bosh sahifa</span>
-    </button>
-    <button class="nav-tab-item" onclick="openCatalogView(event);" id="bottomTabCatalog" title="Kategoriyalar">
-      <span id="navCatalogIcon"></span>
-      <span>Kategoriyalar</span>
-    </button>
-    <button class="nav-tab-item" onclick="openCartView(event);" id="bottomTabCart" title="Savat">
-      <span id="navCartIcon"></span>
-      <span class="nav-tab-badge cart-count-badge" style="display: none;">0</span>
-      <span>Savat</span>
-    </button>
-    <button class="nav-tab-item" onclick="filterByWishlist();" id="bottomTabWishlist" title="Sevimlilar">
-      <span id="navWishlistIcon"></span>
-      <span class="nav-tab-badge wishlist-count-badge" style="display: none;">0</span>
-      <span>Sevimlilar</span>
-    </button>
-    <button class="nav-tab-item" onclick="openContactModal();" id="bottomTabContact" title="Aloqa">
-      <span id="navContactIcon"></span>
-      <span>Aloqa</span>
-    </button>
+  <nav class="mobile-bottom-bar meniscus-dock" id="dock" aria-label="Mobil boshqaruv paneli">
+    <div class="dock__cast" aria-hidden="true"></div>
+    <svg class="dock__skin" id="skin" aria-hidden="true">
+      <defs>
+        <linearGradient id="mnPlate" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#21192e" class="dock__plate-hi"></stop>
+          <stop offset="100%" stop-color="#0c0815" class="dock__plate-lo"></stop>
+        </linearGradient>
+        <linearGradient id="mnRim" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.65" class="dock__rim-hi"></stop>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08" class="dock__rim-lo"></stop>
+        </linearGradient>
+      </defs>
+      <path id="skinFill" class="dock__fill" d=""></path>
+    </svg>
+    <span class="dock__bead" id="bead" aria-hidden="true"></span>
+    <div class="dock__tabs" id="tabs" role="tablist">
+      <button class="tab nav-tab-item active" role="tab" aria-selected="true" style="--acc: #f59e0b;" onclick="goToHome(event);" id="bottomTabHome" title="Bosh sahifa">
+        <span class="tab__icon" id="navHomeIcon"></span>
+        <span class="tab__label">Bosh sahifa</span>
+      </button>
+      <button class="tab nav-tab-item" role="tab" aria-selected="false" style="--acc: #06b6d4;" onclick="openCatalogView(event);" id="bottomTabCatalog" title="Kategoriyalar">
+        <span class="tab__icon" id="navCatalogIcon"></span>
+        <span class="tab__label">Kategoriyalar</span>
+      </button>
+      <button class="tab nav-tab-item" role="tab" aria-selected="false" style="--acc: #10b981;" onclick="openCartView(event);" id="bottomTabCart" title="Savat">
+        <span class="tab__icon" id="navCartIcon"></span>
+        <span class="nav-tab-badge cart-count-badge" style="display: none;">0</span>
+        <span class="tab__label">Savat</span>
+      </button>
+      <button class="tab nav-tab-item" role="tab" aria-selected="false" style="--acc: #ec4899;" onclick="filterByWishlist();" id="bottomTabWishlist" title="Sevimlilar">
+        <span class="tab__icon" id="navWishlistIcon"></span>
+        <span class="nav-tab-badge wishlist-count-badge" style="display: none;">0</span>
+        <span class="tab__label">Sevimlilar</span>
+      </button>
+      <button class="tab nav-tab-item" role="tab" aria-selected="false" style="--acc: #8b5cf6;" onclick="openContactModal();" id="bottomTabContact" title="Aloqa">
+        <span class="tab__icon" id="navContactIcon"></span>
+        <span class="tab__label">Aloqa</span>
+      </button>
+    </div>
   </nav>
 
   <!-- ==========================================================================
@@ -861,6 +878,7 @@
   <script src="js/products-data.js?v=7.8"></script>
   <script src="js/app.js?v=7.8"></script>
   <script src="js/mobile-lock.js?v=7.8"></script>
+  <script src="js/meniscus.js?v=9.0"></script>
 
   <!-- Inject Static Vector Icons into Placeholders -->
   <script>

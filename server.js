@@ -336,19 +336,32 @@ function escapeRegex(str) {
 const PROMO_CODES = { BLACK10: 0.10, APPLEBOX: 0.10, BLACK20: 0.20 };
 const ORDER_STATUSES = ['new', 'processing', 'confirmed', 'completed', 'cancelled'];
 
-async function getSettings() {
+let _cachedSettings = null;
+let _cachedSettingsTs = 0;
+
+async function getSettings(forceRefresh = false) {
+  const now = Date.now();
+  if (!forceRefresh && _cachedSettings && (now - _cachedSettingsTs < 60000)) {
+    return _cachedSettings;
+  }
   if (mongoose.connection.readyState === 1) {
     let s = await Settings.findOne({ key: 'main' }).lean();
     if (!s) {
       s = await Settings.create({ key: 'main', ...DEFAULT_SETTINGS });
       if (s.toObject) s = s.toObject();
     }
+    _cachedSettings = s;
+    _cachedSettingsTs = now;
     return s;
   }
-  return readJsonSafe(SETTINGS_FILE, DEFAULT_SETTINGS);
+  const fileData = readJsonSafe(SETTINGS_FILE, DEFAULT_SETTINGS);
+  _cachedSettings = fileData;
+  _cachedSettingsTs = now;
+  return fileData;
 }
 
 async function saveSettings(data) {
+  _cachedSettings = null; // Keshni darhol yangilash
   if (mongoose.connection.readyState === 1) {
     const toSet = {};
     if (data.shop) {
@@ -372,6 +385,8 @@ async function saveSettings(data) {
       { upsert: true, new: true, lean: true }
     );
     writeJsonSafe(SETTINGS_FILE, updated);
+    _cachedSettings = updated;
+    _cachedSettingsTs = Date.now();
     return updated;
   }
 

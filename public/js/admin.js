@@ -449,10 +449,11 @@ function initLiveClock() {
 
 function initAutoRefresh() {
   const pulseText = document.getElementById('live-pulse-text');
+  adminState.liveCounter = 30;
   setInterval(() => {
     adminState.liveCounter -= 1;
     if (adminState.liveCounter <= 0) {
-      adminState.liveCounter = 8;
+      adminState.liveCounter = 30;
       if (adminState.token) {
         refreshDashboardData(true);
       }
@@ -2876,12 +2877,22 @@ function switchTab(tabId) {
     pane.classList.toggle('active', pane.id === tabId);
   });
 
-  if (tabId === 'tab-analytics') {
-    loadAnalytics(adminState.currentPeriod);
-  } else if (tabId === 'tab-products') {
+  // INSTANT TAB SWITCH (0ms): ma'lumot xotirada bo'lsa, kutmasdan zumda ko'rsatiladi
+  if (tabId === 'tab-products') {
+    if (adminState.products && adminState.products.length > 0) {
+      renderProductsTable();
+    }
     loadProducts();
   } else if (tabId === 'tab-orders') {
+    if (adminState.orders && adminState.orders.length > 0) {
+      renderAllOrdersTable();
+    }
     loadOrders();
+  } else if (tabId === 'tab-analytics') {
+    if (adminState.analyticsData) {
+      renderAnalytics(adminState.analyticsData);
+    }
+    loadAnalytics(adminState.currentPeriod);
   } else if (tabId === 'tab-audit') {
     renderAuditFullTimeline();
   } else if (tabId === 'tab-database') {

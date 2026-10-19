@@ -82,10 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initCurtainIntro();
   loadLiveProducts();
   loadShopSettings();
-  // Har 8 soniyada dashboarddan yangi qo'shilgan/o'zgartirilgan mahsulotlarni yangilab turadi
-  setInterval(loadLiveProducts, 8000);
-  // Har 10 soniyada do'kon sozlamalarini (telefon, manzil, ish vaqti) avtomatik sinxronlaydi
-  setInterval(loadShopSettings, 10000);
+  // Har 30 soniyada dashboarddan yangi qo'shilgan/o'zgartirilgan mahsulotlarni orqa fonda yangilab turadi
+  setInterval(loadLiveProducts, 30000);
+  // Har 45 soniyada do'kon sozlamalarini (telefon, manzil, ish vaqti) avtomatik sinxronlaydi
+  setInterval(loadShopSettings, 45000);
 });
 
 // ==========================================================================
@@ -1017,9 +1017,16 @@ function filterByBrand(brand) {
 function setActiveBottomTab(tabId) {
   document.querySelectorAll('.mobile-bottom-bar .nav-tab-item').forEach(btn => {
     btn.classList.remove('active');
+    btn.setAttribute('aria-selected', 'false');
   });
   const activeBtn = document.getElementById(tabId);
-  if (activeBtn) activeBtn.classList.add('active');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.setAttribute('aria-selected', 'true');
+  }
+  if (window.__meniscus && typeof window.__meniscus.selectById === 'function') {
+    window.__meniscus.selectById(tabId, true);
+  }
 }
 
 function filterByWishlist(e) {
