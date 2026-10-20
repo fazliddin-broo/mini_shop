@@ -128,8 +128,8 @@
           <!-- Til almashtirgich (RU / UZ - Desktop) -->
           <button class="btn-lang desktop-only-action" onclick="toggleLanguage()" id="langToggleBtn" title="Til">RU</button>
 
-          <!-- Mavzu almashtirgich (Quyosh / Oy - Desktop) -->
-          <button class="header-action-btn desktop-only-action" onclick="toggleTheme()" id="themeToggleBtn" title="Rejimni almashtirish">
+          <!-- Mavzu almashtirgich (Quyosh / Oy - Ham Desktop, ham Mobil asosiy panel) -->
+          <button class="header-action-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Rejimni almashtirish">
           </button>
 
           <!-- Sevimlilar (Desktop) -->
@@ -450,27 +450,32 @@
   </footer>
 
   <!-- ==========================================================================
-       MENISCUS LIQUID NAVIGATION DOCK (Exact User Implementation)
+       MOBILE BOTTOM NAVIGATION BAR (Toza, qulay va mahsulotlarni to'smaydigan mobil panel)
        ========================================================================== -->
-  <div class="dockwrap">
-    <div class="glow"></div>
-    <nav class="dock" id="dock" aria-label="Mobil boshqaruv paneli">
-      <svg class="dock__skin" id="skin" aria-hidden="true">
-        <defs>
-          <linearGradient id="mnPlate" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#1b1633"/><stop offset="1" stop-color="#0f0b20"/>
-          </linearGradient>
-          <linearGradient id="mnRim" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#fff" stop-opacity=".30"/>
-            <stop offset="1" stop-color="#fff" stop-opacity=".07"/>
-          </linearGradient>
-        </defs>
-        <path class="dock__fill" id="skinFill"/>
-      </svg>
-      <span class="dock__bead" id="bead" aria-hidden="true"></span>
-      <div role="tablist" id="tabs"></div>
-    </nav>
-  </div>
+  <nav class="mobile-bottom-bar" aria-label="Mobil boshqaruv paneli">
+    <button class="nav-tab-item active" onclick="goToHome(event);" id="bottomTabHome" title="Bosh sahifa">
+      <span class="nav-tab-icon" id="navHomeIcon"></span>
+      <span class="nav-tab-label">Bosh sahifa</span>
+    </button>
+    <button class="nav-tab-item" onclick="openCatalogView(event);" id="bottomTabCatalog" title="Kategoriyalar">
+      <span class="nav-tab-icon" id="navCatalogIcon"></span>
+      <span class="nav-tab-label">Kategoriyalar</span>
+    </button>
+    <button class="nav-tab-item" onclick="openCartView(event);" id="bottomTabCart" title="Savat">
+      <span class="nav-tab-icon" id="navCartIcon"></span>
+      <span class="nav-tab-badge cart-count-badge" style="display: none;">0</span>
+      <span class="nav-tab-label">Savat</span>
+    </button>
+    <button class="nav-tab-item" onclick="filterByWishlist();" id="bottomTabWishlist" title="Sevimlilar">
+      <span class="nav-tab-icon" id="navWishlistIcon"></span>
+      <span class="nav-tab-badge wishlist-count-badge" style="display: none;">0</span>
+      <span class="nav-tab-label">Sevimlilar</span>
+    </button>
+    <button class="nav-tab-item" onclick="openContactModal();" id="bottomTabContact" title="Aloqa">
+      <span class="nav-tab-icon" id="navContactIcon"></span>
+      <span class="nav-tab-label">Aloqa</span>
+    </button>
+  </nav>
 
   <!-- ==========================================================================
        DRAWERS (MOBILE NAV, FILTER, CART & CATALOG)
@@ -856,7 +861,6 @@
   <script src="js/products-data.js?v=7.8"></script>
   <script src="js/app.js?v=7.8"></script>
   <script src="js/mobile-lock.js?v=7.8"></script>
-  <script src="js/meniscus.js?v=9.0"></script>
 
   <!-- Inject Static Vector Icons into Placeholders -->
   <script>

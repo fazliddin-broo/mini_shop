@@ -1024,9 +1024,6 @@ function setActiveBottomTab(tabId) {
     activeBtn.classList.add('active');
     activeBtn.setAttribute('aria-selected', 'true');
   }
-  if (window.__meniscus && typeof window.__meniscus.selectById === 'function') {
-    window.__meniscus.selectById(tabId, true);
-  }
 }
 
 function filterByWishlist(e) {
