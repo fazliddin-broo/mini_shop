@@ -81,11 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
   updateViewMode();
   initCurtainIntro();
   loadLiveProducts();
-  loadShopSettings();
-  // Har 30 soniyada dashboarddan yangi qo'shilgan/o'zgartirilgan mahsulotlarni orqa fonda yangilab turadi
+  // Har 30 soniyada dashboarddan yangi mahsulotlarni yangilab turadi
   setInterval(loadLiveProducts, 30000);
-  // Har 45 soniyada do'kon sozlamalarini (telefon, manzil, ish vaqti) avtomatik sinxronlaydi
   setInterval(loadShopSettings, 45000);
+  // Pastki navigatsiyada dumaloq sharcha (bead) dastlabki holati
+  window.addEventListener('resize', updateBottomNavBead);
+  setTimeout(updateBottomNavBead, 150);
 });
 
 // ==========================================================================
@@ -1014,6 +1015,24 @@ function filterByBrand(brand) {
   selectBrand(brand);
 }
 
+function updateBottomNavBead() {
+  const bar = document.getElementById('mobileBottomBar');
+  const bead = document.getElementById('mobileBottomBead');
+  if (!bar || !bead) return;
+
+  const activeBtn = bar.querySelector('.nav-tab-item.active') || document.getElementById('bottomTabHome');
+  if (!activeBtn) return;
+
+  const barRect = bar.getBoundingClientRect();
+  const btnRect = activeBtn.getBoundingClientRect();
+  const targetX = (btnRect.left + btnRect.width / 2) - barRect.left;
+
+  bead.style.transform = `translate3d(${targetX}px, 0, 0)`;
+  bead.classList.remove('bead-rolling');
+  void bead.offsetWidth;
+  bead.classList.add('bead-rolling');
+}
+
 function setActiveBottomTab(tabId) {
   document.querySelectorAll('.mobile-bottom-bar .nav-tab-item').forEach(btn => {
     btn.classList.remove('active');
@@ -1023,6 +1042,7 @@ function setActiveBottomTab(tabId) {
   if (activeBtn) {
     activeBtn.classList.add('active');
     activeBtn.setAttribute('aria-selected', 'true');
+    updateBottomNavBead();
   }
 }
 
@@ -3495,12 +3515,18 @@ function toggleCustomerAiChat(open) {
   if (!modal) return;
   if (open) {
     modal.classList.add('active');
-    setTimeout(() => {
-      const input = document.getElementById('customerAiInput');
-      if (input) input.focus();
-    }, 150);
+    document.body.classList.add('ai-chat-open');
+    const messagesBox = document.getElementById('customerAiMessages');
+    if (messagesBox) {
+      setTimeout(() => {
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+      }, 60);
+    }
   } else {
     modal.classList.remove('active');
+    document.body.classList.remove('ai-chat-open');
+    const input = document.getElementById('customerAiInput');
+    if (input) input.blur();
   }
 }
 

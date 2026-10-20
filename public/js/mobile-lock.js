@@ -33,7 +33,7 @@
     if (!btn) return;
 
     var STORAGE_KEY = 'blackstore_ai_btn_pos';
-    var MARGIN = 8;
+    var MARGIN = 10;
     var dragging = false;
     var moved = false;
     var startX = 0, startY = 0, originX = 0, originY = 0, pointerId = null;
@@ -43,13 +43,26 @@
       return { w: r.width || 46, h: r.height || 46 };
     }
 
+    function getBottomNavLimit() {
+      var bar = document.querySelector('.mobile-bottom-bar');
+      if (bar && window.getComputedStyle(bar).display !== 'none') {
+        var r = bar.getBoundingClientRect();
+        return r.height || 66;
+      }
+      return 12;
+    }
+
     function clamp(x, y) {
       var s = size();
+      var bottomNavH = getBottomNavLimit();
+      var minX = MARGIN;
       var maxX = window.innerWidth - s.w - MARGIN;
-      var maxY = window.innerHeight - s.h - MARGIN;
+      var minY = 62; // Yuqoridagi asosiy header panelni to'sib qo'ymaslik uchun
+      var maxY = window.innerHeight - s.h - bottomNavH - MARGIN; // Pastki boshqaruv paneliga aslo kirmaslik uchun
+      if (maxY < minY) maxY = minY;
       return {
-        x: Math.min(Math.max(MARGIN, x), Math.max(MARGIN, maxX)),
-        y: Math.min(Math.max(MARGIN, y), Math.max(MARGIN, maxY))
+        x: Math.min(Math.max(minX, x), Math.max(minX, maxX)),
+        y: Math.min(Math.max(minY, y), Math.max(minY, maxY))
       };
     }
 
@@ -65,12 +78,25 @@
     function restore() {
       try {
         var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        var s = size();
+        var bottomNavH = getBottomNavLimit();
+        var defX = window.innerWidth - s.w - MARGIN;
+        var defY = window.innerHeight - s.h - bottomNavH - 16;
+
         if (saved && typeof saved.xr === 'number' && typeof saved.yr === 'number') {
-          var s = size();
-          // Nisbiy joylashuv saqlanadi, shuning uchun ekran aylanganda ham joyida qoladi
-          apply(saved.xr * (window.innerWidth - s.w), saved.yr * (window.innerHeight - s.h));
+          var targetX = saved.xr * (window.innerWidth - s.w);
+          var targetY = saved.yr * (window.innerHeight - s.h);
+          // Har doim clamp orqali o'tkazamiz — pastki panel tagida qolib ketgan bo'lsa darhol tepaga chiqaradi
+          var validPos = clamp(targetX, targetY);
+          apply(validPos.x, validPos.y);
+        } else {
+          apply(defX, defY);
         }
-      } catch (_) { /* e'tiborsiz */ }
+      } catch (_) {
+        var s = size();
+        var bottomNavH = getBottomNavLimit();
+        apply(window.innerWidth - s.w - MARGIN, window.innerHeight - s.h - bottomNavH - 16);
+      }
     }
 
     function save(x, y) {
