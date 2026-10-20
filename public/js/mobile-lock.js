@@ -47,7 +47,7 @@
       var bar = document.querySelector('.mobile-bottom-bar');
       if (bar && window.getComputedStyle(bar).display !== 'none') {
         var r = bar.getBoundingClientRect();
-        return r.height || 66;
+        return (r.height || 66) + 26; // +26: panel ustida suzib turgan sharcha uchun joy
       }
       return 12;
     }

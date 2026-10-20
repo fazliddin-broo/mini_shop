@@ -1015,22 +1015,120 @@ function filterByBrand(brand) {
   selectBrand(brand);
 }
 
-function updateBottomNavBead() {
+// ==========================================================================
+// MENISCUS PASTKI PANEL (IMG_1397) — faqat vizual dvigatel.
+// Mavjud tugmalar/ID/onclick o'zgarmaydi; bu yerda faqat plastina o'yig'i
+// va sharcha prujina fizikasi bilan faol tab tomon yumalab boradi.
+// ==========================================================================
+const MBB_COLORS = {
+  bottomTabHome: '#c9f24a',
+  bottomTabCatalog: '#4fe0c4',
+  bottomTabCart: '#ff9f43',
+  bottomTabWishlist: '#7aa2ff',
+  bottomTabContact: '#ff5c8a'
+};
+const MBB = { ready: false, x: 0, v: 0, q: 0, target: 0, raf: 0, W: 0, H: 0, activeId: '' };
+const MBB_BOWL = 30, MBB_SHOULDER = 12, MBB_BEAD = 46;
+
+function mbbInit() {
+  if (MBB.ready) return true;
   const bar = document.getElementById('mobileBottomBar');
   const bead = document.getElementById('mobileBottomBead');
-  if (!bar || !bead) return;
+  if (!bar || !bead) return false;
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('class', 'mbb-skin');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  const path = document.createElementNS(ns, 'path');
+  path.setAttribute('class', 'mbb-skin-fill');
+  svg.appendChild(path);
+  bar.insertBefore(svg, bar.firstChild);
+  Object.assign(MBB, { bar, bead, svg, path, ready: true });
+  bar.classList.add('mbb-meniscus');
+  if (window.ResizeObserver) new ResizeObserver(() => mbbLayout(false)).observe(bar);
+  window.addEventListener('orientationchange', () => setTimeout(() => mbbLayout(false), 150));
+  return true;
+}
 
-  const activeBtn = bar.querySelector('.nav-tab-item.active') || document.getElementById('bottomTabHome');
-  if (!activeBtn) return;
+// Bitta yo'l: o'yiq — ikki "yelka" aylanasi va botiq kosaga urinma yoylar
+function mbbPath(cx, lean) {
+  const W = MBB.W, H = MBB.H;
+  const rl = MBB_SHOULDER * (1 + 0.45 * lean);
+  const rr = MBB_SHOULDER * (1 - 0.45 * lean);
+  const side = (rs, s) => {
+    const dx = Math.sqrt(Math.max((MBB_BOWL + rs) ** 2 - rs ** 2, 1));
+    const fx = cx + s * dx;
+    const k = MBB_BOWL / (MBB_BOWL + rs);
+    return { tx: fx, px: cx + (fx - cx) * k, py: rs * k };
+  };
+  const L = side(rl, -1), R = side(rr, 1);
+  return `M0 0 H${L.tx} A${rl} ${rl} 0 0 1 ${L.px} ${L.py} ` +
+         `A${MBB_BOWL} ${MBB_BOWL} 0 0 0 ${R.px} ${R.py} ` +
+         `A${rr} ${rr} 0 0 1 ${R.tx} 0 H${W} V${H} H0 Z`;
+}
 
-  const barRect = bar.getBoundingClientRect();
-  const btnRect = activeBtn.getBoundingClientRect();
-  const targetX = (btnRect.left + btnRect.width / 2) - barRect.left;
+function mbbRender() {
+  MBB.bead.style.transform = `translate(${MBB.x - MBB_BEAD / 2}px, ${-MBB_BEAD / 2}px) rotate(${MBB.v * 2}deg)`;
+  MBB.path.setAttribute('d', mbbPath(MBB.x, MBB.q));
+}
 
-  bead.style.transform = `translate3d(${targetX}px, 0, 0)`;
-  bead.classList.remove('bead-rolling');
-  void bead.offsetWidth;
-  bead.classList.add('bead-rolling');
+function mbbTick() {
+  MBB.v = (MBB.v + (MBB.target - MBB.x) * 0.16) * 0.78;
+  MBB.x += MBB.v;
+  MBB.q += (Math.max(-1, Math.min(1, MBB.v / 9)) - MBB.q) * 0.3; // tezlik sirtni egadi
+  mbbRender();
+  if (Math.abs(MBB.v) < 0.02 && Math.abs(MBB.target - MBB.x) < 0.05 && Math.abs(MBB.q) < 0.01) {
+    MBB.x = MBB.target; MBB.v = 0; MBB.q = 0;
+    mbbRender();
+    MBB.raf = 0;
+  } else {
+    MBB.raf = requestAnimationFrame(mbbTick);
+  }
+}
+
+function mbbActiveBtn() {
+  return MBB.bar.querySelector('.nav-tab-item.active') || document.getElementById('bottomTabHome');
+}
+
+function mbbLayout(animate) {
+  if (!MBB.ready) return;
+  const W = MBB.bar.clientWidth, H = MBB.bar.clientHeight;
+  if (!W || !H) return; // desktopda panel yashirin
+  MBB.W = W; MBB.H = H;
+  MBB.svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const btn = mbbActiveBtn();
+  if (!btn) return;
+  MBB.target = btn.offsetLeft + btn.offsetWidth / 2;
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!animate || reduce || !MBB.x) {
+    if (MBB.raf) { cancelAnimationFrame(MBB.raf); MBB.raf = 0; }
+    MBB.x = MBB.target; MBB.v = 0; MBB.q = 0;
+    mbbRender();
+  } else if (!MBB.raf) {
+    MBB.raf = requestAnimationFrame(mbbTick);
+  }
+}
+
+function mbbPaint() {
+  const btn = mbbActiveBtn();
+  if (!btn) return;
+  const id = btn.id;
+  MBB.bar.style.setProperty('--mbb-acc', MBB_COLORS[id] || '#c9f24a');
+  const icon = btn.querySelector('.nav-tab-icon');
+  const html = icon ? icon.innerHTML : '';
+  if (id !== MBB.activeId || !MBB.bead.innerHTML) {
+    MBB.bead.innerHTML = html;
+    const svg = MBB.bead.querySelector('svg');
+    if (svg && MBB.activeId) svg.classList.add('pop');
+    MBB.activeId = id;
+  }
+}
+
+function updateBottomNavBead() {
+  if (!mbbInit()) return;
+  mbbPaint();
+  mbbLayout(true);
 }
 
 function setActiveBottomTab(tabId) {
