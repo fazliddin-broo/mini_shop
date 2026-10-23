@@ -6,6 +6,16 @@ const path = require('path');
 const multer = require('multer');
 const mongoose = require('mongoose');
 const dns = require('dns');
+const cloudinary = require('cloudinary').v2;
+
+if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+  console.log('☁️ Cloudinary muvaffaqiyatli sozlandi!');
+}
 
 // Ba'zi lokal muhitlar yoki provayderlarda SRV DNS yechish muammolarini oldini olish
 try {
@@ -207,6 +217,16 @@ app.use((err, req, res, next) => {
   next(err);
 });
 app.use(express.urlencoded({ extended: true }));
+
+// Maxfiy admin himoyasi: /admin, /admin.html, /dashboard ga kirish butunlay yopiladi (404)
+app.use((req, res, next) => {
+  const p = (req.path || '').toLowerCase();
+  if (p === '/admin' || p === '/admin.html' || p === '/dashboard') {
+    return res.status(404).sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Fayllar papkalari
@@ -661,6 +681,41 @@ const upload = multer({
   }
 });
 
+// ── Cloudinary Helper ─────────────────────────────────────
+async function uploadImageToCloud(file) {
+  const isCloudinaryConfigured = Boolean(
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+  );
+
+  if (!isCloudinaryConfigured) {
+    return `/uploads/${file.filename}`;
+  }
+
+  try {
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: 'black_store_products',
+      resource_type: 'image',
+      transformation: [
+        { quality: 'auto', fetch_format: 'auto' }
+      ]
+    });
+
+    // Cloudinary ga muvaffaqiyatli yuklangach, vaqtinchalik diskdagi lokal faylni tozalaymiz
+    try {
+      if (file.path && fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+      }
+    } catch (_) {}
+
+    return result.secure_url;
+  } catch (err) {
+    console.error('⚠️ Cloudinary yuklashda xatolik:', err.message);
+    return `/uploads/${file.filename}`;
+  }
+}
+
 // ── Telegram Helper ───────────────────────────────────────
 function escapeTelegramHtml(str) {
   return String(str || '')
@@ -750,9 +805,9 @@ app.get(['/', '/shop', '/store', '/index.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ── Black Store Admin Dashboard URL ────────────────────────
-app.get(['/admin', '/admin.html', '/dashboard', '/blackstore-6666'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+// ── Black Store Maxfiy Admin Dashboard URL (FAQAT maxfiy link) ────────────
+app.get('/blackstore-6666', (req, res) => {
+  res.sendFile(path.join(__dirname, 'private', 'admin.html'));
 });
 
 // ── Taplink / Bio Links (Instagram bio uchun) ──────────────
@@ -876,7 +931,8 @@ app.post('/api/admin/products', verifyAdmin, upload.any(), async (req, res) => {
     }
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       for (const f of req.files) {
-        images.push(`/uploads/${f.filename}`);
+        const cloudUrl = await uploadImageToCloud(f);
+        if (cloudUrl) images.push(cloudUrl);
       }
     }
     if (req.body.imageUrls) {
@@ -948,7 +1004,8 @@ app.put('/api/admin/products/:id', verifyAdmin, upload.any(), async (req, res) =
 
     if (req.files && Array.isArray(req.files) && req.files.length > 0) {
       for (const f of req.files) {
-        images.push(`/uploads/${f.filename}`);
+        const cloudUrl = await uploadImageToCloud(f);
+        if (cloudUrl) images.push(cloudUrl);
       }
     }
     if (req.body.imageUrls) {
