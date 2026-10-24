@@ -333,7 +333,7 @@ async function seedDatabaseIfEmpty() {
         try {
           const doc = { ...p, id: String(p.id) };
           await Product.create(doc);
-        } catch (_) {}
+        } catch (_) { }
       }
       await Settings.updateOne({ key: 'main' }, { $set: { seeded: true } }, { upsert: true });
       console.log(`✅ Birlamchi mahsulotlar MongoDB Atlas ga yuklandi.`);
@@ -558,7 +558,7 @@ async function deleteProduct(id) {
   const targetId = String(id);
   if (mongoose.connection.readyState === 1) {
     const result = await Product.deleteOne({ id: targetId });
-    await Settings.updateOne({ key: 'main' }, { $set: { seeded: true } }).catch(() => {});
+    await Settings.updateOne({ key: 'main' }, { $set: { seeded: true } }).catch(() => { });
     const list = readJsonSafe(PRODUCTS_FILE, []);
     const filtered = list.filter(p => String(p.id) !== targetId);
     writeJsonSafe(PRODUCTS_FILE, filtered);
@@ -707,7 +707,7 @@ async function uploadImageToCloud(file) {
       if (file.path && fs.existsSync(file.path)) {
         fs.unlinkSync(file.path);
       }
-    } catch (_) {}
+    } catch (_) { }
 
     return result.secure_url;
   } catch (err) {
@@ -1803,7 +1803,7 @@ function isExplicitCustomerAgreement(userMsg) {
   // Masalan: "400 qilib ber", "tushirib ber", "380 bo'ladimi", "oxirgi narx qancha", "arzonroq bering", "sal o'tib bering"
   // Bu KELISHUV EMAS!
   if (
-    msg.includes('qilib ber') || msg.includes('qib ber') || msg.includes('tushir') || 
+    msg.includes('qilib ber') || msg.includes('qib ber') || msg.includes('tushir') ||
     msg.includes("o'tib") || msg.includes('otib') || msg.includes('tushib') || msg.includes('kamaytir') ||
     msg.includes('arzon') || msg.includes('chegirma') || msg.includes('berasizmi') ||
     msg.includes('berarmisiz') || msg.includes('boladimi') || msg.includes("bo'ladimi") ||
@@ -1816,7 +1816,7 @@ function isExplicitCustomerAgreement(userMsg) {
 
   // Aniq sotib olish / rozi bo'lish kalit so'zlari:
   const agreementKeywords = [
-    'olaman', 'olay', 'roziman', 'rozi', 'kelishdik', 'kelishamiz', 
+    'olaman', 'olay', 'roziman', 'rozi', 'kelishdik', 'kelishamiz',
     'buyurtma', 'zakaz', 'yozing', 'yozvor', 'menga bering', 'shu narxga bering',
     'yetkazib bering', 'qanday olaman', 'qanday rasmiylashtiraman',
     'mayli shu narx', 'hop olaman', "xo'p olaman", 'xop olaman',

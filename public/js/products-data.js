@@ -54,10 +54,10 @@ const BANNERS = [
     badge_ru: '100% Оригинал · Экосистема Apple',
     badge_en: '100% Authentic · Apple Ecosystem',
     bg_style: 'linear-gradient(90deg, rgba(8, 8, 12, 0.92) 0%, rgba(12, 12, 16, 0.72) 45%, rgba(0, 0, 0, 0.2) 100%)',
-    image: 'images/banner_apple_ecosystem.png',
-    image_ru: 'images/banner_apple_ecosystem_ru.png',
-    mobile_image: 'images/banner_mobile_applebox.png',
-    mobile_image_ru: 'images/banner_mobile_applebox_ru.png',
+    image: 'https://res.cloudinary.com/zhdah4g2/image/upload/v1792866635/black_store_banners/tms2amxczkekrcqj9f9v.jpg',
+    image_ru: 'https://res.cloudinary.com/zhdah4g2/image/upload/v1792866636/black_store_banners/y9z1jaw7kcrmfisysifi.jpg',
+    mobile_image: 'https://res.cloudinary.com/zhdah4g2/image/upload/v1792866638/black_store_banners/di2q0ygcxwhxzxwbrptn.jpg',
+    mobile_image_ru: 'https://res.cloudinary.com/zhdah4g2/image/upload/v1792866642/black_store_banners/cblijnekxsehzx4tembx.jpg',
     features: ['iPhone 16 Pro Max', 'AirPods Max', 'Apple Watch Ultra', 'MagSafe Ecosystem']
   },
   {
@@ -76,10 +76,10 @@ const BANNERS = [
     badge_ru: 'Silicone Case · MagSafe · Carbon Fiber',
     badge_en: 'Silicone Case · MagSafe · Carbon Fiber',
     bg_style: 'linear-gradient(90deg, rgba(8, 8, 12, 0.92) 0%, rgba(15, 15, 20, 0.72) 45%, rgba(0, 0, 0, 0.2) 100%)',
-    image: 'images/banner_cases_protection.png',
-    image_ru: 'images/banner_cases_protection_ru.png',
-    mobile_image: 'images/banner_mobile_cases.png',
-    mobile_image_ru: 'images/banner_mobile_cases_ru.png',
+    image: 'https://res.cloudinary.com/zhdah4g2/image/upload/v1792866645/black_store_banners/l12wj6oew7vpr1kf2xvo.jpg',
+    image_ru: 'https://res.cloudinary.com/zhdah4g2/image/upload/v1792866647/black_store_banners/nafmjm3vbrqhwu8teakh.jpg',
+    mobile_image: 'https://res.cloudinary.com/zhdah4g2/image/upload/v1792866650/black_store_banners/us5fk9n4ic28lckhs0sl.jpg',
+    mobile_image_ru: 'https://res.cloudinary.com/zhdah4g2/image/upload/v1792866654/black_store_banners/uweywa0dnoiec3yjenvu.jpg',
     features: ['Shockproof Cases', 'MagSafe Wireless', 'Ultra-Durable Glass', 'Fast Power']
   },
   {
