@@ -95,7 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadLiveProducts() {
   try {
     const res = await fetch('/api/products');
-    if (!res.ok) return;
+    if (!res.ok) {
+      if (PRODUCTS.length === 0 && typeof DEMO_PRODUCTS !== 'undefined' && DEMO_PRODUCTS.length > 0) {
+        PRODUCTS = [...DEMO_PRODUCTS];
+        renderProducts();
+      }
+      return;
+    }
     const data = await res.json();
     if (!Array.isArray(data)) return;
 
@@ -177,6 +183,10 @@ async function loadLiveProducts() {
     }
   } catch (err) {
     console.warn("Live products sync error, fallback static products active:", err);
+    if (PRODUCTS.length === 0 && typeof DEMO_PRODUCTS !== 'undefined' && DEMO_PRODUCTS.length > 0) {
+      PRODUCTS = [...DEMO_PRODUCTS];
+      renderProducts();
+    }
   }
 }
 
