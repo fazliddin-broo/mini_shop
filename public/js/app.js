@@ -3720,7 +3720,7 @@ async function executeAiChatMessage(text) {
             <span>🤝</span> <span>Kelishilgan Maxsus Narx!</span>
           </div>
           <div style="font-size: 0.8rem; color: #e2e8f0; margin-bottom: 8px;">
-            <b>${safeName}</b>: ${safeOld ? `<span style="text-decoration: line-through; color: #94a3b8; font-size: 0.78rem;">${safeOld}</span> ➔ ` : ''}<b style="color: #34d399; font-size: 1.05rem;">${safePrice}</b>
+            <b>${safeName}</b>: ${safeOld ? `<span style="text-decoration: line-through; color: #94a3b8; font-size: 0.78rem; white-space: nowrap;">${safeOld}</span> ➔ ` : ''}<b style="color: #34d399; font-size: 1.05rem; white-space: nowrap;">${safePrice}</b>
           </div>
           <button type="button" class="btn btn-primary" onclick="acceptAiDeal('${safeId}', ${deal.price}, '${dealCurr}')" style="width: 100%; padding: 8px 12px; font-size: 0.85rem; font-weight: 700; background: #10b981; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: #fff;">
             <span>🛍️ Kelishilgan narxda savatga olish</span>
