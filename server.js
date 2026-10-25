@@ -8,13 +8,17 @@ const mongoose = require('mongoose');
 const dns = require('dns');
 const cloudinary = require('cloudinary').v2;
 
-if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY) {
+const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || 'zhdah4g2';
+const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY || '378577798194528';
+const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET || 'tpMNhuiUkHnbZbDUdrL2BqfnEK8';
+
+if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET) {
   cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+    cloud_name: CLOUDINARY_CLOUD_NAME,
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET
   });
-  console.log('☁️ Cloudinary muvaffaqiyatli sozlandi!');
+  console.log('☁️ Cloudinary muvaffaqiyatli sozlandi! (Cloud: ' + CLOUDINARY_CLOUD_NAME + ')');
 }
 
 // Ba'zi lokal muhitlar yoki provayderlarda SRV DNS yechish muammolarini oldini olish
@@ -684,9 +688,9 @@ const upload = multer({
 // ── Cloudinary Helper ─────────────────────────────────────
 async function uploadImageToCloud(file) {
   const isCloudinaryConfigured = Boolean(
-    process.env.CLOUDINARY_CLOUD_NAME &&
-    process.env.CLOUDINARY_API_KEY &&
-    process.env.CLOUDINARY_API_SECRET
+    CLOUDINARY_CLOUD_NAME &&
+    CLOUDINARY_API_KEY &&
+    CLOUDINARY_API_SECRET
   );
 
   if (!isCloudinaryConfigured) {
@@ -897,6 +901,16 @@ app.get('/api/admin/products', verifyAdmin, async (req, res) => {
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// Cloudinary Status Check (Admin)
+app.get('/api/admin/cloudinary-status', verifyAdmin, async (req, res) => {
+  try {
+    const ping = await cloudinary.api.ping();
+    res.json({ success: true, cloud: CLOUDINARY_CLOUD_NAME, ping });
+  } catch (err) {
+    res.status(500).json({ success: false, cloud: CLOUDINARY_CLOUD_NAME, error: err.message });
   }
 });
 
