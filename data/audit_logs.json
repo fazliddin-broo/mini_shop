@@ -1,0 +1,26 @@
+[
+  {
+    "id": "audit-1793113047866-642",
+    "timestamp": "2026-10-27T14:57:27.866Z",
+    "admin": "Admin Test",
+    "channel": "test",
+    "action": "update_product_price",
+    "productId": "prod-101",
+    "productName": "iPhone 18 Pro Burgundy SIM+eSIM",
+    "oldValue": "13 500 000 so'm",
+    "newValue": "13 500 000 so'm",
+    "status": "success"
+  },
+  {
+    "id": "audit-1793112976555-289",
+    "timestamp": "2026-10-27T14:56:16.555Z",
+    "admin": "Admin Test",
+    "channel": "test",
+    "action": "update_product_price",
+    "productId": "prod-101",
+    "productName": "iPhone 18 Pro Burgundy SIM+eSIM",
+    "oldValue": "14 000 000 so'm",
+    "newValue": "13 500 000 so'm",
+    "status": "success"
+  }
+]

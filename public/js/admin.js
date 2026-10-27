@@ -2901,3 +2901,190 @@ function switchTab(tabId) {
     loadSettings();
   }
 }
+
+// =============================================================================
+// 12. AI ADMIN ASSISTANT (✨ O'zbek tilidagi Real AI Boshqaruvchi)
+// =============================================================================
+let aiAssistantState = {
+  isOpen: false,
+  isWaiting: false,
+  pendingConfirmation: false,
+  sessionId: 'admin_dash_' + Date.now()
+};
+
+function toggleAiAssistant(show) {
+  const modal = document.getElementById('ai-assistant-modal');
+  if (!modal) return;
+  if (show === undefined) show = modal.classList.contains('hidden');
+
+  aiAssistantState.isOpen = show;
+  if (show) {
+    modal.classList.remove('hidden');
+    const input = document.getElementById('ai-chat-input');
+    if (input) setTimeout(() => input.focus(), 150);
+  } else {
+    modal.classList.add('hidden');
+  }
+}
+
+function clearAiChat() {
+  const body = document.getElementById('ai-chat-messages');
+  if (!body) return;
+  body.innerHTML = `
+    <div class="ai-msg-row ai">
+      <div class="ai-msg-avatar">✨</div>
+      <div class="ai-msg-bubble">
+        <div class="ai-msg-text">Chat tozalandi. Qanday yordam bera olaman? Masalan: "iPhone 18 Pro Burgundy narxini 13.5 mln qil".</div>
+      </div>
+    </div>
+  `;
+  document.getElementById('ai-confirm-bar')?.classList.add('hidden');
+  aiAssistantState.pendingConfirmation = false;
+}
+
+function handleAiQuickPrompt(promptText) {
+  const input = document.getElementById('ai-chat-input');
+  if (input) {
+    input.value = promptText;
+    sendAiAssistantMessage(promptText);
+  }
+}
+
+function handleAiConfirmation(confirmed) {
+  const answer = confirmed ? 'Ha' : 'Yo‘q';
+  sendAiAssistantMessage(answer);
+  document.getElementById('ai-confirm-bar')?.classList.add('hidden');
+}
+
+function handleAiFormSubmit(e) {
+  if (e) e.preventDefault();
+  const input = document.getElementById('ai-chat-input');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  input.value = '';
+  sendAiAssistantMessage(val);
+}
+
+async function sendAiAssistantMessage(userText) {
+  if (!userText || !userText.trim()) return;
+  const body = document.getElementById('ai-chat-messages');
+  const indicator = document.getElementById('ai-typing-indicator');
+  const indicatorText = document.getElementById('ai-typing-text');
+  const confirmBar = document.getElementById('ai-confirm-bar');
+
+  // 1. Append User Message
+  const userRow = document.createElement('div');
+  userRow.className = 'ai-msg-row user';
+  userRow.innerHTML = `<div class="ai-msg-bubble"><div class="ai-msg-text">${escapeHtml(userText)}</div></div>`;
+  body.appendChild(userRow);
+  body.scrollTop = body.scrollHeight;
+
+  // 2. Show indicator
+  if (indicator) {
+    indicator.classList.remove('hidden');
+    if (indicatorText) {
+      if (userText.toLowerCase().includes('narx')) indicatorText.textContent = '⚙️ Narx tekshirilmoqda...';
+      else if (userText.toLowerCase().includes("o'chir") || userText.toLowerCase().includes('ochir')) indicatorText.textContent = "⚠️ Ma'lumot tekshirilmoqda...";
+      else indicatorText.textContent = '🔎 Mahsulot qidirilmoqda...';
+    }
+  }
+
+  aiAssistantState.isWaiting = true;
+
+  try {
+    const res = await authFetch('/api/admin/ai-assistant/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: userText,
+        sessionId: aiAssistantState.sessionId
+      })
+    });
+
+    const data = await res.json();
+
+    if (indicator) indicator.classList.add('hidden');
+    aiAssistantState.isWaiting = false;
+
+    const replyText = data.reply || "Xabar qabul qilindi.";
+
+    // 3. Append AI Response
+    const aiRow = document.createElement('div');
+    aiRow.className = 'ai-msg-row ai';
+    aiRow.innerHTML = `
+      <div class="ai-msg-avatar">✨</div>
+      <div class="ai-msg-bubble">
+        <div class="ai-msg-text">${escapeHtml(replyText).replace(/\n/g, '<br>')}</div>
+      </div>
+    `;
+    body.appendChild(aiRow);
+    body.scrollTop = body.scrollHeight;
+
+    // 4. Check if confirmation is required
+    if (data.status === 'confirmation_required' || replyText.includes('o‘zgartiraymi?') || replyText.includes("o'zgartiraymi?") || replyText.includes('Davom etaymi?')) {
+      if (confirmBar) confirmBar.classList.remove('hidden');
+      aiAssistantState.pendingConfirmation = true;
+    } else {
+      if (confirmBar) confirmBar.classList.add('hidden');
+      aiAssistantState.pendingConfirmation = false;
+    }
+
+    // 5. If action completed, refresh products and table!
+    if (data.status === 'completed' || replyText.includes('✅ Tayyor')) {
+      loadProducts();
+      showToast("Mahsulot muvaffaqiyatli yangilandi!", "success");
+    }
+
+  } catch (err) {
+    console.error('AI chat error:', err);
+    if (indicator) indicator.classList.add('hidden');
+    aiAssistantState.isWaiting = false;
+
+    const errRow = document.createElement('div');
+    errRow.className = 'ai-msg-row ai';
+    errRow.innerHTML = `
+      <div class="ai-msg-avatar" style="color: #ef4444;">⚠️</div>
+      <div class="ai-msg-bubble" style="border-color: rgba(239, 68, 68, 0.4);">
+        <div class="ai-msg-text">⚠️ AI xizmatida vaqtinchalik muammo yuz berdi. Iltimos, qaytadan urinib ko‘ring.</div>
+      </div>
+    `;
+    body.appendChild(errRow);
+    body.scrollTop = body.scrollHeight;
+  }
+}
+
+// Full audit timeline renderer
+async function renderAuditFullTimeline() {
+  const container = document.getElementById('audit-timeline-container') || document.querySelector('.audit-timeline-box');
+  if (!container) return;
+
+  try {
+    const res = await authFetch('/api/admin/ai-assistant/audit-logs?limit=50');
+    const data = await res.json();
+    if (data && data.success && Array.isArray(data.logs)) {
+      if (data.logs.length === 0) {
+        container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-muted);">Hozircha audit yozuvlari mavjud emas.</div>';
+        return;
+      }
+
+      container.innerHTML = data.logs.map(log => `
+        <div class="audit-item" style="padding: 12px 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-main);">
+              ${log.channel === 'telegram' ? '🤖 [Telegram]' : '💻 [Dashboard]'} ${escapeHtml(log.action)} — ${escapeHtml(log.productName || 'Mahsulot')}
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 3px;">
+              Eski: <span style="text-decoration: line-through;">${escapeHtml(String(log.oldValue))}</span> ➡️ Yangi: <strong style="color: #10b981;">${escapeHtml(String(log.newValue))}</strong> | Admin: ${escapeHtml(log.admin)}
+            </div>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap;">
+            ${new Date(log.timestamp).toLocaleTimeString('uz-UZ', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (err) {
+    console.error('Audit timeline fetch error:', err);
+  }
+}

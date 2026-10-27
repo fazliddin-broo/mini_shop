@@ -7,6 +7,8 @@ const multer = require('multer');
 const mongoose = require('mongoose');
 const dns = require('dns');
 const cloudinary = require('cloudinary').v2;
+const { AiAdminAssistant, getAuditLogs } = require('./services/aiAdminAssistant');
+const { TelegramAdminBot } = require('./services/telegramAdminBot');
 
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || 'zhdah4g2';
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY || '378577798194528';
@@ -422,6 +424,9 @@ async function saveSettings(data) {
     ai: { ...(current.ai || {}), ...(data.ai || {}) }
   };
   writeJsonSafe(SETTINGS_FILE, updated);
+  if (typeof telegramAdminBot !== 'undefined' && data.telegram) {
+    telegramAdminBot.updateConfig(data.telegram.botToken, data.telegram.chatId);
+  }
   return updated;
 }
 
@@ -575,6 +580,21 @@ async function deleteProduct(id) {
   writeJsonSafe(PRODUCTS_FILE, filtered);
   return filtered.length < initialLen;
 }
+
+// ── AI Admin Assistant & Telegram Bot Instances ────────────
+const aiAdminAssistant = new AiAdminAssistant({
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+  createProduct
+});
+
+const telegramAdminBot = new TelegramAdminBot(
+  aiAdminAssistant,
+  process.env.TELEGRAM_BOT_TOKEN || '8774427252:AAF5urz9dAKom8Zh_cJOlwG7EED5nr0DXJc',
+  process.env.TELEGRAM_ADMIN_ID || '7878337508'
+);
 
 async function getOrders() {
   if (mongoose.connection.readyState === 1) {
@@ -901,6 +921,43 @@ app.get('/api/admin/products', verifyAdmin, async (req, res) => {
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+// ── 4.5 AI Admin Assistant Chat Endpoint ───────────────────
+app.post('/api/admin/ai-assistant/chat', verifyAdmin, async (req, res) => {
+  try {
+    const { message, sessionId } = req.body;
+    if (!message || !message.trim()) {
+      return res.status(400).json({ success: false, error: "Xabar matni bo'sh bo'lishi mumkin emas" });
+    }
+
+    const result = await aiAdminAssistant.processAdminMessage({
+      text: message,
+      adminUser: 'Dashboard Admin',
+      channel: 'dashboard',
+      sessionId: sessionId || 'admin_dashboard'
+    });
+
+    res.json({ success: true, ...result });
+  } catch (err) {
+    console.error('AI Admin Assistant chat error:', err);
+    res.status(500).json({
+      success: false,
+      error: err.message,
+      reply: "⚠️ AI xizmatida vaqtinchalik muammo yuz berdi. Iltimos, qaytadan urinib ko‘ring."
+    });
+  }
+});
+
+// ── 4.6 AI Admin Audit Logs Endpoint ───────────────────────
+app.get('/api/admin/ai-assistant/audit-logs', verifyAdmin, async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 100;
+    const logs = getAuditLogs(limit);
+    res.json({ success: true, logs });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
@@ -2020,7 +2077,11 @@ async function startServer() {
     console.log(`Mijoz vitrinasi:  http://localhost:${PORT}`);
     console.log(`Maxfiy Admin:    http://localhost:${PORT}/blackstore-6666`);
     console.log(`MongoDB holati:  ${mongoose.connection.readyState === 1 ? '✅ Ulangan (Atlas)' : '⚠️ Kutilmoqda / Ulanmagan'}`);
+    console.log(`✨ AI Admin:     Faol (Dashboard + Telegram Bot)`);
     console.log(`=========================================`);
+
+    // Start background Telegram Bot Listener
+    telegramAdminBot.startPolling();
   });
 }
 

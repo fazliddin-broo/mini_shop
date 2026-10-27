@@ -12,12 +12,12 @@
     "adminPin": "1234"
   },
   "telegram": {
-    "botToken": "8399821587:AAEezCvv51nqqS10ZeAQ-7ACTgWneJMTyV8",
+    "botToken": "",
     "chatId": "7878337508",
     "enabled": true
   },
   "ai": {
-    "provider": "openai",
+    "provider": "gemini",
     "apiKey": "",
     "systemPrompt": "Siz 'Black Store' do'konining tajribali, muomalali va epchil virtual savdogar AI maslahatchisisiz. Xaridorlar bilan o'zbek bozorona madaniyatida samimiy savdolashasiz.",
     "welcomeMessage": "Assalomu alaykum! Black Store do'koniga xush kelibsiz! Qanday gadjet qidiryapsiz? Narxlar bo'yicha ham savdolashib, kelishamiz! 😊"

@@ -1,1 +1,121 @@
-[]
+[
+  {
+    "id": "prod-101",
+    "name": "iPhone 18 Pro Burgundy SIM+eSIM",
+    "category": "telefon-aksessuar",
+    "brand": "Apple",
+    "price": 13500000,
+    "minPrice": 13000000,
+    "oldPrice": 15500000,
+    "priceUsd": 1055,
+    "image": "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Apple iPhone 18 Pro, Rang: Burgundy (To'q qizil), Tarmoq: SIM + eSIM. 1 yil rasmiy kafolat.",
+    "specs": [
+      "Rang: Burgundy",
+      "SIM: SIM + eSIM",
+      "Xotira: 256GB",
+      "Kafolat: 1 yil"
+    ],
+    "stock": 12,
+    "featured": true,
+    "badge": "Top Savdo"
+  },
+  {
+    "id": "prod-102",
+    "name": "iPhone 18 Pro Black SIM",
+    "category": "telefon-aksessuar",
+    "brand": "Apple",
+    "price": 13800000,
+    "minPrice": 12900000,
+    "oldPrice": 15000000,
+    "priceUsd": 1080,
+    "image": "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Apple iPhone 18 Pro, Rang: Black (Qora), Tarmoq: Fizik SIM. 1 yil kafolat.",
+    "specs": [
+      "Rang: Black",
+      "SIM: Fizik SIM",
+      "Xotira: 256GB",
+      "Kafolat: 1 yil"
+    ],
+    "stock": 8,
+    "featured": false,
+    "badge": ""
+  },
+  {
+    "id": "prod-103",
+    "name": "iPhone 18 Pro Natural Titanium eSIM",
+    "category": "telefon-aksessuar",
+    "brand": "Apple",
+    "price": 15000000,
+    "minPrice": 14200000,
+    "oldPrice": 16200000,
+    "priceUsd": 1180,
+    "image": "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Apple iPhone 18 Pro, Rang: Natural Titanium, Tarmoq: Dual eSIM. 1 yil rasmiy kafolat.",
+    "specs": [
+      "Rang: Natural Titanium",
+      "SIM: Dual eSIM",
+      "Xotira: 512GB",
+      "Kafolat: 1 yil"
+    ],
+    "stock": 5,
+    "featured": true,
+    "badge": "Yangi"
+  },
+  {
+    "id": "prod-104",
+    "name": "AirPods Pro 2 USB-C",
+    "category": "naushniki-quloqchinlar",
+    "brand": "Apple",
+    "price": 2800000,
+    "minPrice": 2500000,
+    "oldPrice": 3200000,
+    "priceUsd": 220,
+    "image": "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Apple AirPods Pro 2 (USB-C) MagSafe zaryadlash qutisi bilan.",
+    "specs": [
+      "Faol shovqinni bekor qilish (ANC)",
+      "USB-C port",
+      "Batareya: 30 soatgacha"
+    ],
+    "stock": 15,
+    "featured": true,
+    "badge": "Hit"
+  },
+  {
+    "id": "prod-105",
+    "name": "Samsung Galaxy S24 Ultra Titanium Black",
+    "category": "telefon-aksessuar",
+    "brand": "Samsung",
+    "price": 13000000,
+    "minPrice": 12000000,
+    "oldPrice": 14500000,
+    "priceUsd": 1020,
+    "image": "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "Samsung Galaxy S24 Ultra, 12GB/256GB, S-Pen bilan.",
+    "specs": [
+      "Displey: 6.8 Dynamic AMOLED 2X",
+      "Kamera: 200MP",
+      "Xotira: 256GB",
+      "S-Pen mavjud"
+    ],
+    "stock": 7,
+    "featured": false,
+    "badge": ""
+  }
+]
