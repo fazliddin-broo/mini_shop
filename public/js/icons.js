@@ -29,6 +29,14 @@ const ICONS = {
     <path d="M20.8 17.8c0-7.8-5.8-13.4-14.2-13.4-3.8 0-5.2.4-5.2.4L0 8.9s1.4-.3 4.2-.3c5.4 0 8.7 3.5 8.7 9.2 0 5.9-3.7 9.5-9.2 9.5-2.3 0-3.7-.3-3.7-.3l.6 4.2s1.8.4 4.7.4c9.2 0 15.1-6.1 15.1-14zm23.7-7h-3.7l-6.7 20.8h5.1l1.4-4.6h7.1l1.4 4.6h5.2L44.5 10.8zm-2.8 12.4l2.2-7.2 2.2 7.2h-4.4zm36.8-12.4h-4.6l-9.5 14.7V10.8h-4.6v20.8h4.6l9.5-14.7v14.7h4.6V10.8zm26.6 0c-7.9 0-13.7 6-13.7 13.9 0 8 5.8 14 13.7 14s13.7-6 13.7-14c0-7.9-5.8-13.9-13.7-13.9zm0 23.7c-5.1 0-8.7-4.2-8.7-9.8s3.7-9.8 8.7-9.8 8.7 4.2 8.7 9.8-3.7 9.8-8.7 9.8zm39.7-23.7h-4.6l-9.5 14.7V10.8h-4.6v20.8h4.6l9.5-14.7v14.7h4.6V10.8z"/>
   </svg>`,
 
+  asus: `<img src="images/brands/asus.svg" alt="ASUS" class="brand-drawer-img" />`,
+
+  lenovo: `<img src="images/brands/lenovo.svg" alt="Lenovo" class="brand-drawer-img" />`,
+
+  hp: `<img src="images/brands/hp.svg" alt="HP" class="brand-drawer-img" />`,
+
+  dell: `<img src="images/brands/dell.svg" alt="Dell" class="brand-drawer-img" />`,
+
   lightning: `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
   </svg>`,
