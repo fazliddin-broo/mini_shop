@@ -1,6 +1,6 @@
 /**
  * Telegram Admin Bot Integration (Two-Way Interactive Polling with Custom Keyboards)
- * Allows the store owner to manage products, prices, and stock via natural Uzbek Telegram messages.
+ * Allows the store owner to manage products, prices, minPrices, stock, and add new products via Uzbek Telegram messages.
  */
 
 class TelegramAdminBot {
@@ -55,7 +55,7 @@ class TelegramAdminBot {
     return {
       keyboard: [
         [{ text: "📦 Mahsulotlar ro'yxati" }, { text: "📊 Do'kon statistikasi" }],
-        [{ text: "❓ Yordam / Qanday ishlatish" }]
+        [{ text: "➕ Yangi mahsulot qo'shish" }, { text: "❓ Yordam" }]
       ],
       resize_keyboard: true
     };
@@ -64,7 +64,7 @@ class TelegramAdminBot {
   getConfirmationKeyboard() {
     return {
       keyboard: [
-        [{ text: "✅ Ha, o'zgartirilsin" }, { text: "❌ Bekor qilish" }]
+        [{ text: "✅ Ha, tasdiqlayman" }, { text: "❌ Bekor qilish" }]
       ],
       resize_keyboard: true,
       one_time_keyboard: true
@@ -77,14 +77,34 @@ class TelegramAdminBot {
     // /start yoki Yordam
     if (t === '/start' || t === '/help' || t.includes('yordam')) {
       const welcomeMsg = `👋 <b>Assalomu alaykum, Hurmatli Boshqaruvchi!</b>\n\n` +
-        `🤖 Men sizning do'koningizning <b>AI Admin Maslahatchisiman</b>.\n\n` +
-        `Siz menga oddiy o'zbek tilida bemalol buyruq berishingiz mumkin, masalan:\n` +
-        `🔹 <i>"Asus expertbook narxini 3 400 000 qil"</i>\n` +
-        `🔹 <i>"Asus noutbuk qoldig'ini 15 ta qil"</i>\n` +
-        `🔹 <i>"iPhone 18 Pro narxini 13.5 million qil"</i>\n\n` +
-        `Men kerakli tovarni bazadan topib, tasdiqlash uchun tugmalarni chiqaraman. Tasdiqlashingiz bilan narx yoki qoldiq haqiqiy bazada darhol yangilanadi! ⚡️`;
+        `🤖 Men sizning MiniShop do'koningizning <b>AI Admin Maslahatchisiman</b>.\n\n` +
+        `Menga istalgan operatsiyani oddiy o'zbek tilida yozishingiz mumkin:\n\n` +
+        `💰 <b>Narx va Minimal narxni o'zgartirish:</b>\n` +
+        `• <i>"Asus narxini 3 400 000, minimal narxini 3 100 000 qil"</i>\n` +
+        `• <i>"Asus minimal narxini 3 200 000 qil"</i>\n\n` +
+        `📦 <b>Qoldiqni yangilash:</b>\n` +
+        `• <i>"Asus qoldig'ini 15 ta qil"</i>\n\n` +
+        `➕ <b>Yangi mahsulot qo'shish:</b>\n` +
+        `• <i>"Yangi tovar qo'sh: HP Victus 15, brend HP, toifa noutbuklar, narxi 8 500 000, minimal narxi 8 000 000, qoldiq 6 ta, 16GB RAM 512GB SSD"</i>\n\n` +
+        `⚡️ Men ma'lumotlarni aniqlab, pastda <b>[✅ Ha, tasdiqlayman]</b> tugmasini chiqaraman. Tugmani bosishingiz bilan haqiqiy bazada barchasi bajariladi!`;
 
       await this.sendMessage(chatId, welcomeMsg, {
+        parse_mode: 'HTML',
+        reply_markup: this.getMainKeyboard()
+      });
+      return true;
+    }
+
+    // Yangi mahsulot qo'shish yo'riqnomasi
+    if (t.includes('yangi mahsulot') || t.includes('tovar qo\'shish') || t === '/add') {
+      const addMsg = `➕ <b>YANGI MAHSULOT QO‘SHISH BO‘YICHA YO‘RIQNOMA:</b>\n\n` +
+        `Botga yangi tovar haqida xohlagan shaklda ma'lumot yozing, masalan:\n\n` +
+        `<i>"Yangi mahsulot qo'sh: Lenovo Legion 5, brend Lenovo, toifa noutbuklar, narxi 11 000 000 so'm, minimal narx 10 500 000 so'm, omborda 5 ta, 16GB RAM 512GB SSD RTX 4060"</i>\n\n` +
+        `yoki qisqacha:\n` +
+        `<i>"Yangi tovar: HP Victus 15, narxi 8 500 000, minimal narxi 8 000 000, qoldiq 6 ta"</i>\n\n` +
+        `🤖 <b>AI darhol tovar ma'lumotlarini to'plab, bazaga kiritish uchun sizdan tasdiqlash so'raydi!</b>`;
+
+      await this.sendMessage(chatId, addMsg, {
         parse_mode: 'HTML',
         reply_markup: this.getMainKeyboard()
       });
@@ -103,18 +123,19 @@ class TelegramAdminBot {
         }
 
         let msg = `📦 <b>DO'KON BAZASIDAGI MAHSULOTLAR (Jami: ${products.length} ta):</b>\n\n`;
-        products.slice(0, 15).forEach((p, idx) => {
+        products.slice(0, 20).forEach((p, idx) => {
           const name = p.name || p.title || 'Nomsiz mahsulot';
           const price = Number(p.price || 0).toLocaleString('uz-UZ');
+          const minPrice = Number(p.minPrice || p.price || 0).toLocaleString('uz-UZ');
           const stock = p.stock || 0;
-          msg += `${idx + 1}. <b>${name}</b>\n   💰 Narxi: ${price} so'm | Qoldiq: ${stock} ta\n\n`;
+          msg += `${idx + 1}. <b>${name}</b>\n   💰 Sotuv: <b>${price} so'm</b> | 📉 Min: <b>${minPrice} so'm</b>\n   📦 Qoldiq: <b>${stock} ta</b> | 🆔 <code>${p.id}</code>\n\n`;
         });
 
-        if (products.length > 15) {
-          msg += `<i>...va yana ${products.length - 15} ta tovar.</i>\n\n`;
+        if (products.length > 20) {
+          msg += `<i>...va yana ${products.length - 20} ta tovar.</i>\n\n`;
         }
 
-        msg += `💡 <i>Narx yoki qoldiqni o'zgartirish uchun tovar nomini va yangi qiymatini yozing.</i>`;
+        msg += `💡 <i>Narx, minimal narx yoki qoldiqni o'zgartirish uchun tovar nomini va yangi qiymatlarini yozing.</i>`;
 
         await this.sendMessage(chatId, msg, {
           parse_mode: 'HTML',
@@ -130,8 +151,8 @@ class TelegramAdminBot {
     if (t.includes('statistika') || t === '/stats') {
       try {
         const products = await this.assistant.db.getAllProducts();
-        const totalProds = products.length;
-        const totalStock = products.reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
+        const totalProds = (products || []).length;
+        const totalStock = (products || []).reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
 
         const statsMsg = `📊 <b>DO'KON STATISTIKASI:</b>\n\n` +
           `📦 Mahsulot turlari: <b>${totalProds} ta</b>\n` +
@@ -213,14 +234,12 @@ class TelegramAdminBot {
               // Send appropriate keyboard depending on status
               if (result.status === 'confirmation_required') {
                 await this.sendMessage(chatId, result.reply, {
+                  parse_mode: 'HTML',
                   reply_markup: this.getConfirmationKeyboard()
-                });
-              } else if (result.status === 'completed' || result.status === 'cancelled') {
-                await this.sendMessage(chatId, result.reply, {
-                  reply_markup: this.getMainKeyboard()
                 });
               } else {
                 await this.sendMessage(chatId, result.reply, {
+                  parse_mode: 'HTML',
                   reply_markup: this.getMainKeyboard()
                 });
               }
