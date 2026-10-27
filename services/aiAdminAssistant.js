@@ -132,12 +132,14 @@ class AiAdminAssistant {
     // 1. CONFIRMATION CHECK (Agar oldingi so'rov tasdiqlash kutayotgan bo'lsa)
     if (session.pendingAction) {
       const isAffirmative = [
-        'ha', 'xa', 'albatta', "o'zgartir", 'ozgartir', "ha o'zgartir", 'tasdiqlayman', 'mayli', 'yes', 'ok', 'bajar', 'davom et'
-      ].some(k => lowerText === k || lowerText.startsWith(k + ' ') || lowerText.endsWith(' ' + k));
+        'ha', 'xa', 'albatta', "o'zgartir", 'ozgartir', "ha o'zgartir", 'tasdiqlayman', 'mayli', 'yes', 'ok', 'bajar', 'davom et',
+        "✅ ha, o'zgartirilsin", "✅ ha", "ha, o'zgartirilsin", "ha o'zgartirilsin", "o'zgartirilsin"
+      ].some(k => lowerText === k || lowerText.includes(k));
 
       const isNegative = [
-        "yo'q", 'yoq', 'kerakmas', 'bekor qil', 'bekor', 'shartmas', 'no', 'cancel', "to'xtat"
-      ].some(k => lowerText === k || lowerText.startsWith(k + ' '));
+        "yo'q", 'yoq', 'kerakmas', 'bekor qil', 'bekor', 'shartmas', 'no', 'cancel', "to'xtat",
+        "❌ bekor qilish", "❌ bekor", "bekor qilish"
+      ].some(k => lowerText === k || lowerText.includes(k));
 
       if (isAffirmative) {
         const action = session.pendingAction;

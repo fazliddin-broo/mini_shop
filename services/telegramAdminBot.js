@@ -1,12 +1,12 @@
 /**
- * Telegram Admin Bot Integration (Two-Way Interactive Polling)
- * Allows the store owner to manage products and prices via natural Uzbek Telegram messages.
+ * Telegram Admin Bot Integration (Two-Way Interactive Polling with Custom Keyboards)
+ * Allows the store owner to manage products, prices, and stock via natural Uzbek Telegram messages.
  */
 
 class TelegramAdminBot {
   constructor(assistantInstance, botToken, adminId) {
     this.assistant = assistantInstance;
-    this.botToken = (botToken || process.env.TELEGRAM_BOT_TOKEN || '').trim();
+    this.botToken = (botToken || process.env.TELEGRAM_BOT_TOKEN || '8774427252:AAF5urz9dAKom8Zh_cJOlwG7EED5nr0DXJc').trim();
     this.adminId = String(adminId || process.env.TELEGRAM_ADMIN_ID || '7878337508').trim();
     this.isRunning = false;
     this.offset = 0;
@@ -17,16 +17,16 @@ class TelegramAdminBot {
     if (adminId) this.adminId = String(adminId).trim();
   }
 
-  async sendMessage(chatId, text, parseMode = null) {
+  async sendMessage(chatId, text, options = {}) {
     if (!this.botToken || !chatId) return;
     try {
       const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
       const payload = {
         chat_id: chatId,
         text,
-        disable_web_page_preview: true
+        disable_web_page_preview: true,
+        ...options
       };
-      if (parseMode) payload.parse_mode = parseMode;
 
       const res = await fetch(url, {
         method: 'POST',
@@ -49,6 +49,107 @@ class TelegramAdminBot {
         body: JSON.stringify({ chat_id: chatId, action })
       });
     } catch (_) { }
+  }
+
+  getMainKeyboard() {
+    return {
+      keyboard: [
+        [{ text: "📦 Mahsulotlar ro'yxati" }, { text: "📊 Do'kon statistikasi" }],
+        [{ text: "❓ Yordam / Qanday ishlatish" }]
+      ],
+      resize_keyboard: true
+    };
+  }
+
+  getConfirmationKeyboard() {
+    return {
+      keyboard: [
+        [{ text: "✅ Ha, o'zgartirilsin" }, { text: "❌ Bekor qilish" }]
+      ],
+      resize_keyboard: true,
+      one_time_keyboard: true
+    };
+  }
+
+  async handleQuickCommand(text, chatId) {
+    const t = text.trim().toLowerCase();
+
+    // /start yoki Yordam
+    if (t === '/start' || t === '/help' || t.includes('yordam')) {
+      const welcomeMsg = `👋 <b>Assalomu alaykum, Hurmatli Boshqaruvchi!</b>\n\n` +
+        `🤖 Men sizning do'koningizning <b>AI Admin Maslahatchisiman</b>.\n\n` +
+        `Siz menga oddiy o'zbek tilida bemalol buyruq berishingiz mumkin, masalan:\n` +
+        `🔹 <i>"Asus expertbook narxini 3 400 000 qil"</i>\n` +
+        `🔹 <i>"Asus noutbuk qoldig'ini 15 ta qil"</i>\n` +
+        `🔹 <i>"iPhone 18 Pro narxini 13.5 million qil"</i>\n\n` +
+        `Men kerakli tovarni bazadan topib, tasdiqlash uchun tugmalarni chiqaraman. Tasdiqlashingiz bilan narx yoki qoldiq haqiqiy bazada darhol yangilanadi! ⚡️`;
+
+      await this.sendMessage(chatId, welcomeMsg, {
+        parse_mode: 'HTML',
+        reply_markup: this.getMainKeyboard()
+      });
+      return true;
+    }
+
+    // Mahsulotlar ro'yxati
+    if (t.includes('mahsulotlar') || t === '/products') {
+      try {
+        const products = await this.assistant.db.getAllProducts();
+        if (!products || products.length === 0) {
+          await this.sendMessage(chatId, "📦 Hozircha bazada mahsulotlar mavjud emas.", {
+            reply_markup: this.getMainKeyboard()
+          });
+          return true;
+        }
+
+        let msg = `📦 <b>DO'KON BAZASIDAGI MAHSULOTLAR (Jami: ${products.length} ta):</b>\n\n`;
+        products.slice(0, 15).forEach((p, idx) => {
+          const name = p.name || p.title || 'Nomsiz mahsulot';
+          const price = Number(p.price || 0).toLocaleString('uz-UZ');
+          const stock = p.stock || 0;
+          msg += `${idx + 1}. <b>${name}</b>\n   💰 Narxi: ${price} so'm | Qoldiq: ${stock} ta\n\n`;
+        });
+
+        if (products.length > 15) {
+          msg += `<i>...va yana ${products.length - 15} ta tovar.</i>\n\n`;
+        }
+
+        msg += `💡 <i>Narx yoki qoldiqni o'zgartirish uchun tovar nomini va yangi qiymatini yozing.</i>`;
+
+        await this.sendMessage(chatId, msg, {
+          parse_mode: 'HTML',
+          reply_markup: this.getMainKeyboard()
+        });
+        return true;
+      } catch (err) {
+        console.error('Error listing products for TG:', err);
+      }
+    }
+
+    // Statistika
+    if (t.includes('statistika') || t === '/stats') {
+      try {
+        const products = await this.assistant.db.getAllProducts();
+        const totalProds = products.length;
+        const totalStock = products.reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
+
+        const statsMsg = `📊 <b>DO'KON STATISTIKASI:</b>\n\n` +
+          `📦 Mahsulot turlari: <b>${totalProds} ta</b>\n` +
+          `🔢 Ombordagi jami qoldiq: <b>${totalStock} dona</b>\n` +
+          `⚡️ AI holati: <b>Faol (100% Online)</b>\n` +
+          `🛡 Boshqaruvchi: <b>Admin (#${this.adminId})</b>`;
+
+        await this.sendMessage(chatId, statsMsg, {
+          parse_mode: 'HTML',
+          reply_markup: this.getMainKeyboard()
+        });
+        return true;
+      } catch (err) {
+        console.error('Error getting stats for TG:', err);
+      }
+    }
+
+    return false;
   }
 
   async startPolling() {
@@ -93,7 +194,11 @@ class TelegramAdminBot {
             // 2. SHOW TYPING INDICATOR
             await this.sendChatAction(chatId, 'typing');
 
-            // 3. PROCESS MESSAGE WITH AI ADMIN ASSISTANT
+            // 3. CHECK QUICK MENU / COMMANDS
+            const handledQuick = await this.handleQuickCommand(msg.text, chatId);
+            if (handledQuick) continue;
+
+            // 4. PROCESS MESSAGE WITH AI ADMIN ASSISTANT
             const senderName = msg.from?.first_name || 'Admin';
             const sessionId = `tg_${fromId}`;
 
@@ -105,23 +210,38 @@ class TelegramAdminBot {
                 sessionId
               });
 
-              await this.sendMessage(chatId, result.reply);
+              // Send appropriate keyboard depending on status
+              if (result.status === 'confirmation_required') {
+                await this.sendMessage(chatId, result.reply, {
+                  reply_markup: this.getConfirmationKeyboard()
+                });
+              } else if (result.status === 'completed' || result.status === 'cancelled') {
+                await this.sendMessage(chatId, result.reply, {
+                  reply_markup: this.getMainKeyboard()
+                });
+              } else {
+                await this.sendMessage(chatId, result.reply, {
+                  reply_markup: this.getMainKeyboard()
+                });
+              }
             } catch (err) {
               console.error('Error processing telegram message:', err);
-              await this.sendMessage(chatId, "⚠️ Xatolik yuz berdi. Iltimos, qaytadan urinib ko‘ring.");
+              await this.sendMessage(chatId, "⚠️ Xatolik yuz berdi. Iltimos, qaytadan urinib ko‘ring.", {
+                reply_markup: this.getMainKeyboard()
+              });
             }
           }
         }
       } catch (err) {
         // Tarmoq vaqtincha uzilsa yoki abort bo'lsa
         if (err.name !== 'AbortError') {
-          console.warn('Telegram polling retry in 5s:', err.message);
+          console.warn('Telegram polling retry in 3s:', err.message);
         }
-        await new Promise(r => setTimeout(r, 4000));
+        await new Promise(r => setTimeout(r, 3000));
       }
 
       if (this.isRunning) {
-        setTimeout(poll, 600);
+        setTimeout(poll, 400);
       }
     };
 
