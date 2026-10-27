@@ -1196,7 +1196,7 @@ function getFilteredProducts() {
     return list;
   }
 
-  // Brand filter (Apple, Samsung, WHOOP, Meta, Google, Canon)
+  // Brand filter (Apple, Samsung, WHOOP, Meta, Google)
   if (APP_STATE.activeBrand && APP_STATE.activeBrand !== 'all') {
     const b = APP_STATE.activeBrand.toLowerCase();
     list = list.filter(p => {
@@ -3186,7 +3186,6 @@ const SEARCH_SYNONYMS = {
   'shisha': ['glass', 'shisha', 'protector', 'стекло'],
   'гугл': ['google', 'pixel'],
   'пиксель': ['pixel', 'google'],
-  'канон': ['canon'],
   'вуп': ['whoop'],
   'хуп': ['whoop']
 };

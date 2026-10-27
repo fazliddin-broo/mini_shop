@@ -24,14 +24,9 @@ const CATEGORIES = [
 const BRANDS = [
   { id: 'Apple', name: 'Apple', logo: 'images/brands/apple.png' },
   { id: 'Samsung', name: 'Samsung', logo: 'images/brands/samsung.png' },
-  { id: 'ASUS', name: 'ASUS', logo: 'images/brands/asus.svg' },
-  { id: 'Lenovo', name: 'Lenovo', logo: 'images/brands/lenovo.svg' },
-  { id: 'HP', name: 'HP', logo: 'images/brands/hp.svg' },
-  { id: 'Dell', name: 'Dell', logo: 'images/brands/dell.svg' },
   { id: 'WHOOP', name: 'WHOOP', logo: 'images/brands/whoop.png' },
   { id: 'Ray-Ban', name: 'Ray-Ban', logo: 'images/brands/meta.png' },
-  { id: 'Google', name: 'Google', logo: 'images/brands/google.png' },
-  { id: 'Canon', name: 'Canon', logo: 'images/brands/canon.png' }
+  { id: 'Google', name: 'Google', logo: 'images/brands/google.png' }
 ];
 
 // Bannerlar — Screenshot 2 dagi Applebox uslubida

@@ -68,7 +68,7 @@ function formatSum(num) {
 function getDefaultProductImage(category = '', brand = '') {
   const cat = String(category || '').toLowerCase();
   const br = String(brand || '').toLowerCase();
-  if (cat.includes('noutbuk') || cat.includes('laptop') || br.includes('asus') || br.includes('lenovo') || br.includes('hp') || br.includes('dell')) {
+  if (cat.includes('noutbuk') || cat.includes('laptop')) {
     return 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80';
   }
   if (cat.includes('telefon') || cat.includes('phone') || br.includes('apple') || br.includes('iphone') || br.includes('samsung')) {
