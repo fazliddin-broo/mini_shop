@@ -1,5 +1,17 @@
 [
   {
+    "id": "audit-1793114366391-11",
+    "timestamp": "2026-10-27T15:19:26.392Z",
+    "admin": "Admin Test",
+    "channel": "telegram",
+    "action": "update_product_price",
+    "productId": "prod-106",
+    "productName": "Asus expertbook",
+    "oldValue": "3 500 000 so'm",
+    "newValue": "3 400 000 so'm",
+    "status": "success"
+  },
+  {
     "id": "audit-1793113047866-642",
     "timestamp": "2026-10-27T14:57:27.866Z",
     "admin": "Admin Test",

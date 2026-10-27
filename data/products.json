@@ -117,5 +117,29 @@
     "stock": 7,
     "featured": false,
     "badge": ""
+  },
+  {
+    "id": "prod-106",
+    "name": "Asus expertbook",
+    "category": "noutbuklar",
+    "brand": "ASUS",
+    "price": 3400000,
+    "minPrice": 3200000,
+    "oldPrice": 4000000,
+    "priceUsd": 266,
+    "image": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80"
+    ],
+    "description": "ASUS ExpertBook noutbuki, 8GB RAM, 512GB SSD, ixcham va yengil korpus.",
+    "specs": [
+      "Brend: ASUS",
+      "RAM: 8GB",
+      "Xotira: 512GB SSD",
+      "Kafolat: 1 yil"
+    ],
+    "stock": 12,
+    "featured": true,
+    "badge": "Yangi"
   }
 ]
