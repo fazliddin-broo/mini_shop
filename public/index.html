@@ -42,7 +42,7 @@
   </script>
 
   <!-- CSS Stylesheet (Cache-busted) -->
-  <link rel="stylesheet" href="css/style.css?v=7.8" />
+  <link rel="stylesheet" href="css/style.css?v=8.0" />
 </head>
 <body>
 
@@ -790,35 +790,51 @@
   <!-- ==========================================================================
        AI CONSULTANT FLOATING BUTTON & CHAT MODAL (VIRTUAL SELLER)
        ========================================================================== -->
-  <button class="floating-ai-consultant-btn" id="floatingAiConsultantBtn" onclick="toggleCustomerAiChat(true)" title="AI Savdo Maslahatchisi">
-    <div class="ai-sparkle-dot"></div>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
-      <rect x="3" y="8" width="18" height="12" rx="4"></rect>
-      <circle cx="9" cy="14" r="1.5" fill="currentColor"></circle>
-      <circle cx="15" cy="14" r="1.5" fill="currentColor"></circle>
-      <path d="M9 18h6"></path>
-    </svg>
-    <span class="ai-btn-text">AI Maslahatchi</span>
+  <!-- Floating Speech Bubble Tooltip -->
+  <div class="ai-bargain-bubble" id="aiBargainBubble" onclick="toggleCustomerAiChat(true)" role="tooltip">
+    <button type="button" class="ai-bubble-close-btn" id="aiBubbleCloseBtn" onclick="event.stopPropagation(); dismissAiBubble();" aria-label="Yopish">×</button>
+    <div class="ai-bubble-content-wrap">
+      <div class="ai-bubble-badge-row">
+        <span class="ai-bubble-badge">🤝 Jonli Savdolashish</span>
+      </div>
+      <div class="ai-bubble-msg">Narx qimmat tuyuldimi? Men bilan savdolashing, tushirib beraman!</div>
+    </div>
+  </div>
+
+  <!-- Redesigned High-Impact AI Bargain Capsule FAB Button -->
+  <button class="ai-bargain-fab" id="floatingAiConsultantBtn" type="button" onclick="toggleCustomerAiChat(true)" aria-label="AI bilan savdolashish va narxni tushirish" title="Narxni tushiring (AI bilan savdolashish)">
+    <span class="ai-fab-pulse"></span>
+    
+    <span class="ai-fab-avatar-wrap">
+      <img src="images/ai-consultant.jpg" alt="Malika, AI Savdo Maslahatchisi" class="ai-fab-avatar-img" onerror="this.style.display='none'; document.getElementById('aiFabAvatarSvgFallback').style.display='block';" />
+      <svg id="aiFabAvatarSvgFallback" class="ai-fab-avatar-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span class="ai-fab-pct-chip" title="Chegirma so'rash">%</span>
+      <span class="ai-fab-online-dot"></span>
+    </span>
+
+    <span class="ai-fab-text-wrap">
+      <span class="ai-fab-headline">
+        Narxni tushiring!
+        <span class="ai-fab-pill-badge">AI</span>
+      </span>
+      <span class="ai-fab-subtext">Savdolashib arzon oling</span>
+    </span>
   </button>
 
   <div class="modal-backdrop" id="customerAiModal" onclick="if(event.target === this) toggleCustomerAiChat(false);">
     <div class="modal-card ai-customer-modal-card">
       <div class="modal-header ai-modal-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div class="ai-avatar-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"></path>
-              <rect x="3" y="8" width="18" height="12" rx="4"></rect>
-              <circle cx="9" cy="14" r="1.5" fill="#facc15"></circle>
-              <circle cx="15" cy="14" r="1.5" fill="#facc15"></circle>
-              <path d="M9 18h6"></path>
-            </svg>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="ai-avatar-icon" style="overflow: hidden; padding: 0; border-radius: 50%; border: 2px solid #facc15; width: 40px; height: 40px;">
+            <img src="images/ai-consultant.jpg" alt="Malika AI" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';" />
           </div>
           <div>
-            <h3 style="font-family: var(--font-heading); font-size: 1.05rem; margin: 0; color: #fff;">Black Store AI Maslahatchi</h3>
+            <h3 style="font-family: var(--font-heading); font-size: 1.05rem; margin: 0; color: #fff;">Malika • Virtual Savdogar (AI)</h3>
             <span style="font-size: 0.75rem; color: #4ade80; display: flex; align-items: center; gap: 4px;">
-              <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block;"></span> 24/7 Do'kon bo'yicha maslahat
+              <span style="width: 6px; height: 6px; border-radius: 50%; background: #4ade80; display: inline-block;"></span> Online • Narxni kelishib, arzonroq oling!
             </span>
           </div>
         </div>
@@ -830,7 +846,7 @@
       <div class="ai-customer-messages" id="customerAiMessages">
         <div class="ai-chat-bubble ai-bubble-bot">
           <div class="ai-bubble-content">
-            Assalomu alaykum! Men Black Store virtual savdo maslahatchisiman. Apple mahsulotlari narxi, xususiyatlari yoki yetkazib berish bo'yicha savollaringizga mamnuniyat bilan javob beraman! 😊
+            Assalomu alaykum! Men Black Store virtual savdo maslahatchisiman. Do‘kondagi istalgan mahsulotimiz narxini men bilan savdolashib, arzonroqqa kelishib olishingiz mumkin! 😊 Qaysi tovar sizni qiziqtiryapti?
           </div>
         </div>
       </div>
@@ -858,10 +874,10 @@
   <!-- ==========================================================================
        SCRIPTS (PURE SVG ICONS + DATA + LOGIC - Cache-busted)
        ========================================================================== -->
-  <script src="js/icons.js?v=7.9"></script>
-  <script src="js/products-data.js?v=7.9"></script>
-  <script src="js/app.js?v=7.9"></script>
-  <script src="js/mobile-lock.js?v=7.9"></script>
+  <script src="js/icons.js?v=8.0"></script>
+  <script src="js/products-data.js?v=8.0"></script>
+  <script src="js/app.js?v=8.0"></script>
+  <script src="js/mobile-lock.js?v=8.0"></script>
 
   <!-- Inject Static Vector Icons into Placeholders -->
   <script>
