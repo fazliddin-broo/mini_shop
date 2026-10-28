@@ -3611,20 +3611,25 @@ function closeReviewsModal() {
 }
 
 // ==========================================================================
-// CUSTOMER AI CONSULTANT CHAT LOGIC (VIRTUAL SELLER)
+// CUSTOMER AI CONSULTANT CHAT LOGIC (VIRTUAL SELLER - SMOOTH & STABLE)
 // ==========================================================================
 function toggleCustomerAiChat(open) {
   const modal = document.getElementById('customerAiModal');
   if (!modal) return;
+
   if (open) {
-    if (typeof dismissAiBubble === 'function') dismissAiBubble();
     modal.classList.add('active');
     document.body.classList.add('ai-chat-open');
     const messagesBox = document.getElementById('customerAiMessages');
+    const input = document.getElementById('customerAiInput');
     if (messagesBox) {
       setTimeout(() => {
         messagesBox.scrollTop = messagesBox.scrollHeight;
-      }, 60);
+      }, 50);
+    }
+    // Faqat sichqoncha (desktop) bo'lsa avtomatik fokus qilamiz
+    if (input && window.innerWidth >= 768) {
+      setTimeout(() => { input.focus(); }, 120);
     }
   } else {
     modal.classList.remove('active');
@@ -3633,6 +3638,16 @@ function toggleCustomerAiChat(open) {
     if (input) input.blur();
   }
 }
+
+// ESC bosilganda AI chatni yopish
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('customerAiModal');
+    if (modal && modal.classList.contains('active')) {
+      toggleCustomerAiChat(false);
+    }
+  }
+});
 
 function sendQuickAiPrompt(text) {
   const input = document.getElementById('customerAiInput');
@@ -3759,74 +3774,5 @@ window.handleCustomerAiSend = handleCustomerAiSend;
 window.retryAiMessage = retryAiMessage;
 window.acceptAiDeal = acceptAiDeal;
 
-// ==========================================================================
-// AI BARGAIN FAB & SPEECH BUBBLE CONTROLS
-// ==========================================================================
-function dismissAiBubble() {
-  const bubble = document.getElementById('aiBargainBubble');
-  if (bubble) bubble.classList.remove('is-visible');
-  try {
-    sessionStorage.setItem('bs_ai_bargain_bubble_seen', '1');
-  } catch (e) {}
-}
-
-function initAiBargainFab() {
-  const fab = document.getElementById('floatingAiConsultantBtn');
-  const bubble = document.getElementById('aiBargainBubble');
-  if (!fab) return;
-
-  // 1. Scroll listener: compact when scrolling down, expand when scrolling up
-  let lastScrollY = window.scrollY;
-  let scrollTimeout = null;
-
-  window.addEventListener('scroll', () => {
-    const currentY = window.scrollY;
-    const diff = currentY - lastScrollY;
-
-    if (Math.abs(diff) > 8) {
-      if (currentY > lastScrollY && currentY > 100) {
-        fab.classList.add('is-compact');
-      } else {
-        fab.classList.remove('is-compact');
-      }
-      lastScrollY = currentY;
-    }
-
-    if (scrollTimeout) clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      if (window.scrollY < 200) {
-        fab.classList.remove('is-compact');
-      }
-    }, 1200);
-  }, { passive: true });
-
-  // 2. Speech Bubble display (gentle, unannoying, once per session)
-  let seen = false;
-  try {
-    seen = !!sessionStorage.getItem('bs_ai_bargain_bubble_seen');
-  } catch (e) {}
-
-  if (!seen && bubble) {
-    setTimeout(() => {
-      const modal = document.getElementById('customerAiModal');
-      if (modal && modal.classList.contains('active')) return;
-      bubble.classList.add('is-visible');
-    }, 2800);
-
-    setTimeout(() => {
-      dismissAiBubble();
-    }, 11500);
-  }
-}
-
-// Boot AI bargain fab controls
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initAiBargainFab);
-} else {
-  initAiBargainFab();
-}
-
-window.dismissAiBubble = dismissAiBubble;
-window.initAiBargainFab = initAiBargainFab;
 
 

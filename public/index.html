@@ -42,7 +42,7 @@
   </script>
 
   <!-- CSS Stylesheet (Cache-busted) -->
-  <link rel="stylesheet" href="css/style.css?v=8.0" />
+  <link rel="stylesheet" href="css/style.css?v=8.2" />
 </head>
 <body>
 
@@ -790,37 +790,26 @@
   <!-- ==========================================================================
        AI CONSULTANT FLOATING BUTTON & CHAT MODAL (VIRTUAL SELLER)
        ========================================================================== -->
-  <!-- Floating Speech Bubble Tooltip -->
-  <div class="ai-bargain-bubble" id="aiBargainBubble" onclick="toggleCustomerAiChat(true)" role="tooltip">
-    <button type="button" class="ai-bubble-close-btn" id="aiBubbleCloseBtn" onclick="event.stopPropagation(); dismissAiBubble();" aria-label="Yopish">×</button>
-    <div class="ai-bubble-content-wrap">
-      <div class="ai-bubble-badge-row">
-        <span class="ai-bubble-badge">🤝 Jonli Savdolashish</span>
-      </div>
-      <div class="ai-bubble-msg">Narx qimmat tuyuldimi? Men bilan savdolashing, tushirib beraman!</div>
-    </div>
-  </div>
-
-  <!-- Redesigned High-Impact AI Bargain Capsule FAB Button -->
-  <button class="ai-bargain-fab" id="floatingAiConsultantBtn" type="button" onclick="toggleCustomerAiChat(true)" aria-label="AI bilan savdolashish va narxni tushirish" title="Narxni tushiring (AI bilan savdolashish)">
-    <span class="ai-fab-pulse"></span>
-    
+  <!-- ==========================================================================
+       AI CONSULTANT FLOATING BUTTON & CHAT MODAL (VIRTUAL SELLER - BIR BUTUN QISM)
+       ========================================================================== -->
+  <!-- Bir butun, doimiy, silliq va qotmaydigan AI Savdogar suzuvchi tugmasi -->
+  <button class="ai-bargain-fab" id="floatingAiConsultantBtn" type="button" onclick="toggleCustomerAiChat(true)" aria-label="AI Savdogar bilan narxni tushirish va savdolashish" title="AI Savdogar • Narxni tushiring">
     <span class="ai-fab-avatar-wrap">
-      <img src="images/ai-consultant.jpg" alt="Malika, AI Savdo Maslahatchisi" class="ai-fab-avatar-img" onerror="this.style.display='none'; document.getElementById('aiFabAvatarSvgFallback').style.display='block';" />
+      <img src="images/ai-consultant.jpg" alt="Malika AI" class="ai-fab-avatar-img" onerror="this.style.display='none'; document.getElementById('aiFabAvatarSvgFallback').style.display='block';" />
       <svg id="aiFabAvatarSvgFallback" class="ai-fab-avatar-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
         <circle cx="12" cy="7" r="4"></circle>
       </svg>
-      <span class="ai-fab-pct-chip" title="Chegirma so'rash">%</span>
-      <span class="ai-fab-online-dot"></span>
+      <span class="ai-fab-online-dot" title="Online"></span>
     </span>
 
     <span class="ai-fab-text-wrap">
       <span class="ai-fab-headline">
-        Narxni tushiring!
+        <span>AI Savdogar</span>
         <span class="ai-fab-pill-badge">AI</span>
       </span>
-      <span class="ai-fab-subtext">Savdolashib arzon oling</span>
+      <span class="ai-fab-subtext">Narxni tushiring</span>
     </span>
   </button>
 
@@ -874,10 +863,10 @@
   <!-- ==========================================================================
        SCRIPTS (PURE SVG ICONS + DATA + LOGIC - Cache-busted)
        ========================================================================== -->
-  <script src="js/icons.js?v=8.0"></script>
-  <script src="js/products-data.js?v=8.0"></script>
-  <script src="js/app.js?v=8.0"></script>
-  <script src="js/mobile-lock.js?v=8.0"></script>
+  <script src="js/icons.js?v=8.2"></script>
+  <script src="js/products-data.js?v=8.2"></script>
+  <script src="js/app.js?v=8.2"></script>
+  <script src="js/mobile-lock.js?v=8.2"></script>
 
   <!-- Inject Static Vector Icons into Placeholders -->
   <script>
