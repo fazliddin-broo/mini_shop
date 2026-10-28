@@ -74,8 +74,7 @@ class TelegramAdminBot {
     return {
       keyboard: [
         [{ text: "🏷 Mahsulot va minimal narxlarni o'zgartirish" }],
-        [{ text: "➕ Yangi mahsulot qo'shish" }],
-        [{ text: "📋 Tovar va qoldiqlar ro'yxati" }, { text: "📊 Do'kon statistikasi" }]
+        [{ text: "➕ Yangi mahsulot qo'shish" }]
       ],
       resize_keyboard: true
     };
@@ -170,13 +169,11 @@ class TelegramAdminBot {
             if (t === '/start' || t === '/help') {
               const welcome = `Assalomu alaykum, hurmatli do‘kon egasi! 👑\n\n` +
                 `Men sizning shaxsiy <b>AI Admin Yordamchingizman</b>. Menga oddiy odamdek erkin o‘zbek tilida yozishingiz mumkin:\n\n` +
-                `📌 <b>Nimalar qila olaman?</b>\n` +
-                `• <b>Narx va Minimal savdo narxini o‘zgartirish:</b>\n` +
+                `📌 <b>Asosiy vazifalarim:</b>\n` +
+                `• <b>Narx va Minimal narxlarni o‘zgartirish:</b>\n` +
                 `  <i>«Asus expertbook sotuv narxini 3 300 000, minimalini 3 200 000 qil»</i>\n\n` +
                 `• <b>Yangi mahsulot qo‘shish:</b>\n` +
                 `  <i>«Yangi tovar: iPhone 16 Pro 256GB Desert, narxi 1400$, min narxi 1350$, qoldiq 5 ta»</i> (rasm bilan birga yuborishingiz ham mumkin)\n\n` +
-                `• <b>Do‘kon tovarlari va qoldiqlari haqida so‘rash:</b>\n` +
-                `  <i>«Do‘konda nechta noutbuk bor?», «Eng qimmat tovar qaysi?»</i>\n\n` +
                 `Quyidagi tugmalardan foydalanishingiz yoki to‘g‘ridan-to‘g‘ri yozishingiz mumkin:`;
 
               await this.sendMessage(chatId, welcome, {
@@ -184,67 +181,6 @@ class TelegramAdminBot {
                 reply_markup: this.getMainKeyboard()
               });
               continue;
-            }
-
-            // Tovar va qoldiqlar ro'yxati
-            if (t.includes('tovar va qoldiqlar') || t.includes('mahsulotlar ro\'yxati') || t === '/products') {
-              try {
-                const products = await this.assistant.db.getAllProducts();
-                if (!products || products.length === 0) {
-                  await this.sendMessage(chatId, "Do'konda hali mahsulotlar mavjud emas.", {
-                    reply_markup: this.getMainKeyboard()
-                  });
-                  continue;
-                }
-
-                let listMsg = `📋 <b>DO‘KON TOVARLARI VA QOLDIQLARI:</b>\n\n`;
-                products.slice(0, 15).forEach((p, idx) => {
-                  const price = Number(p.price || 0).toLocaleString('uz-UZ');
-                  const minP = Number(p.minPrice || p.price || 0).toLocaleString('uz-UZ');
-                  listMsg += `${idx + 1}. <b>${p.name || p.title}</b>\n` +
-                             `   💰 Sotuv: <b>${price} so'm</b> | 📉 Min: <b>${minP} so'm</b>\n` +
-                             `   📦 Qoldiq: <b>${p.stock || 0} ta</b>\n\n`;
-                });
-
-                if (products.length > 15) {
-                  listMsg += `<i>...va yana ${products.length - 15} ta tovar mavjud.</i>\n\n`;
-                }
-
-                listMsg += `💡 <i>Istalgan tovar narxini o‘zgartirish uchun nomini va yangi narxini yozing.</i>`;
-
-                await this.sendMessage(chatId, listMsg, {
-                  parse_mode: 'HTML',
-                  reply_markup: this.getMainKeyboard()
-                });
-                continue;
-              } catch (e) {
-                console.error('List products error:', e);
-              }
-            }
-
-            // Statistika
-            if (t.includes('do\'kon statistikasi') || t.includes('statistika') || t === '/stats') {
-              try {
-                const products = await this.assistant.db.getAllProducts();
-                const totalCount = products.length;
-                const totalStock = products.reduce((acc, p) => acc + (Number(p.stock) || 0), 0);
-                const outOfStock = products.filter(p => !p.stock || p.stock <= 0).length;
-
-                const stats = `📊 <b>DO‘KON STATISTIKASI:</b>\n\n` +
-                              `📦 Mahsulot turlari: <b>${totalCount} ta</b>\n` +
-                              `🔢 Ombordagi umumiy qoldiq: <b>${totalStock} dona</b>\n` +
-                              `⚠️ Qoldig‘i tugaganlar: <b>${outOfStock} ta</b>\n` +
-                              `🤖 AI Admin va Sotuvchi: <b>Faol (Dual-AI 100% Online)</b>\n` +
-                              `🛡 Boshqaruvchi: <b>Admin (#${this.adminId})</b>`;
-
-                await this.sendMessage(chatId, stats, {
-                  parse_mode: 'HTML',
-                  reply_markup: this.getMainKeyboard()
-                });
-                continue;
-              } catch (e) {
-                console.error('Stats error:', e);
-              }
             }
 
             // Narxlarni o'zgartirish tugmasi bosilganda
