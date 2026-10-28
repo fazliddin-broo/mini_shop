@@ -82,26 +82,116 @@ function getDefaultProductImage(category = '', brand = '') {
 
 function cleanAiResponseText(text) {
   let cleaned = String(text || '').trim();
-  // Filter out internal monologue like "Tushundim. Bu foydalanuvchi bilan birinchi marta gaplashish."
   cleaned = cleaned.replace(/^(?:Tushundim\.|Xo'sh,|Albatta,|O'ylashimcha,)[^\n]*\n+/i, '').trim();
   return cleaned;
 }
 
-// ── LOCAL SMART PARSER FALLBACK (High Reliability) ──────────
+// ── DUAL AI ENGINE: OPENAI GPT-4o-mini + GOOGLE GEMINI FLASH ─
+async function callDualAi(prompt, systemInstruction = '') {
+  const openAiKey = (process.env.OPENAI_API_KEY || '').trim();
+  const fallbackGeminiKey = Buffer.from('QVEuQWI4Uk42Sk8xSXB2NG1YZy1sdVNnMVZ3QWVJM0lyakZRbW0wU2pydVlLdWJXNF8ycnc=', 'base64').toString('utf8');
+  const geminiKey = (process.env.GEMINI_API_KEY || fallbackGeminiKey).trim();
+
+  // 1. PRIMARY: OpenAI GPT-4o-mini (Tezkor, barqaror, 0 uzilish)
+  if (openAiKey && openAiKey.startsWith('sk-')) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 12000);
+
+      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${openAiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemInstruction },
+            { role: 'user', content: prompt }
+          ],
+          temperature: 0.35,
+          max_tokens: 1500
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+
+      if (res.ok) {
+        const data = await res.json();
+        const text = data?.choices?.[0]?.message?.content || '';
+        if (text) return cleanAiResponseText(text);
+      } else {
+        const errTxt = await res.text();
+        console.warn('⚠️ OpenAI GPT-4o-mini xatolik:', res.status, errTxt.substring(0, 100));
+      }
+    } catch (e) {
+      console.warn('⚠️ OpenAI GPT ulanish xatosi, Gemini ga o‘tilmoqda:', e.message);
+    }
+  }
+
+  // 2. SECONDARY: Google Gemini Flash
+  if (geminiKey) {
+    const geminiModels = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-flash-latest'];
+    for (const model of geminiModels) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 12000);
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
+        const payload = {
+          contents: [{ parts: [{ text: prompt }] }]
+        };
+        if (systemInstruction) {
+          payload.systemInstruction = { parts: [{ text: systemInstruction }] };
+        }
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+
+        if (res.ok) {
+          const data = await res.json();
+          const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (text) return cleanAiResponseText(text);
+        }
+      } catch (err) {
+        console.warn(`⚠️ Gemini (${model}) xatolik:`, err.message);
+      }
+    }
+  }
+
+  throw new Error('AI xizmatlariga ulanib bo‘lmadi.');
+}
+
+// ── LOCAL SMART PARSER (Zaxira tezyurar tahlilchi) ──────────
 function parsePriceIntentLocally(text, allProducts) {
   const clean = text.toLowerCase();
   const cleanNum = s => s ? parseInt(s.replace(/[\s\.\,]/g, ''), 10) : null;
 
-  // Extract prices
-  const priceMatch = clean.match(/narxi(?:ni)?\s*([0-9\s]{5,15})(?:qilib|qil|bo'lsin|so'm)/i);
-  const minPriceMatch = clean.match(/minimal[^\d]*?([0-9\s]{5,15})(?:qilib|qil|bo'lsin|so'm)/i);
+  // Narxlarni ajratib olish (so'm, mln, k)
+  let priceVal = null;
+  let minPriceVal = null;
 
-  const priceVal = priceMatch ? cleanNum(priceMatch[1]) : null;
-  const minPriceVal = minPriceMatch ? cleanNum(minPriceMatch[1]) : null;
+  // Regex 1: "narxini X va minimal narxini Y qil"
+  const fullMatch = clean.match(/narxi(?:ni)?\s*([0-9\s\.\,]{4,15})\s*(?:qilib|qil|bo'lsin|so'm)?.*?(?:va\s+)?minimal[^\d]*?([0-9\s\.\,]{4,15})/i);
+  if (fullMatch) {
+    priceVal = cleanNum(fullMatch[1]);
+    minPriceVal = cleanNum(fullMatch[2]);
+  } else {
+    const pM = clean.match(/narxi(?:ni)?\s*([0-9\s\.\,]{5,15})/i);
+    const mM = clean.match(/minimal[^\d]*?([0-9\s\.\,]{5,15})/i);
+    if (pM) priceVal = cleanNum(pM[1]);
+    if (mM) minPriceVal = cleanNum(mM[1]);
+  }
 
   if (!priceVal && !minPriceVal) return null;
 
-  // Find product by keyword overlap
+  // Eng yaqin mahsulotni topish
   let bestProd = null;
   let bestScore = 0;
 
@@ -110,8 +200,9 @@ function parsePriceIntentLocally(text, allProducts) {
     const words = prodName.split(/\s+/).filter(w => w.length > 2);
     let score = 0;
     for (const w of words) {
-      if (clean.includes(w)) score++;
+      if (clean.includes(w)) score += 2;
     }
+    if (clean.includes(prodName)) score += 10;
     if (score > bestScore) {
       bestScore = score;
       bestProd = p;
@@ -129,70 +220,10 @@ function parsePriceIntentLocally(text, allProducts) {
   return null;
 }
 
-// ── GEMINI API CALLER WITH MULTI-MODEL FALLBACK ────────────
-async function callGeminiApi(prompt, systemInstruction = '', apiKey = null) {
-  const fallbackKey = Buffer.from('QVEuQWI4Uk42Sk8xSXB2NG1YZy1sdVNnMVZ3QWVJM0lyakZRbW0wU2pydVlLdWJXNF8ycnc=', 'base64').toString('utf8');
-  const geminiKey = (apiKey || process.env.GEMINI_API_KEY || fallbackKey).trim();
-  if (!geminiKey) {
-    throw new Error('GEMINI_API_KEY belgilanmagan!');
-  }
-
-  const models = [
-    'gemini-3-flash-preview',
-    'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite-preview',
-    'gemini-2.5-flash'
-  ];
-  let lastErr = null;
-
-  for (const model of models) {
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${geminiKey}`;
-      const payload = {
-        contents: [
-          {
-            parts: [{ text: prompt }]
-          }
-        ]
-      };
-
-      if (systemInstruction) {
-        payload.systemInstruction = {
-          parts: [{ text: systemInstruction }]
-        };
-      }
-
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 18000);
-
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal
-      });
-      clearTimeout(timer);
-
-      const data = await res.json();
-      if (data.error) {
-        lastErr = new Error(`Gemini API (${model}) error: ${data.error.message || JSON.stringify(data.error)}`);
-        continue;
-      }
-
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-      if (text) return cleanAiResponseText(text);
-    } catch (err) {
-      lastErr = err;
-    }
-  }
-
-  throw lastErr || new Error('Barcha AI modellari band.');
-}
-
 // ── CORE AI ADMIN ASSISTANT ORCHESTRATOR ───────────────────
 class AiAdminAssistant {
   constructor(dbHelpers) {
-    this.db = dbHelpers; // { getAllProducts, getProductById, updateProduct, deleteProduct, createProduct }
+    this.db = dbHelpers;
   }
 
   async processAdminMessage({ text = '', imageUrl = null, adminUser = 'Admin', channel = 'telegram', sessionId = 'default' }) {
@@ -201,14 +232,14 @@ class AiAdminAssistant {
     const lowerText = trimmedText.toLowerCase();
 
     // ─────────────────────────────────────────────────────────────
-    // 1. CONFIRMATION HANDLING (Agar tasdiq kutayotgan harakat bo'lsa)
+    // 1. CONFIRMATION HANDLING (Tasdiqlash holati)
     // ─────────────────────────────────────────────────────────────
     if (session.pendingAction) {
       const isAffirmative = [
         'ha', 'xa', 'albatta', 'tasdiqlayman', 'bajar', 'ok', 'yes', 'mayli',
-        'shular', 'ha shular', 'shularmi hammasi ha', 'ha bazaga', 'ha bazaga qo\'shilsin',
-        'ha qoshilsin', 'ha qo\'shilsin', 'ha o\'zgartirilsin', 'o\'zgartirilsin', 'qo\'shilsin',
-        '✅ ha, tasdiqlayman', '✅ ha, o\'zgartirilsin', '✅ ha, bazaga qo\'shilsin', '✅ ha'
+        'shular', 'ha shular', 'ha o\'zgartirilsin', 'o\'zgartirilsin', 'qo\'shilsin',
+        'ha bazaga qo\'shilsin', '✅ ha, o\'zgartirilsin', '✅ ha, bazaga qo\'shilsin', '✅ ha',
+        'tasdiq', 'tugat'
       ].some(k => lowerText === k || lowerText.includes(k));
 
       const isNegative = [
@@ -237,7 +268,7 @@ class AiAdminAssistant {
 
             if (!updated) {
               return {
-                reply: "⚠️ Mahsulotni o‘zgartirishda xatolik yuz berdi. O‘zgarish saqlanmadi.",
+                reply: "⚠️ Mahsulotni o‘zgartirishda xatolik yuz berdi. Iltimos, qayta urinib ko‘ring.",
                 status: 'error'
               };
             }
@@ -262,7 +293,10 @@ class AiAdminAssistant {
             });
 
             return {
-              reply: `✅ <b>Tayyor!</b> ${action.productName} narxi ${parts.join(' va ')}ga muvaffaqiyatli o‘zgartirildi.`,
+              reply: `✅ <b>Tayyor!</b> <b>${action.productName}</b> narxi muvaffaqiyatli o‘zgartirildi:\n\n` +
+                     (action.newPrice && action.newPrice !== 'KEEP' ? `💰 Yangi sotuv narxi: <b>${formatSum(action.newPrice)}</b>\n` : '') +
+                     (action.newMinPrice && action.newMinPrice !== 'KEEP' ? `📉 Yangi minimal narx: <b>${formatSum(action.newMinPrice)}</b>\n` : '') +
+                     `\n✨ <i>Mijozlar vitrinasida va savdo chatida narxlar darhol yangilandi.</i>`,
               status: 'completed',
               action: 'update_price',
               product: updated
@@ -311,12 +345,12 @@ class AiAdminAssistant {
             });
 
             return {
-              reply: `✅ <b>Muvaffaqiyatli qo‘shildi!</b>\n\n` +
-                     `🆕 <b>${created.name || created.title}</b> bazaga kiritildi.\n` +
+              reply: `🎉 <b>Yangi mahsulot bazaga muvaffaqiyatli qo‘shildi!</b>\n\n` +
+                     `📦 <b>${created.name || created.title}</b>\n` +
                      `🏷 Brend: <b>${created.brand}</b> | Toifa: <b>${created.category}</b>\n` +
                      `💰 Sotuv narxi: <b>${formatSum(created.price)}</b>\n` +
                      `📉 Minimal narx: <b>${formatSum(created.minPrice)}</b>\n` +
-                     `📦 Qoldiq: <b>${created.stock} ta</b>\n` +
+                     `🔢 Ombordagi qoldiq: <b>${created.stock} ta</b>\n` +
                      `🆔 ID: <code>${created.id}</code>`,
               status: 'completed',
               action: 'create_product',
@@ -336,32 +370,23 @@ class AiAdminAssistant {
         session.pendingAction = null;
         session.mode = 'idle';
         return {
-          reply: "❌ Bekor qilindi. Baza o‘zgarishsiz qoldi.",
+          reply: "❌ Bekor qilindi. Baza o‘zgarishsiz qoldi. Yana qanday yordam bera olaman?",
           status: 'cancelled'
         };
       }
 
-      // If in create_product confirmation, and user uploads image or extra info instead of saying yes/no
-      if (session.pendingAction.type === 'create_product') {
+      // Agar rasm yuborilsa
+      if (session.pendingAction.type === 'create_product' && imageUrl) {
         const prod = session.pendingAction.productData;
-        if (imageUrl) {
-          prod.image = imageUrl;
-          prod.images = [imageUrl];
-        }
-        if (trimmedText) {
-          // If user gives more info, append or refine description
-          prod.description = (prod.description ? (prod.description + ' | ') : '') + trimmedText;
-        }
+        prod.image = imageUrl;
+        prod.images = [imageUrl];
 
         return {
-          reply: `Yangi mahsulot ma’lumotlari yangilandi:\n\n` +
-                 `🆕 Nomi: <b>${prod.name}</b>\n` +
-                 `🏷 Brend: <b>${prod.brand}</b> | Toifa: <b>${prod.category}</b>\n` +
+          reply: `📸 Rasm biriktirildi!\n\n` +
+                 `📦 Nomi: <b>${prod.name}</b>\n` +
                  `💰 Sotuv narxi: <b>${formatSum(prod.price)}</b>\n` +
-                 `📉 Minimal narx: <b>${formatSum(prod.minPrice)}</b>\n` +
-                 `📦 Qoldiq: <b>${prod.stock} ta</b>\n` +
-                 `🖼 Rasm: ${prod.image ? 'Yuklandi ✅' : 'Standart rasm'}\n\n` +
-                 `Shularmi hammasi? Bazaga qo‘shaymi?`,
+                 `📉 Minimal narx: <b>${formatSum(prod.minPrice)}</b>\n\n` +
+                 `Mahsulotni bazaga qo‘shaymi?`,
           status: 'create_confirmation_required',
           pending: session.pendingAction
         };
@@ -374,89 +399,60 @@ class AiAdminAssistant {
     const allProducts = await this.db.getAllProducts();
 
     // ─────────────────────────────────────────────────────────────
-    // 3. TRY LOCAL PARSING (Instant, Bulletproof for Spikes)
-    // ─────────────────────────────────────────────────────────────
-    const localParsed = parsePriceIntentLocally(trimmedText, allProducts || []);
-    if (localParsed) {
-      const p = localParsed.product;
-      session.pendingAction = {
-        type: 'update_price',
-        productId: p.id,
-        productName: p.name || p.title || 'Mahsulot',
-        oldPrice: p.price || 0,
-        oldMinPrice: p.minPrice || p.price || 0,
-        newPrice: localParsed.newPrice,
-        newMinPrice: localParsed.newMinPrice
-      };
-
-      const sotuvQatori = localParsed.newPrice !== 'KEEP' ? `💰 Sotuv narxi: ${formatSum(p.price)} ➡️ <b>${formatSum(localParsed.newPrice)}</b>\n` : '';
-      const minQatori = localParsed.newMinPrice !== 'KEEP' ? `📉 Minimal narx (AI tushib berishi mumkin bo'lgan chegara): ${formatSum(p.minPrice || p.price)} ➡️ <b>${formatSum(localParsed.newMinPrice)}</b>\n` : '';
-
-      return {
-        reply: `Men quyidagi mahsulotni topdim:\n\n` +
-               `📱 <b>${p.name || p.title}</b>\n` +
-               sotuvQatori +
-               minQatori +
-               `\nNarxlarni o‘zgartiraymi?`,
-        status: 'price_confirmation_required',
-        pending: session.pendingAction
-      };
-    }
-
-    // ─────────────────────────────────────────────────────────────
-    // 4. CALL GEMINI FOR NATURAL LANGUAGE REASONING
+    // 3. AI REASONING (OpenAI GPT-4o-mini / Gemini Flash)
     // ─────────────────────────────────────────────────────────────
     const catalogSummary = (allProducts || []).map(p => {
       const prodName = p.name || p.title || 'Nomsiz tovar';
-      const specsStr = Array.isArray(p.specs) ? p.specs.join(', ') : '';
-      return `[ID: ${p.id}] ${prodName} | Brend: ${p.brand || 'Boshqa'} | Kategoriya: ${p.category || ''} | Sotuv narxi: ${p.price || 0} so'm | Minimal narx: ${p.minPrice || p.price || 0} so'm | Qoldiq: ${p.stock || 0} ta | Xususiyatlar: ${specsStr}`;
+      return `[ID: ${p.id}] "${prodName}" | Brend: ${p.brand || 'Boshqa'} | Narx: ${p.price || 0} so'm | Min: ${p.minPrice || p.price || 0} so'm | Qoldiq: ${p.stock || 0} ta`;
     }).join('\n');
 
-    const systemPrompt = `Siz MiniShop do'konining aqlli, tajribali va do'stona O'zbek tilidagi AI Admin Yordamchisisiz.
-Magazin egasining erkin o'zbek tilidagi buyruqlarini tushunib, tovarlar bazasini boshqarasiz.
+    const systemPrompt = `Siz 'Black Store / MiniShop' do'koni egasining eng aqlli, erkin so'zlashuvchi va tajribali O'zbek tilidagi Shaxsiy AI Admin Yordamchisisiz.
+Admin sizga erkin o'zbek tilida (sleng, qisqartmalar, ruscha aralash) gapirsa ham darhol tushunasiz.
 
-DO'KON BAZASIDAGI BARCHA TOVARLAR RO'YXATI:
-${catalogSummary || "(Hozircha baza bo'sh)"}
+DO'KON BAZASIDAGI BARCHA MAHSULOTLAR RO'YXATI:
+${catalogSummary || "(Baza bo'sh)"}
 
-MUHIM QOIDALAR:
-1. SOTUV VA/YOKI MINIMAL NARXNI (minPrice - AI tushib berishi kerak bo'lgan narx) O'ZGARTIRISH:
-   Agar foydalanuvchi mavjud tovarning sotuv narxini, minimal narxini yoki ikkalasini o'zgartirishni aytsa:
-   - Tovarni ro'yxatdan toping.
-   - Birinchi qatorga FAQAT mana bu direktivani yozing:
+ASOSIY VAZIFALARINGIZ:
+1. NARXLARNI O'ZGARTIRISH (Sotuv narxi va Minimal savdolashuv narxi):
+   Foydalanuvchi mahsulot narxini o'zgartirishni so'raganda (masalan: "asus expertbookni narxini 3 300 000 qil va minimal narxni esa 3 200 000 qil" yoki "iphone 15 pro 14 mln bo'lsin, minimali 13.5 mln"):
+   - Tovarni ro'yxatdan eng to'g'ri nom/brend bo'yicha aniqlang.
+   - Birinchi qatorga FAQAT mana bu direktivani chiqaring:
      ACTION:PROPOSE_PRICE_UPDATE|<PRODUCT_ID>|<YANGI_SOTUV_NARXI_YOKI_KEEP>|<YANGI_MIN_NARXI_YOKI_KEEP>
-   (Masalan: ACTION:PROPOSE_PRICE_UPDATE|prod-106|3100000|3000000)
-   - Keyingi qatorlarda esa o'zbekcha yozing:
+   (Misol: ACTION:PROPOSE_PRICE_UPDATE|prod-106|3300000|3200000)
+   - Keyingi qatorlarda chiroyli, tushunarli o'zbekcha yozing:
      Men quyidagi mahsulotni topdim:
 
-     📱 [Tovar nomi]
-     💰 Yangi sotuv narxi: [Yangi sotuv narxi] so'm
-     📉 Yangi minimal narx: [Yangi minimal narx] so'm
+     📱 <b>[Mahsulot to'liq nomi]</b>
+     💰 Yangi sotuv narxi: <b>[Yangi sotuv narxi] so'm</b>
+     📉 Yangi minimal narx: <b>[Yangi minimal narx] so'm</b>
 
      Narxlarni o‘zgartiraymi?
 
 2. YANGI MAHSULOT QO'SHISH:
-   Agar foydalanuvchi yangi mahsulot ma'lumotlarini kiritsa:
-   - Birinchi qatorga FAQAT mana bu direktivani JSON ko'rinishida yozing:
-     ACTION:PROPOSE_CREATE_PRODUCT|{"name":"...","brand":"...","category":"...","price":...,"minPrice":...,"stock":...,"description":"...","specs":["..."]}
-   - Keyingi qatorlarda foydalanuvchidan tasdiq so'rang:
+   Foydalanuvchi yangi tovar kiritganda:
+   - Birinchi qatorga:
+     ACTION:PROPOSE_CREATE_PRODUCT|{"name":"...","brand":"...","category":"...","price":...,"minPrice":...,"stock":...,"description":"..."}
+   - Keyingi qatorda:
      Yangi mahsulot ma’lumotlarini tayyorladim:
+     📦 <b>[Nomi]</b>
+     💰 Sotuv narxi: <b>[Narx] so'm</b>
+     📉 Minimal narx: <b>[Min] so'm</b>
+     🔢 Qoldiq: <b>[Qoldiq] ta</b>
 
-     🆕 Nomi: [Nomi]
-     🏷 Brend: [Brend] | Toifa: [Toifa]
-     💰 Sotuv narxi: [Narx] so'm
-     📉 Minimal narx: [Min narx] so'm
-     📦 Qoldiq: [Qoldiq] ta
-     📝 Tavsif/Xususiyatlar: [Tavsif]
+     Bazaga qo‘shaymi?
 
-     Shularmi hammasi? Bazaga qo‘shaymi yoki yana biror ma’lumot (yoki rasm) qo‘shasizmi?
+3. MA'LUMOT SO'RALGANDA:
+   Agar admin tovarlar, qoldiqlar, narxlar yoki statistika haqida so'rasa (masalan: "asus narxi qancha?", "eng ko'p qolgan noutbuklar", "do'konda nimalar bor?"):
+   - Bazadagi ma'lumotlar asosida juda aniq, chiroyli va qisqa javob bering.
+   - Hech qanday robot shablonlarsiz, jonli yordamchi kabi gapiring.
 
-3. Qisqa salomlashilsa do'stona salom berib, 2 ta asosiy imkoniyatni ayting.
-4. Ichki monolog (masalan: "Tushundim. Bu foydalanuvchi...") yozmang, to'g'ridan-to'g'ri o'zbekcha javob bering.`;
+4. MUOMALA:
+   Doimo hurmat bilan, do'stona va aniq o'zbek tilida gapiring. Ortiqcha falsafa qilmang.`;
 
     try {
-      const aiReply = await callGeminiApi(`Foydalanuvchi xabari: "${trimmedText}"`, systemPrompt);
+      const aiReply = await callDualAi(`Admin xabari: "${trimmedText}"`, systemPrompt);
 
-      // --- 4.1 PRICE UPDATE DIRECTIVE ---
+      // --- 3.1 PRICE UPDATE DIRECTIVE ---
       if (aiReply.includes('ACTION:PROPOSE_PRICE_UPDATE|')) {
         const match = aiReply.match(/ACTION:PROPOSE_PRICE_UPDATE\|([^|\r\n]+)\|([^|\r\n]+)(?:\|([^|\r\n]+))?/);
         if (match) {
@@ -486,7 +482,7 @@ MUHIM QOIDALAR:
         }
       }
 
-      // --- 4.2 CREATE PRODUCT DIRECTIVE ---
+      // --- 3.2 CREATE PRODUCT DIRECTIVE ---
       if (aiReply.includes('ACTION:PROPOSE_CREATE_PRODUCT|')) {
         const lineMatch = aiReply.match(/ACTION:PROPOSE_CREATE_PRODUCT\|([^\r\n]+)/);
         if (lineMatch) {
@@ -494,20 +490,7 @@ MUHIM QOIDALAR:
           let parsedData = null;
           try {
             parsedData = JSON.parse(rawData);
-          } catch (e) {
-            const parts = rawData.split('|');
-            if (parts.length >= 3) {
-              parsedData = {
-                name: parts[0]?.trim(),
-                brand: parts[1]?.trim() || 'Boshqa',
-                category: parts[2]?.trim() || 'noutbuklar',
-                price: parseInt(parts[3]?.trim(), 10) || 0,
-                minPrice: parseInt(parts[4]?.trim(), 10) || parseInt(parts[3]?.trim(), 10) || 0,
-                stock: parseInt(parts[5]?.trim(), 10) || 10,
-                description: parts[6]?.trim() || parts[0]?.trim()
-              };
-            }
-          }
+          } catch (_) { }
 
           if (parsedData && parsedData.name) {
             if (imageUrl) {
@@ -536,10 +519,38 @@ MUHIM QOIDALAR:
       };
 
     } catch (err) {
-      console.warn("AI processing warning:", err.message);
+      console.warn("AI fallback ishga tushmoqda:", err.message);
+
+      // Local smart parser fallback
+      const localParsed = parsePriceIntentLocally(trimmedText, allProducts || []);
+      if (localParsed) {
+        const p = localParsed.product;
+        session.pendingAction = {
+          type: 'update_price',
+          productId: p.id,
+          productName: p.name || p.title || 'Mahsulot',
+          oldPrice: p.price || 0,
+          oldMinPrice: p.minPrice || p.price || 0,
+          newPrice: localParsed.newPrice,
+          newMinPrice: localParsed.newMinPrice
+        };
+
+        const sotuvQatori = localParsed.newPrice !== 'KEEP' ? `💰 Yangi sotuv narxi: <b>${formatSum(localParsed.newPrice)}</b>\n` : '';
+        const minQatori = localParsed.newMinPrice !== 'KEEP' ? `📉 Yangi minimal narx: <b>${formatSum(localParsed.newMinPrice)}</b>\n` : '';
+
+        return {
+          reply: `Men quyidagi mahsulotni topdim:\n\n` +
+                 `📱 <b>${p.name || p.title}</b>\n` +
+                 sotuvQatori +
+                 minQatori +
+                 `\nNarxlarni o‘zgartiraymi?`,
+          status: 'price_confirmation_required',
+          pending: session.pendingAction
+        };
+      }
 
       return {
-        reply: "Assalomu alaykum! Men MiniShop AI Yordamchingizman. Mahsulot va minimal narxlarni o‘zgartirish yoki yangi tovar qo‘shishda yordam beraman.",
+        reply: "Assalomu alaykum! Qanday yordam bera olaman? Masalan: <i>«Asus expertbook sotuv narxini 3 300 000, minimal narxini esa 3 200 000 qil»</i> deb yozishingiz mumkin.",
         status: 'greeting'
       };
     }
